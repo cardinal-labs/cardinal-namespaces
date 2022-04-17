@@ -13,8 +13,6 @@
 
 ## Background
 
-Cardinal staking encompasses a suite of contracts for issuing and staking NFTs and FTs. The simple program is a stake pool that tracks total stake duration. In addition, there is an implementation of a token minting reward distributor. Cardinal staking works well with any standard NFT collection and also composes with other programs in the Cardinal NFT infrastructure ecosystem.
-
 ## Packages
 
 | Package                | Description                   | Version                                                                                                             | Docs                                                                                                            |
