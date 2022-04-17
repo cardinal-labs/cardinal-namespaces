@@ -88,10 +88,8 @@ pub fn handler(ctx: Context<ClaimEntry>, ix: ClaimEntryIx) -> ProgramResult {
         if ctx.accounts.namespace.max_rental_seconds != None && ix.duration.unwrap() >= ctx.accounts.namespace.max_rental_seconds.unwrap() {
             return Err(ErrorCode::RentalDurationTooLarge.into());
         }
-    } else {
-        if ctx.accounts.namespace.max_rental_seconds != None {
-            return Err(ErrorCode::NamespaceRequiresDuration.into());
-        }
+    } else if ctx.accounts.namespace.max_rental_seconds != None {
+        return Err(ErrorCode::NamespaceRequiresDuration.into());
     }
 
     let namespace_seeds = &[NAMESPACE_PREFIX.as_bytes(), ctx.accounts.namespace.name.as_bytes(), &[ctx.accounts.namespace.bump]];
@@ -141,7 +139,7 @@ pub fn handler(ctx: Context<ClaimEntry>, ix: ClaimEntryIx) -> ProgramResult {
         bump: ix.certificate_bump,
         recipient: Some(ctx.accounts.user.key()),
         // payment -- as u64 floors the decimal payment
-        payment_amount: payment_amount,
+        payment_amount,
         payment_mint: Some(ctx.accounts.namespace.payment_mint),
         // time expiry
         duration: ix.duration,
@@ -172,5 +170,5 @@ pub fn handler(ctx: Context<ClaimEntry>, ix: ClaimEntryIx) -> ProgramResult {
     };
     let cpi_ctx = CpiContext::new(certificate_program, cpi_accounts);
     cardinal_certificate::cpi::claim_certificate(cpi_ctx)?;
-    return Ok(());
+    Ok(())
 }

@@ -47,11 +47,11 @@ pub fn handler(ctx: Context<UpdateEntryMintMetadataCtx>) -> ProgramResult {
         &[ctx.accounts.certificate_mint_metadata.to_account_info(), ctx.accounts.namespace.to_account_info()],
         namespace_signer,
     )?;
-    return Ok(());
+    Ok(())
 }
 
 pub fn assert_derivation(program_id: &Pubkey, account: &AccountInfo, path: &[&[u8]]) -> Result<u8> {
-    let (key, bump) = Pubkey::find_program_address(&path, program_id);
+    let (key, bump) = Pubkey::find_program_address(path, program_id);
     if key != *account.key {
         return Err(ErrorCode::InvalidEntry.into());
     }

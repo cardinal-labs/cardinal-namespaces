@@ -40,5 +40,5 @@ pub struct SetEntryData<'info> {
 pub fn handler(ctx: Context<SetEntryData>, data: Pubkey) -> ProgramResult {
     let entry = &mut ctx.accounts.entry;
     entry.data = Some(data);
-    return Ok(())
+    Ok(())
 }

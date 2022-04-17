@@ -27,5 +27,5 @@ pub fn handler(ctx: Context<InitializeGlobalNamespaceCtx>, ix: InitializeGlobalN
     global_context.update_authority = ctx.accounts.authority.key();
     global_context.rent_authority = ctx.accounts.authority.key();
     global_context.rent_percentage = ix.rent_percentage;
-    return Ok(());
+    Ok(())
 }

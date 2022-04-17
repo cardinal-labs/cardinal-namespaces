@@ -31,5 +31,5 @@ pub fn handler(ctx: Context<InvalidateManagedEntryCtx>) -> ProgramResult {
     let entry = &mut ctx.accounts.entry;
     entry.data = None;
     entry.is_claimed = false;
-    return Ok(())
+    Ok(())
 }

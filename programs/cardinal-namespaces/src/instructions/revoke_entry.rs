@@ -93,5 +93,5 @@ pub fn handler(ctx: Context<RevokeEntryCtx>) -> ProgramResult {
     let cpi_ctx = CpiContext::new(certificate_program, cpi_accounts).with_signer(namespace_signer);
     cardinal_certificate::cpi::revoke_certificate(cpi_ctx)?;
 
-    return Ok(())
+    Ok(())
 }

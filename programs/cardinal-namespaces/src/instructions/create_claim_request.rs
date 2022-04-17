@@ -28,5 +28,5 @@ pub fn handler(ctx: Context<CreateClaimRequestCtx>, entry_name: String, claim_re
     } else {
         claim_request.is_approved = true;
     }
-    return Ok(());
+    Ok(())
 }

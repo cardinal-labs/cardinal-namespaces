@@ -53,5 +53,5 @@ pub fn handler(ctx: Context<SetReverseEntryCtx>, reverse_entry_bump: u8) -> Prog
     reverse_entry.bump = reverse_entry_bump;
     reverse_entry.namespace_name = ctx.accounts.namespace.name.clone();
     reverse_entry.entry_name = entry.name.clone();
-    return Ok(())
+    Ok(())
 }

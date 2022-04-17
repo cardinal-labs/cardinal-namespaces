@@ -34,5 +34,5 @@ pub struct InvalidateManagedReverseEntryCtx<'info> {
 pub fn handler(ctx: Context<InvalidateManagedReverseEntryCtx>) -> ProgramResult {
     let entry = &mut ctx.accounts.entry;
     entry.reverse_entry = None;
-    return Ok(())
+    Ok(())
 }

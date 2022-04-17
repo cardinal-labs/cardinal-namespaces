@@ -36,5 +36,5 @@ pub fn handler(ctx: Context<UpdateNamepsace>, ix: UpdateNamespaceIx) -> ProgramR
     namespace.min_rental_seconds = ix.min_rental_seconds;
     namespace.max_rental_seconds = ix.max_rental_seconds;
     namespace.transferable_entries = ix.transferable_entries;
-    return Ok(());
+    Ok(())
 }

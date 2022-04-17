@@ -20,5 +20,5 @@ pub struct UpdateGlobalNamespaceCtx<'info> {
 pub fn handler(ctx: Context<UpdateGlobalNamespaceCtx>, rent_percentage: u64) -> ProgramResult {
     let global_context = &mut ctx.accounts.global_context;
     global_context.rent_percentage = rent_percentage;
-    return Ok(());
+    Ok(())
 }

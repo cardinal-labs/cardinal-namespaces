@@ -139,5 +139,5 @@ pub fn handler(ctx: Context<InitEntry>, ix: InitEntryIx) -> ProgramResult {
     };
     let cpi_ctx = CpiContext::new(certificate_program, cpi_accounts).with_signer(namespace_signer);
     cardinal_certificate::cpi::create_mint_manager(cpi_ctx, ix.mint_manager_bump)?;
-    return Ok(());
+    Ok(())
 }
