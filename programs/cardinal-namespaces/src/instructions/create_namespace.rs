@@ -1,7 +1,4 @@
-use {
-    crate::{state::*},
-    anchor_lang::{prelude::*,
-}};
+use {crate::state::*, anchor_lang::prelude::*};
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct CreateNamespaceIx {
@@ -50,5 +47,5 @@ pub fn handler(ctx: Context<CreateNamespace>, ix: CreateNamespaceIx) -> ProgramR
     namespace.max_rental_seconds = ix.max_rental_seconds;
     namespace.schema = ix.schema;
     namespace.transferable_entries = ix.transferable_entries;
-    return Ok(())
+    return Ok(());
 }

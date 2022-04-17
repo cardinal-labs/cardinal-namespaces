@@ -1,10 +1,10 @@
-use {
-    crate::{state::*, errors::*},
-    anchor_lang::{prelude::*}
-};
 use cardinal_certificate::{
     self,
     state::{Certificate, CertificateState},
+};
+use {
+    crate::{errors::*, state::*},
+    anchor_lang::prelude::*,
 };
 
 #[derive(Accounts)]
@@ -32,5 +32,5 @@ pub fn handler(ctx: Context<InvalidateUnmanagedEntryCtx>) -> ProgramResult {
     let entry = &mut ctx.accounts.entry;
     entry.data = None;
     entry.is_claimed = false;
-    return Ok(())
+    return Ok(());
 }

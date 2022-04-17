@@ -1,17 +1,17 @@
-use {
-    crate::{state::*, errors::*},
-    anchor_lang::{prelude::*,
-}};
 use anchor_spl::{
-    token::{Token, Mint},
-    associated_token::{self, AssociatedToken}
+    associated_token::{self, AssociatedToken},
+    token::{Mint, Token},
 };
 use cardinal_certificate::{
     self,
+    cpi::accounts::{ClaimCertificateCtx, IssueCertificateCtx},
     instructions::IssueCertificateIx,
-    state::{CertificateKind},
-    cpi::accounts::{IssueCertificateCtx, ClaimCertificateCtx},
-    program::{CardinalCertificate}
+    program::CardinalCertificate,
+    state::CertificateKind,
+};
+use {
+    crate::{errors::*, state::*},
+    anchor_lang::prelude::*,
 };
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
@@ -66,7 +66,7 @@ pub struct ClaimEntry<'info> {
     user_certificate_token_account: UncheckedAccount<'info>,
     #[account(mut)]
     user_payment_token_account: UncheckedAccount<'info>,
-    
+
     // programs
     certificate_program: Program<'info, CardinalCertificate>,
     token_program: Program<'info, Token>,
@@ -79,7 +79,7 @@ pub fn handler(ctx: Context<ClaimEntry>, ix: ClaimEntryIx) -> ProgramResult {
     let entry = &mut ctx.accounts.entry;
     entry.data = Some(ctx.accounts.user.key());
     entry.is_claimed = true;
-    
+
     // duration checks
     if ix.duration != None {
         if ix.duration.unwrap() <= ctx.accounts.namespace.min_rental_seconds {
@@ -116,7 +116,7 @@ pub fn handler(ctx: Context<ClaimEntry>, ix: ClaimEntryIx) -> ProgramResult {
     // issue certificate
     let certificate_program = ctx.accounts.certificate_program.to_account_info();
     let cpi_accounts = IssueCertificateCtx {
-        mint_manager: ctx.accounts.mint_manager.to_account_info(), 
+        mint_manager: ctx.accounts.mint_manager.to_account_info(),
         certificate: ctx.accounts.certificate.to_account_info(),
         certificate_mint: ctx.accounts.certificate_mint.to_account_info(),
         certificate_token_account: ctx.accounts.certificate_token_account.to_account_info(),
@@ -128,12 +128,16 @@ pub fn handler(ctx: Context<ClaimEntry>, ix: ClaimEntryIx) -> ProgramResult {
     };
     let mut payment_amount: Option<u64> = None;
     if ix.duration != None {
-        payment_amount = Some((ctx.accounts.namespace.payment_amount_daily as f64 * (ix.duration .unwrap() as f64) / (60*60*24) as f64) as u64);
+        payment_amount = Some((ctx.accounts.namespace.payment_amount_daily as f64 * (ix.duration.unwrap() as f64) / (60 * 60 * 24) as f64) as u64);
     }
     let create_certificate_ix = IssueCertificateIx {
         // basic
         amount: 1,
-        kind: if ctx.accounts.namespace.transferable_entries { CertificateKind::Unmanaged as u8 } else { CertificateKind::Managed as u8 },
+        kind: if ctx.accounts.namespace.transferable_entries {
+            CertificateKind::Unmanaged as u8
+        } else {
+            CertificateKind::Managed as u8
+        },
         bump: ix.certificate_bump,
         recipient: Some(ctx.accounts.user.key()),
         // payment -- as u64 floors the decimal payment
@@ -168,5 +172,5 @@ pub fn handler(ctx: Context<ClaimEntry>, ix: ClaimEntryIx) -> ProgramResult {
     };
     let cpi_ctx = CpiContext::new(certificate_program, cpi_accounts);
     cardinal_certificate::cpi::claim_certificate(cpi_ctx)?;
-    return Ok(())
+    return Ok(());
 }

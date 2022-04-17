@@ -1,9 +1,7 @@
+use anchor_spl::token::{self, Token, TokenAccount, Transfer};
 use {
-    crate::{state::*, errors::*},
-    anchor_lang::{prelude::*,
-}};
-use anchor_spl::{
-    token::{self, Transfer, TokenAccount, Token},
+    crate::{errors::*, state::*},
+    anchor_lang::prelude::*,
 };
 
 #[derive(Accounts)]
@@ -57,5 +55,5 @@ pub fn handler(ctx: Context<CollectNamespaceFundsCtx>, amount: u64) -> ProgramRe
     let cpi_program = ctx.accounts.token_program.to_account_info();
     let cpi_context = CpiContext::new(cpi_program, cpi_accounts).with_signer(namespace_signer);
     token::transfer(cpi_context, global_namespace_payment)?;
-    return Ok(())
+    return Ok(());
 }

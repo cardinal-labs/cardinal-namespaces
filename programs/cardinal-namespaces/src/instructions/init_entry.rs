@@ -1,17 +1,13 @@
-use {
-    crate::{state::*},
-    anchor_lang::{prelude::*, solana_program::{program::{invoke_signed}}}
-};
 use anchor_spl::{
+    associated_token::{self, AssociatedToken},
     token::{self, Token},
-    associated_token::{self, AssociatedToken}
 };
-use cardinal_certificate::{
-    self,
-    cpi::accounts::{CreateMintManagerCtx},
-    program::{CardinalCertificate}
+use cardinal_certificate::{self, cpi::accounts::CreateMintManagerCtx, program::CardinalCertificate};
+use metaplex_token_metadata::instruction::create_metadata_accounts;
+use {
+    crate::state::*,
+    anchor_lang::{prelude::*, solana_program::program::invoke_signed},
 };
-use metaplex_token_metadata::{instruction::{create_metadata_accounts}};
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct InitEntryIx {
@@ -44,7 +40,7 @@ pub struct InitEntry<'info> {
     mint_manager: UncheckedAccount<'info>,
     #[account(mut)]
     certificate_mint: UncheckedAccount<'info>,
-    #[account(mut)]  
+    #[account(mut)]
     certificate_mint_metadata: UncheckedAccount<'info>,
 
     // programs
@@ -85,7 +81,7 @@ pub fn handler(ctx: Context<InitEntry>, ix: InitEntryIx) -> ProgramResult {
             *ctx.accounts.certificate_mint.key,
             ctx.accounts.namespace.key(),
             *ctx.accounts.payer.key,
-            ctx.accounts.namespace.key(),   
+            ctx.accounts.namespace.key(),
             ix.name.clone() + "." + &ctx.accounts.namespace.name.to_string(),
             "NAME".to_string(),
             // generative URL which will inclde image of the name with expiration data
@@ -96,7 +92,7 @@ pub fn handler(ctx: Context<InitEntry>, ix: InitEntryIx) -> ProgramResult {
             true,
         ),
         &[
-            ctx.accounts.certificate_mint_metadata.to_account_info(), 
+            ctx.accounts.certificate_mint_metadata.to_account_info(),
             ctx.accounts.certificate_mint.to_account_info(),
             ctx.accounts.namespace.to_account_info(),
             ctx.accounts.payer.to_account_info(),
@@ -120,7 +116,7 @@ pub fn handler(ctx: Context<InitEntry>, ix: InitEntryIx) -> ProgramResult {
     let cpi_program = ctx.accounts.token_program.to_account_info();
     let cpi_context = CpiContext::new(cpi_program, cpi_accounts);
     associated_token::create(cpi_context)?;
-            
+
     // mint single token to namespace token account
     let cpi_accounts = token::MintTo {
         mint: ctx.accounts.certificate_mint.to_account_info(),
@@ -134,7 +130,7 @@ pub fn handler(ctx: Context<InitEntry>, ix: InitEntryIx) -> ProgramResult {
     // init certificate mint manager
     let certificate_program = ctx.accounts.certificate_program.to_account_info();
     let cpi_accounts = CreateMintManagerCtx {
-        mint_manager: ctx.accounts.mint_manager.to_account_info(), 
+        mint_manager: ctx.accounts.mint_manager.to_account_info(),
         mint: ctx.accounts.certificate_mint.to_account_info(),
         freeze_authority: ctx.accounts.namespace.to_account_info(),
         payer: ctx.accounts.payer.to_account_info(),
@@ -143,5 +139,5 @@ pub fn handler(ctx: Context<InitEntry>, ix: InitEntryIx) -> ProgramResult {
     };
     let cpi_ctx = CpiContext::new(certificate_program, cpi_accounts).with_signer(namespace_signer);
     cardinal_certificate::cpi::create_mint_manager(cpi_ctx, ix.mint_manager_bump)?;
-    return Ok(())
+    return Ok(());
 }

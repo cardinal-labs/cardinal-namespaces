@@ -1,7 +1,4 @@
-use {
-    crate::{state::*},
-    anchor_lang::{prelude::*}
-};
+use {crate::state::*, anchor_lang::prelude::*};
 
 #[derive(Accounts)]
 #[instruction(entry_name: String, claim_request_bump: u8, user: Pubkey)]
@@ -31,5 +28,5 @@ pub fn handler(ctx: Context<CreateClaimRequestCtx>, entry_name: String, claim_re
     } else {
         claim_request.is_approved = true;
     }
-    return Ok(())
+    return Ok(());
 }

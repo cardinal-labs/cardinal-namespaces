@@ -1,9 +1,7 @@
+use anchor_spl::token::{self, Token, TokenAccount, Transfer};
 use {
-    crate::{state::*, errors::*},
-    anchor_lang::{prelude::*,
-}};
-use anchor_spl::{
-    token::{self, Transfer, TokenAccount, Token},
+    crate::{errors::*, state::*},
+    anchor_lang::prelude::*,
 };
 
 #[derive(Accounts)]
@@ -39,5 +37,5 @@ pub fn handler(ctx: Context<CollectGlobalFundsCtx>, amount: u64) -> ProgramResul
     let cpi_program = ctx.accounts.token_program.to_account_info();
     let cpi_context = CpiContext::new(cpi_program, cpi_accounts).with_signer(global_context_signer);
     token::transfer(cpi_context, amount)?;
-    return Ok(())
+    return Ok(());
 }

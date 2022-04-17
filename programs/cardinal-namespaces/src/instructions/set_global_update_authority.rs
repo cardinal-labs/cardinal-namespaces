@@ -1,7 +1,7 @@
 use {
-    crate::{state::*, errors::*},
-    anchor_lang::{prelude::*,
-}};
+    crate::{errors::*, state::*},
+    anchor_lang::prelude::*,
+};
 
 #[derive(Accounts)]
 pub struct SetGlobalNamespaceUpdateAuthorityCtx<'info> {

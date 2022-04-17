@@ -1,9 +1,8 @@
+use metaplex_token_metadata::{instruction::update_metadata_accounts, state::Data};
 use {
-    crate::{state::*, errors::*},
-    anchor_lang::{prelude::*, solana_program::{program::{invoke_signed}}}
+    crate::{errors::*, state::*},
+    anchor_lang::{prelude::*, solana_program::program::invoke_signed},
 };
-use metaplex_token_metadata::{instruction::{update_metadata_accounts}, state::{Data}};
-
 
 #[derive(Accounts)]
 pub struct UpdateEntryMintMetadataCtx<'info> {
@@ -45,20 +44,13 @@ pub fn handler(ctx: Context<UpdateEntryMintMetadataCtx>) -> ProgramResult {
             }),
             None,
         ),
-        &[
-            ctx.accounts.certificate_mint_metadata.to_account_info(), 
-            ctx.accounts.namespace.to_account_info(),
-        ],
+        &[ctx.accounts.certificate_mint_metadata.to_account_info(), ctx.accounts.namespace.to_account_info()],
         namespace_signer,
     )?;
-    return Ok(())
+    return Ok(());
 }
 
-pub fn assert_derivation(
-    program_id: &Pubkey,
-    account: &AccountInfo,
-    path: &[&[u8]],
-) -> Result<u8> {
+pub fn assert_derivation(program_id: &Pubkey, account: &AccountInfo, path: &[&[u8]]) -> Result<u8> {
     let (key, bump) = Pubkey::find_program_address(&path, program_id);
     if key != *account.key {
         return Err(ErrorCode::InvalidEntry.into());

@@ -35,5 +35,5 @@ pub enum ErrorCode {
     #[msg("Invalid approve authority")]
     InvalidApproveAuthority,
     #[msg("Namespace requires token")]
-    NamespaceRequiresToken
+    NamespaceRequiresToken,
 }

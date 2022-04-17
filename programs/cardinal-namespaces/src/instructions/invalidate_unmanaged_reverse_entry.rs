@@ -1,9 +1,7 @@
+use cardinal_certificate::{self};
 use {
-    crate::{state::*, errors::*},
-    anchor_lang::{prelude::*}
-};
-use cardinal_certificate::{
-    self,
+    crate::{errors::*, state::*},
+    anchor_lang::prelude::*,
 };
 
 #[derive(Accounts)]
@@ -34,5 +32,5 @@ pub struct InvalidateUnmanagedReverseEntryCtx<'info> {
 pub fn handler(ctx: Context<InvalidateUnmanagedReverseEntryCtx>) -> ProgramResult {
     let entry = &mut ctx.accounts.entry;
     entry.reverse_entry = None;
-    return Ok(())
+    return Ok(());
 }

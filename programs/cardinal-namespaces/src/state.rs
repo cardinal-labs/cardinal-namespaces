@@ -15,7 +15,7 @@ pub struct GlobalContext {
     pub rent_percentage: u64,
 }
 
-pub const NAMESPACE_SIZE: usize = 8 + std::mem::size_of::<Namespace>() + 80; 
+pub const NAMESPACE_SIZE: usize = 8 + std::mem::size_of::<Namespace>() + 80;
 #[account]
 pub struct Namespace {
     pub bump: u8,
@@ -33,7 +33,7 @@ pub struct Namespace {
     pub transferable_entries: bool,
 }
 
-pub const CLAIM_REQUEST_SIZE: usize = 8 + std::mem::size_of::<ClaimRequest>() + 24; 
+pub const CLAIM_REQUEST_SIZE: usize = 8 + std::mem::size_of::<ClaimRequest>() + 24;
 #[account]
 pub struct ClaimRequest {
     pub bump: u8,
@@ -43,7 +43,7 @@ pub struct ClaimRequest {
     pub entry_name: String,
 }
 
-pub const ENTRY_SIZE: usize = 8 + std::mem::size_of::<Entry>() + 24; 
+pub const ENTRY_SIZE: usize = 8 + std::mem::size_of::<Entry>() + 24;
 #[account]
 pub struct Entry {
     pub bump: u8,
@@ -55,7 +55,7 @@ pub struct Entry {
     pub is_claimed: bool,
 }
 
-pub const REVERSE_ENTRY_SIZE: usize = 8 + std::mem::size_of::<ReverseEntry>() + 24 + 24; 
+pub const REVERSE_ENTRY_SIZE: usize = 8 + std::mem::size_of::<ReverseEntry>() + 24 + 24;
 #[account]
 pub struct ReverseEntry {
     pub bump: u8,

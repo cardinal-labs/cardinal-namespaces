@@ -1,6 +1,6 @@
 use {
-    crate::{state::*, errors::*},
-    anchor_lang::{prelude::*}
+    crate::{errors::*, state::*},
+    anchor_lang::prelude::*,
 };
 
 #[derive(Accounts)]
@@ -18,5 +18,5 @@ pub struct UpdateClaimRequestCtx<'info> {
 pub fn handler(ctx: Context<UpdateClaimRequestCtx>, is_approved: bool) -> ProgramResult {
     let rent_request = &mut ctx.accounts.rent_request;
     rent_request.is_approved = is_approved;
-    return Ok(())
+    return Ok(());
 }
