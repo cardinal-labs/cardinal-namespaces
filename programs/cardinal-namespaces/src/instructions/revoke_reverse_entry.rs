@@ -1,6 +1,6 @@
 use {
-    crate::{state::*, errors::*},
-    anchor_lang::{prelude::*}
+    crate::{errors::*, state::*},
+    anchor_lang::prelude::*,
 };
 
 #[derive(Accounts)]
@@ -19,7 +19,7 @@ pub struct RevokeReverseEntryCtx<'info> {
     pub reverse_entry: Box<Account<'info, ReverseEntry>>,
     // you have a claim request for this entry
     #[account(mut, constraint =
-        claim_request.is_approved 
+        claim_request.is_approved
         && claim_request.entry_name == entry.name
         @ ErrorCode::ClaimNotAllowed
     )]

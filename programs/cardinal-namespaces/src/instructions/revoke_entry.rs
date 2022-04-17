@@ -1,14 +1,8 @@
+use anchor_spl::token::{Token, TokenAccount};
+use cardinal_certificate::{self, cpi::accounts::RevokeCertificateCtx, program::CardinalCertificate};
 use {
-    crate::{state::*, errors::*},
-    anchor_lang::{prelude::*}
-};
-use anchor_spl::{
-    token::{TokenAccount, Token},
-};
-use cardinal_certificate::{
-    self,
-    cpi::accounts::{RevokeCertificateCtx},
-    program::{CardinalCertificate}
+    crate::{errors::*, state::*},
+    anchor_lang::prelude::*,
 };
 
 #[derive(Accounts)]
@@ -22,19 +16,19 @@ pub struct RevokeEntryCtx<'info> {
     pub entry: Box<Account<'info, Entry>>,
     #[account(mut,
         constraint =
-        claim_request.is_approved 
+        claim_request.is_approved
         && claim_request.entry_name == entry.name
         @ ErrorCode::ClaimNotAllowed
     )]
     pub claim_request: Box<Account<'info, ClaimRequest>>,
 
-    #[account(mut, constraint = 
+    #[account(mut, constraint =
         namespace_certificate_token_account.mint == entry.mint
         && namespace_certificate_token_account.owner == namespace.key()
         @ ErrorCode::NamespaceRequiresToken
     )]
     pub namespace_certificate_token_account: Box<Account<'info, TokenAccount>>,
-    #[account(mut, constraint = 
+    #[account(mut, constraint =
         // TODO parse certificate here and use certificate payment mint? in case it has changed in the namespace
         namespace_payment_token_account.mint == namespace.payment_mint
         && namespace_payment_token_account.owner == namespace.key()
@@ -58,7 +52,7 @@ pub struct RevokeEntryCtx<'info> {
     user_certificate_token_account: UncheckedAccount<'info>,
     #[account(mut)]
     user_payment_token_account: UncheckedAccount<'info>,
-    
+
     // programs
     certificate_program: Program<'info, CardinalCertificate>,
     token_program: Program<'info, Token>,
@@ -75,7 +69,7 @@ pub fn handler(ctx: Context<RevokeEntryCtx>) -> ProgramResult {
     // revoke certificate
     let certificate_program = ctx.accounts.certificate_program.to_account_info();
     let cpi_accounts = RevokeCertificateCtx {
-        mint_manager: ctx.accounts.mint_manager.to_account_info(), 
+        mint_manager: ctx.accounts.mint_manager.to_account_info(),
         certificate: ctx.accounts.certificate.to_account_info(),
         certificate_mint: ctx.accounts.certificate_mint.to_account_info(),
         certificate_token_account: ctx.accounts.certificate_token_account.to_account_info(),
@@ -83,7 +77,7 @@ pub fn handler(ctx: Context<RevokeEntryCtx>) -> ProgramResult {
 
         recipient_token_account: ctx.accounts.user_certificate_token_account.to_account_info(),
         recipient_payment_token_account: ctx.accounts.user_payment_token_account.to_account_info(),
-        
+
         issuer_token_account: ctx.accounts.namespace_certificate_token_account.to_account_info(),
         issuer_payment_token_account: ctx.accounts.namespace_payment_token_account.to_account_info(),
 

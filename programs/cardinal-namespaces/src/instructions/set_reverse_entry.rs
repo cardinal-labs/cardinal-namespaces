@@ -1,9 +1,9 @@
-use {
-    crate::{state::*, errors::*},
-    anchor_lang::{prelude::*,
-}};
-use anchor_spl::{token::{TokenAccount}};
+use anchor_spl::token::TokenAccount;
 use cardinal_certificate::{self};
+use {
+    crate::{errors::*, state::*},
+    anchor_lang::prelude::*,
+};
 
 #[derive(Accounts)]
 #[instruction(reverse_entry_bump: u8)]
@@ -24,7 +24,7 @@ pub struct SetReverseEntryCtx<'info> {
     )]
     reverse_entry: Box<Account<'info, ReverseEntry>>,
 
-    #[account(constraint = 
+    #[account(constraint =
         user_certificate_token_account.mint == entry.mint
         && user_certificate_token_account.owner == user.key()
         && user_certificate_token_account.amount > 0

@@ -1,9 +1,7 @@
+use anchor_spl::token::TokenAccount;
 use {
-    crate::{state::*, errors::*},
-    anchor_lang::{prelude::*}
-};
-use anchor_spl::{
-    token::{TokenAccount},
+    crate::{errors::*, state::*},
+    anchor_lang::prelude::*,
 };
 
 #[derive(Accounts)]
@@ -20,8 +18,8 @@ pub struct InvalidateManagedReverseEntryCtx<'info> {
         close = invalidator,
         constraint = reverse_entry.key() == entry.reverse_entry.unwrap() @ ErrorCode::InvalidReverseEntry,
     )]
-    pub reverse_entry: Account<'info, ReverseEntry>,    
-    #[account(mut, constraint = 
+    pub reverse_entry: Account<'info, ReverseEntry>,
+    #[account(mut, constraint =
         namespace_certificate_token_account.mint == entry.mint
         && namespace_certificate_token_account.owner == namespace.key()
         && namespace_certificate_token_account.amount > 0
