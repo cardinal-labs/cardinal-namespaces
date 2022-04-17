@@ -1,19 +1,14 @@
+import { NAMESPACES_PROGRAM_ID } from "@cardinal/namespaces";
 import * as anchor from "@project-serum/anchor";
 import * as web3 from "@solana/web3.js";
 
 import { getReverseEntry } from "./accounts";
-import { IDL } from "./types/idl";
-
-export const NAMESPACES_PROGRAM_ID = new web3.PublicKey(
-  "nameXpT2PwZ2iA6DTNYTotTmiMYusBCYqwBLN2QgF4w"
-);
-export const NAMESPACES_IDL = IDL;
-export const GLOBAL_RENTAL_PERCENTAGE = 0.2;
-export const GLOBAL_CONTEXT_SEED = "context";
-export const NAMESPACE_SEED = "namespace";
-export const ENTRY_SEED = "entry";
-export const REVERSE_ENTRY_SEED = "reverse-entry";
-export const CLAIM_REQUEST_SEED = "rent-request";
+import {
+  CLAIM_REQUEST_SEED,
+  ENTRY_SEED,
+  NAMESPACE_SEED,
+  REVERSE_ENTRY_SEED,
+} from "./constants";
 
 export function formatName(namespace: string, name: string): string {
   return namespace === "twitter" ? `@${name}` : `${name}.${namespace}`;

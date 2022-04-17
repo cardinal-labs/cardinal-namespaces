@@ -1,34 +1,37 @@
 import * as anchor from "@project-serum/anchor";
-import * as web3 from "@solana/web3.js";
-import * as splToken from "@solana/spl-token";
-import { Namespaces } from "../../../target/types/namespaces";
-import assert from "assert";
-import { withCreateNamespace, withUpdateNamespace } from "../src";
-import { NAMESPACE_SEED, createMint } from "./utils";
 import { SignerWallet } from "@saberhq/solana-contrib";
+import type * as splToken from "@solana/spl-token";
+import * as web3 from "@solana/web3.js";
+import assert from "assert";
+
+import {
+  getNamespace,
+  NAMESPACES_PROGRAM_ID,
+  withCreateNamespace,
+  withUpdateNamespace,
+} from "../src";
+import { createMint, NAMESPACE_SEED } from "./utils";
 
 describe("namespace-create-update", () => {
-  const provider = anchor.Provider.env();
-  anchor.setProvider(provider);
-  const program = anchor.workspace.Namespaces as anchor.Program<Namespaces>;
+  const provider = anchor.getProvider();
+
   const mintAuthority = web3.Keypair.generate();
   const NAMESPACE_NAME = "ns2";
-  let paymentTokenAccount = null;
-  let paymentMint: splToken.Token = null;
+  let paymentMint: splToken.Token;
 
   it("Creates a namespace", async () => {
-    [paymentTokenAccount, paymentMint] = await createMint(
+    [, paymentMint] = await createMint(
       provider.connection,
       mintAuthority,
       provider.wallet.publicKey
     );
 
-    const [namespaceId, bump] = await web3.PublicKey.findProgramAddress(
+    const [namespaceId] = await web3.PublicKey.findProgramAddress(
       [
         anchor.utils.bytes.utf8.encode(NAMESPACE_SEED),
         anchor.utils.bytes.utf8.encode(NAMESPACE_NAME),
       ],
-      program.programId
+      NAMESPACES_PROGRAM_ID
     );
 
     const transaction = new web3.Transaction();
@@ -58,20 +61,15 @@ describe("namespace-create-update", () => {
       transaction.serialize()
     );
 
-    const namespaceAccount = await program.account.namespace.fetch(namespaceId);
-    assert.equal(namespaceAccount.name, NAMESPACE_NAME);
-    assert.equal(namespaceAccount.maxRentalSeconds, 86400);
+    const namespaceAccount = await getNamespace(
+      provider.connection,
+      namespaceId
+    );
+    assert.equal(namespaceAccount.parsed.name, NAMESPACE_NAME);
+    assert.equal(namespaceAccount.parsed.maxRentalSeconds, 86400);
   });
 
   it("Update a namespace not authority", async () => {
-    const [namespaceId] = await web3.PublicKey.findProgramAddress(
-      [
-        anchor.utils.bytes.utf8.encode(NAMESPACE_SEED),
-        anchor.utils.bytes.utf8.encode(NAMESPACE_NAME),
-      ],
-      program.programId
-    );
-
     const transaction = new web3.Transaction();
     await withUpdateNamespace(
       provider.connection,
@@ -107,7 +105,7 @@ describe("namespace-create-update", () => {
         anchor.utils.bytes.utf8.encode(NAMESPACE_SEED),
         anchor.utils.bytes.utf8.encode(NAMESPACE_NAME),
       ],
-      program.programId
+      NAMESPACES_PROGRAM_ID
     );
 
     const transaction = new web3.Transaction();
@@ -135,8 +133,11 @@ describe("namespace-create-update", () => {
       transaction.serialize()
     );
 
-    const namespaceAccount = await program.account.namespace.fetch(namespaceId);
-    assert.equal(namespaceAccount.name, NAMESPACE_NAME);
-    assert.equal(namespaceAccount.maxRentalSeconds, 86500);
+    const namespaceAccount = await getNamespace(
+      provider.connection,
+      namespaceId
+    );
+    assert.equal(namespaceAccount.parsed.name, NAMESPACE_NAME);
+    assert.equal(namespaceAccount.parsed.maxRentalSeconds, 86500);
   });
 });

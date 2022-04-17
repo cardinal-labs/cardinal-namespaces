@@ -1128,10 +1128,6 @@ export type Namespaces = {
           {
             name: "mintManagerBump";
             type: "u8";
-          },
-          {
-            name: "stakeBoost";
-            type: "u64";
           }
         ];
       };
@@ -2416,10 +2412,6 @@ export const IDL: Namespaces = {
           {
             name: "mintManagerBump",
             type: "u8",
-          },
-          {
-            name: "stakeBoost",
-            type: "u64",
           },
         ],
       },

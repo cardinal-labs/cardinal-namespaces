@@ -265,12 +265,23 @@
   resolved "https://registry.yarnpkg.com/@rushstack/eslint-patch/-/eslint-patch-1.1.1.tgz#782fa5da44c4f38ae9fd38e9184b54e451936118"
   integrity sha512-BUyKJGdDWqvWC5GEhyOiUrGNi9iJUr4CU0O2WxJL6QJhHeeA/NVBalH+FeK0r/x/W0rPymXt5s78TDS7d6lCwg==
 
-"@saberhq/anchor-contrib@^1.12.44", "@saberhq/anchor-contrib@^1.12.47", "@saberhq/anchor-contrib@^1.12.48", "@saberhq/anchor-contrib@^1.12.56":
+"@saberhq/anchor-contrib@^1.12.47", "@saberhq/anchor-contrib@^1.12.48", "@saberhq/anchor-contrib@^1.12.56":
   version "1.12.56"
   resolved "https://registry.yarnpkg.com/@saberhq/anchor-contrib/-/anchor-contrib-1.12.56.tgz#f74919e35367bfac847eb1d75fd4441a33cf8194"
   integrity sha512-REr3AUT8wO+FdhrURa/ewiYFew/gqWEOcL4oCiZHxCu3I8yoblC8ChhbAG1bydknfwg5o+3NV5YWmQqFEP+ePg==
   dependencies:
     "@saberhq/solana-contrib" "^1.12.56"
+    eventemitter3 "^4.0.7"
+    lodash.camelcase "^4.3.0"
+    lodash.mapvalues "^4.6.0"
+    tslib "^2.3.1"
+
+"@saberhq/anchor-contrib@^1.12.61":
+  version "1.12.61"
+  resolved "https://registry.yarnpkg.com/@saberhq/anchor-contrib/-/anchor-contrib-1.12.61.tgz#254342f43586ebfa0a8a14eb374b6df967b16d37"
+  integrity sha512-oVRuOTos2nwjcKz49DoQigOxSgK7g5Y4VaKwMgCHUHvPR4iW5C9dJtv6JzYgzM2IfJdHVVXDKOC1KFqXVETFXg==
+  dependencies:
+    "@saberhq/solana-contrib" "^1.12.61"
     eventemitter3 "^4.0.7"
     lodash.camelcase "^4.3.0"
     lodash.mapvalues "^4.6.0"
@@ -308,11 +319,24 @@
     eslint-plugin-unused-imports "^2.0.0"
     prettier "^2.6.0"
 
-"@saberhq/solana-contrib@^1.12.23", "@saberhq/solana-contrib@^1.12.44", "@saberhq/solana-contrib@^1.12.47", "@saberhq/solana-contrib@^1.12.48", "@saberhq/solana-contrib@^1.12.56":
+"@saberhq/solana-contrib@^1.12.23", "@saberhq/solana-contrib@^1.12.47", "@saberhq/solana-contrib@^1.12.48", "@saberhq/solana-contrib@^1.12.56":
   version "1.12.56"
   resolved "https://registry.yarnpkg.com/@saberhq/solana-contrib/-/solana-contrib-1.12.56.tgz#0472ba6960d9993c37808697d7afff5b63e11b14"
   integrity sha512-b6Szv+XqJE9pFqQ6QfQluRyvQIXAdmLk/KrZ2Ks/XtQVMX2ZxdBf5mGozGNa8NzuzgeOzj/BQ8akbAazfll5dw==
   dependencies:
+    "@types/promise-retry" "^1.1.3"
+    "@types/retry" "^0.12.1"
+    promise-retry "^2.0.1"
+    retry "^0.13.1"
+    tiny-invariant "^1.2.0"
+    tslib "^2.3.1"
+
+"@saberhq/solana-contrib@^1.12.61":
+  version "1.12.61"
+  resolved "https://registry.yarnpkg.com/@saberhq/solana-contrib/-/solana-contrib-1.12.61.tgz#b5368955e5c64ca1dd21213e038fa0f14b7cd2db"
+  integrity sha512-gZtGcWNcpSx5SgYBj9V/3ZRmZ5ikEbkUfJpZj76lIeEcTvMV/ww7vByDMLXKehuzgWKl28RzTkMRMrNLflTNfA==
+  dependencies:
+    "@solana/buffer-layout" "^4.0.0"
     "@types/promise-retry" "^1.1.3"
     "@types/retry" "^0.12.1"
     promise-retry "^2.0.1"

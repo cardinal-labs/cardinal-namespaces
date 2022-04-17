@@ -1,14 +1,13 @@
-import * as anchor from "@project-serum/anchor";
-import * as web3 from "@solana/web3.js";
-import * as splToken from "@solana/spl-token";
-import { Namespaces } from "../src/types/idl";
-import assert from "assert";
-import { createMint, withFindOrInitAssociatedTokenAccount } from "./utils";
 import { certificateIdForMint } from "@cardinal/certificates";
+import * as anchor from "@project-serum/anchor";
+import * as splToken from "@solana/spl-token";
+import * as web3 from "@solana/web3.js";
+import assert from "assert";
+
 import {
   getClaimRequest,
   getNameEntry,
-  getNamespace,
+  getNamespaceByName,
   getReverseEntry,
   withClaimEntry,
   withCreateClaimRequest,
@@ -17,11 +16,10 @@ import {
   withSetReverseEntry,
   withUpdateClaimRequest,
 } from "../src";
+import { createMint, withFindOrInitAssociatedTokenAccount } from "./utils";
 
 describe("namespace-create-rent", () => {
-  const provider = anchor.Provider.env();
-  anchor.setProvider(provider);
-  const program = anchor.workspace.Namespaces as anchor.Program<Namespaces>;
+  const provider = anchor.getProvider();
 
   // test params
   const namespaceName = "ns1";
@@ -32,11 +30,10 @@ describe("namespace-create-rent", () => {
   const PAYMENT_MINT_START = 10000;
 
   // global
-  let paymentTokenAccount = null;
-  let paymentMint: splToken.Token = null;
+  let paymentMint: splToken.Token;
 
   it("Creates a namespace", async () => {
-    [paymentTokenAccount, paymentMint] = await createMint(
+    [, paymentMint] = await createMint(
       provider.connection,
       mintAuthority,
       provider.wallet.publicKey,
@@ -69,7 +66,7 @@ describe("namespace-create-rent", () => {
       transaction.serialize()
     );
 
-    const checkNamespace = await getNamespace(
+    const checkNamespace = await getNamespaceByName(
       provider.connection,
       namespaceName
     );
@@ -98,7 +95,7 @@ describe("namespace-create-rent", () => {
       await provider.connection.getRecentBlockhash("max")
     ).blockhash;
     await provider.wallet.signTransaction(transaction);
-    await transaction.partialSign(certificateMint);
+    transaction.partialSign(certificateMint);
     await web3.sendAndConfirmRawTransaction(
       provider.connection,
       transaction.serialize()
@@ -203,7 +200,7 @@ describe("namespace-create-rent", () => {
       transaction.serialize()
     );
 
-    const checkNamespace = await getNamespace(
+    const checkNamespace = await getNamespaceByName(
       provider.connection,
       namespaceName
     );

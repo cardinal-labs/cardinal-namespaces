@@ -11,7 +11,6 @@ import type { Wallet } from "@saberhq/solana-contrib";
 import * as splToken from "@solana/spl-token";
 import * as web3 from "@solana/web3.js";
 
-import type { Namespaces } from "./types/idl";
 import {
   CLAIM_REQUEST_SEED,
   ENTRY_SEED,
@@ -20,7 +19,8 @@ import {
   NAMESPACES_IDL,
   NAMESPACES_PROGRAM_ID,
   REVERSE_ENTRY_SEED,
-} from "./utils";
+} from ".";
+import type { NAMESPACES_PROGRAM } from "./constants";
 
 export async function withInit(
   connection: web3.Connection,
@@ -29,7 +29,7 @@ export async function withInit(
   transaction: web3.Transaction
 ): Promise<web3.Transaction> {
   const provider = new anchor.Provider(connection, wallet, {});
-  const namespacesProgram = new anchor.Program<Namespaces>(
+  const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
     NAMESPACES_IDL,
     NAMESPACES_PROGRAM_ID,
     provider
@@ -75,7 +75,7 @@ export async function withCreateNamespace(
   transaction: web3.Transaction
 ): Promise<web3.Transaction> {
   const provider = new anchor.Provider(connection, wallet, {});
-  const namespacesProgram = new anchor.Program<Namespaces>(
+  const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
     NAMESPACES_IDL,
     NAMESPACES_PROGRAM_ID,
     provider
@@ -132,7 +132,7 @@ export async function withUpdateNamespace(
   transaction: web3.Transaction
 ): Promise<web3.Transaction> {
   const provider = new anchor.Provider(connection, wallet, {});
-  const namespacesProgram = new anchor.Program<Namespaces>(
+  const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
     NAMESPACES_IDL,
     NAMESPACES_PROGRAM_ID,
     provider
@@ -178,7 +178,7 @@ export async function withInitEntry(
   transaction: web3.Transaction
 ): Promise<web3.Transaction> {
   const provider = new anchor.Provider(connection, wallet, {});
-  const namespacesProgram = new anchor.Program<Namespaces>(
+  const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
     NAMESPACES_IDL,
     NAMESPACES_PROGRAM_ID,
     provider
@@ -285,7 +285,7 @@ export async function withCreateClaimRequest(
   transaction: web3.Transaction
 ): Promise<web3.Transaction> {
   const provider = new anchor.Provider(connection, wallet, {});
-  const namespacesProgram = new anchor.Program<Namespaces>(
+  const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
     NAMESPACES_IDL,
     NAMESPACES_PROGRAM_ID,
     provider
@@ -336,7 +336,7 @@ export async function withUpdateClaimRequest(
   transaction: web3.Transaction
 ): Promise<web3.Transaction> {
   const provider = new anchor.Provider(connection, wallet, {});
-  const namespacesProgram = new anchor.Program<Namespaces>(
+  const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
     NAMESPACES_IDL,
     NAMESPACES_PROGRAM_ID,
     provider
@@ -370,7 +370,7 @@ export async function withClaimEntry(
   transaction: web3.Transaction
 ): Promise<web3.Transaction> {
   const provider = new anchor.Provider(connection, wallet, {});
-  const namespacesProgram = new anchor.Program<Namespaces>(
+  const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
     NAMESPACES_IDL,
     NAMESPACES_PROGRAM_ID,
     provider
@@ -514,7 +514,7 @@ export async function withSetEntryData(
   transaction: web3.Transaction
 ): Promise<web3.Transaction> {
   const provider = new anchor.Provider(connection, wallet, {});
-  const namespacesProgram = new anchor.Program<Namespaces>(
+  const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
     NAMESPACES_IDL,
     NAMESPACES_PROGRAM_ID,
     provider
@@ -575,7 +575,7 @@ export async function withSetReverseEntry(
   transaction: web3.Transaction
 ): Promise<web3.Transaction> {
   const provider = new anchor.Provider(connection, wallet, {});
-  const namespacesProgram = new anchor.Program<Namespaces>(
+  const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
     NAMESPACES_IDL,
     NAMESPACES_PROGRAM_ID,
     provider
@@ -647,7 +647,7 @@ export async function withRevokeReverseEntry(
   transaction: web3.Transaction
 ): Promise<web3.Transaction> {
   const provider = new anchor.Provider(connection, wallet, {});
-  const namespacesProgram = new anchor.Program<Namespaces>(
+  const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
     NAMESPACES_IDL,
     NAMESPACES_PROGRAM_ID,
     provider
@@ -694,7 +694,7 @@ export async function withRevokeEntry(
   transaction: web3.Transaction
 ): Promise<web3.Transaction> {
   const provider = new anchor.Provider(connection, wallet, {});
-  const namespacesProgram = new anchor.Program<Namespaces>(
+  const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
     NAMESPACES_IDL,
     NAMESPACES_PROGRAM_ID,
     provider
@@ -826,7 +826,7 @@ export async function withUpdateMintMetadata(
   transaction: web3.Transaction
 ): Promise<web3.Transaction> {
   const provider = new anchor.Provider(connection, wallet, {});
-  const namespacesProgram = new anchor.Program<Namespaces>(
+  const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
     NAMESPACES_IDL,
     NAMESPACES_PROGRAM_ID,
     provider

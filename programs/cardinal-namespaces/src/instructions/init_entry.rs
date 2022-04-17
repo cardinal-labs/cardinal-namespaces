@@ -14,7 +14,6 @@ pub struct InitEntryIx {
     pub name: String,
     pub entry_bump: u8,
     pub mint_manager_bump: u8,
-    pub stake_boost: u64,
 }
 
 #[derive(Accounts)]
