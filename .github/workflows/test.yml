@@ -16,9 +16,9 @@ permissions:
 env:
   CARGO_TERM_COLOR: always
   SOLANA_VERSION: 1.9.13
-  ANCHOR_GIT: https://github.com/project-serum/anchor
   RUST_TOOLCHAIN: nightly
-  SOTERIA_VERSION: 0.0.0
+  ANCHOR_GIT: https://github.com/project-serum/anchor
+  ANCHOR_VERSION: 0.20.1
 
 jobs:
   rust-clippy:
@@ -97,6 +97,7 @@ jobs:
       - uses: ./.github/actions/install-anchor
         with:
           anchor_git: ${{ env.ANCHOR_GIT }}
+          anchor_version: ${{ env.ANCHOR_VERSION }}
 
       - uses: actions/cache@v3
         with:
@@ -114,7 +115,7 @@ jobs:
       - name: Setup
         run: mkdir -p target/deploy
       - run: cp -r tests/test-keypairs/* target/deploy
-      - run: find . -type f -name "*" -exec sed -i'' -e "s/nameXpT2PwZ2iA6DTNYTotTmiMYusBCYqwBLN2QgF4w/$(solana-keygen pubkey tests/test-keypairs/cardinal_stake_pool-keypair.json)/g" {} +
+      - run: find . -type f -name "*" -exec sed -i'' -e "s/nameXpT2PwZ2iA6DTNYTotTmiMYusBCYqwBLN2QgF4w/$(solana-keygen pubkey tests/test-keypairs/namespaces-keypair.json)/g" {} +
       - run: find . -type f -name "Anchor.toml" -exec sed -i'' -e "s/yarn mocha tests\/\*.spec.ts/yarn mocha tests\/\*.spec.ts --reporter mocha-junit-reporter --reporter-options mochaFile=.\/tests\/out.xml/g" {} +
 
       - name: Run tests
