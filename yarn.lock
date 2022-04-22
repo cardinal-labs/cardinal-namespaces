@@ -357,9 +357,9 @@
     tslib "^2.3.1"
 
 "@saberhq/tsconfig@^1.12.44":
-  version "1.12.56"
-  resolved "https://registry.yarnpkg.com/@saberhq/tsconfig/-/tsconfig-1.12.56.tgz#571392410a9ac2e910be8cf4bc177916566d6301"
-  integrity sha512-smKKMZgaKqKFW/Lmukf/lgKxIW9LKGOdrw2xNKdF2JLojmWLMwOaeEBwd/ENQPJerI2kmzwTnDBe9NSU7XCjOA==
+  version "1.12.65"
+  resolved "https://registry.yarnpkg.com/@saberhq/tsconfig/-/tsconfig-1.12.65.tgz#b51a0c5c835fa022b8514682c4dead19b1b4799b"
+  integrity sha512-a/KcAvUmG6Iw1bZiLb7q2ZjxrqNFv6kyHFHAr2Wl7qp6wix6xU7aHE1Uijq0/VkrLrf2sV6AjqTfHEP7i/b0bA==
 
 "@solana/buffer-layout@^3.0.0":
   version "3.0.0"
