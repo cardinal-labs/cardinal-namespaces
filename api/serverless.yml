@@ -1,0 +1,49 @@
+org: jpbogle
+app: cardinal
+service: cardinal-namespaces
+frameworkVersion: "2 || 3"
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  lambdaHashingVersion: "20201221"
+  httpApi:
+    cors: true
+
+package:
+  individually: true
+  exclude:
+    - "./node_modules"
+    - "./yarn.lock"
+
+functions:
+  twitter-approver:
+    handler: twitter-approver/handler.approve
+    timeout: 30
+    environment:
+      TWITTER_SOLANA_KEY: ${ssm:/TWITTER_SOLANA_KEY~true}
+    events:
+      - httpApi:
+          path: /twitter/approve
+          method: get
+  twitter-revoker:
+    handler: twitter-revoker/handler.revoke
+    timeout: 30
+    environment:
+      TWITTER_SOLANA_KEY: ${ssm:/TWITTER_SOLANA_KEY~true}
+    events:
+      - httpApi:
+          path: /twitter/revoke
+          method: get
+  twitter-proxy:
+    handler: twitter-proxy/handler.proxy
+    events:
+      - httpApi:
+          path: /twitter/proxy
+          method: get
+
+plugins:
+  - serverless-plugin-typescript
+  - serverless-offline
+  - serverless-plugin-include-dependencies
+  - serverless-step-functions
