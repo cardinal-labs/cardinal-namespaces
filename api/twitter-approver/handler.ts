@@ -23,7 +23,6 @@ module.exports.approve = async (event) => {
       event?.queryStringParameters?.handle,
       event?.queryStringParameters?.cluster
     );
-    console.log(message);
     return {
       statusCode: status,
       body: JSON.stringify({ result: "done", txid, message }),
