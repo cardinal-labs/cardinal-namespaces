@@ -2,7 +2,6 @@
 import * as twitterApprover from "./twitter-approver";
 
 module.exports.approve = async (event) => {
-  console.log(event.queryStringParameters);
   try {
     if (
       !event?.queryStringParameters?.tweetId ||
