@@ -7,7 +7,7 @@ provider:
   name: aws
   runtime: nodejs14.x
   lambdaHashingVersion: "20201221"
-  httpApi:
+  http:
     cors: true
 
 package:
@@ -23,8 +23,8 @@ functions:
     environment:
       TWITTER_SOLANA_KEY: ${ssm:/TWITTER_SOLANA_KEY~true}
     events:
-      - httpApi:
-          path: /twitter/approve
+      - http:
+          path: /approve
           method: get
   twitter-revoker:
     handler: twitter-revoker/handler.revoke
@@ -32,18 +32,31 @@ functions:
     environment:
       TWITTER_SOLANA_KEY: ${ssm:/TWITTER_SOLANA_KEY~true}
     events:
-      - httpApi:
-          path: /twitter/revoke
+      - http:
+          path: /revoke
           method: get
   twitter-proxy:
     handler: twitter-proxy/handler.proxy
     events:
-      - httpApi:
-          path: /twitter/proxy
+      - http:
+          path: /proxy
           method: get
 
+custom:
+  domains:
+    main:
+      domainName: api.cardinal.so
+    dev:
+      domainName: dev-api.cardinal.so
+  customDomain:
+    rest:
+      domainName: ${self:custom.domains.${opt:stage}.domainName}
+      basePath: twitter
+      certificateName: "*.cardinal.com"
+      createRoute53Record: true
+
 plugins:
+  - serverless-domain-manager
   - serverless-plugin-typescript
   - serverless-offline
   - serverless-plugin-include-dependencies
-  - serverless-step-functions
