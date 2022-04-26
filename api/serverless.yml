@@ -24,7 +24,7 @@ functions:
       TWITTER_SOLANA_KEY: ${ssm:/TWITTER_SOLANA_KEY~true}
     events:
       - http:
-          path: /twitter/approve
+          path: /approve
           method: get
   twitter-revoker:
     handler: twitter-revoker/handler.revoke
@@ -33,16 +33,30 @@ functions:
       TWITTER_SOLANA_KEY: ${ssm:/TWITTER_SOLANA_KEY~true}
     events:
       - http:
-          path: /twitter/revoke
+          path: /revoke
           method: get
   twitter-proxy:
     handler: twitter-proxy/handler.proxy
     events:
       - http:
-          path: /twitter/proxy
+          path: /proxy
           method: get
 
+custom:
+  domains:
+    main:
+      domainName: api.cardinal.so
+    dev:
+      domainName: dev-api.cardinal.so
+  customDomain:
+    rest:
+      domainName: ${self:custom.domains.${opt:stage}.domainName}
+      basePath: twitter
+      certificateName: "*.cardinal.com"
+      createRoute53Record: true
+
 plugins:
+  - serverless-domain-manager
   - serverless-plugin-typescript
   - serverless-offline
   - serverless-plugin-include-dependencies
