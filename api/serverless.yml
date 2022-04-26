@@ -7,7 +7,7 @@ provider:
   name: aws
   runtime: nodejs14.x
   lambdaHashingVersion: "20201221"
-  httpApi:
+  http:
     cors: true
 
 package:
@@ -23,7 +23,7 @@ functions:
     environment:
       TWITTER_SOLANA_KEY: ${ssm:/TWITTER_SOLANA_KEY~true}
     events:
-      - httpApi:
+      - http:
           path: /twitter/approve
           method: get
   twitter-revoker:
@@ -32,13 +32,13 @@ functions:
     environment:
       TWITTER_SOLANA_KEY: ${ssm:/TWITTER_SOLANA_KEY~true}
     events:
-      - httpApi:
+      - http:
           path: /twitter/revoke
           method: get
   twitter-proxy:
     handler: twitter-proxy/handler.proxy
     events:
-      - httpApi:
+      - http:
           path: /twitter/proxy
           method: get
 
@@ -46,4 +46,3 @@ plugins:
   - serverless-plugin-typescript
   - serverless-offline
   - serverless-plugin-include-dependencies
-  - serverless-step-functions
