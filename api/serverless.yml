@@ -41,6 +41,15 @@ functions:
       - http:
           path: /proxy
           method: get
+          caching:
+            enabled: true
+            ttlInSeconds: 3600 # overrides the global setting for ttlInSeconds
+            perKeyInvalidation:
+              requireAuthorization: false # default is true
+            cacheKeyParameters:
+              - name: request.path.url
+              - name: request.path.usernames
+  
 
 custom:
   domains:
@@ -54,8 +63,11 @@ custom:
       basePath: twitter
       certificateName: "*.cardinal.com"
       createRoute53Record: true
+  apiGatewayCaching:
+    enabled: true
 
 plugins:
+  - serverless-api-gateway-caching
   - serverless-domain-manager
   - serverless-plugin-typescript
   - serverless-offline
