@@ -17,6 +17,11 @@ module.exports.revoke = async (event) => {
     console.log("Error: ", e);
     return {
       statusCode: 400,
+      headers: {
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Origin": "*", // Required for CORS support to work
+        "Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS
+      },
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       body: JSON.stringify({ error: e.toString() }),
     };
