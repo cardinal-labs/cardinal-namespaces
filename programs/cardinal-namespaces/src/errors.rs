@@ -36,4 +36,6 @@ pub enum ErrorCode {
     InvalidApproveAuthority,
     #[msg("Namespace requires token")]
     NamespaceRequiresToken,
+    #[msg("Account discriminator mismatch")]
+    AccountDiscriminatorMismatch,
 }

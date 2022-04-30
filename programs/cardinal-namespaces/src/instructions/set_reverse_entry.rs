@@ -1,3 +1,4 @@
+use anchor_lang::Discriminator;
 use anchor_spl::token::TokenAccount;
 use cardinal_certificate::{self};
 use {
@@ -48,6 +49,14 @@ pub struct SetReverseEntryCtx<'info> {
 pub fn handler(ctx: Context<SetReverseEntryCtx>, reverse_entry_bump: u8) -> ProgramResult {
     let entry = &mut ctx.accounts.entry;
     entry.reverse_entry = Some(ctx.accounts.reverse_entry.key());
+
+    // discriminator check
+    let acct = ctx.accounts.reverse_entry.to_account_info();
+    let data: &[u8] = &acct.try_borrow_data()?;
+    let disc_bytes = &data[..8];
+    if disc_bytes != ReverseEntry::discriminator() && disc_bytes.iter().any(|a| a != &0) {
+        return Err(ErrorCode::AccountDiscriminatorMismatch.into());
+    }
 
     let reverse_entry = &mut ctx.accounts.reverse_entry;
     reverse_entry.bump = reverse_entry_bump;
