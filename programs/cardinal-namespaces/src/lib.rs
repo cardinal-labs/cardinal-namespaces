@@ -91,7 +91,7 @@ pub mod namespaces {
         update_claim_request::handler(ctx, is_approved)
     }
 
-    pub fn update_entry_mint_metadata(ctx: Context<UpdateEntryMintMetadataCtx>) -> ProgramResult {
-        update_entry_mint_metadata::handler(ctx)
+    pub fn update_entry_mint_metadata(ctx: Context<UpdateEntryMintMetadataCtx>, args: UpdateMetadataArgs) -> ProgramResult {
+        update_entry_mint_metadata::handler(ctx, args)
     }
 }
