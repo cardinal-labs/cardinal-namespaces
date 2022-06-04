@@ -44,7 +44,7 @@ export async function getNamespace(
     NAMESPACES_PROGRAM_ID,
     provider
   );
-  const parsed = (await namespacesProgram.account.namespace.fetch(
+  const parsed = (await namespacesProgram.account.namespace!.fetch(
     namespaceId
   )) as NamespaceData;
   return {
@@ -110,7 +110,7 @@ export async function getNameEntry(
     ],
     namespacesProgram.programId
   );
-  const parsed = (await namespacesProgram.account.entry.fetch(
+  const parsed = (await namespacesProgram.account.entry!.fetch(
     entryId
   )) as NamespaceData;
   return {
@@ -152,7 +152,7 @@ export async function getNameEntries(
     )
   );
   const entryIds = entryTuples.map((tuple) => tuple[0]);
-  const result = (await namespacesProgram.account.entry.fetchMultiple(
+  const result = (await namespacesProgram.account.entry!.fetchMultiple(
     entryIds
   )) as EntryData[];
   return result.map((parsed: EntryData, i) => ({
@@ -192,7 +192,7 @@ export async function getClaimRequest(
     ],
     namespacesProgram.programId
   );
-  const parsed = (await namespacesProgram.account.claimRequest.fetch(
+  const parsed = (await namespacesProgram.account.claimRequest!.fetch(
     claimRequestId
   )) as ClaimRequestData;
   return {
@@ -248,7 +248,7 @@ export async function getReverseEntry(
     [anchor.utils.bytes.utf8.encode(REVERSE_ENTRY_SEED), pubkey.toBytes()],
     namespacesProgram.programId
   );
-  const parsed = (await namespacesProgram.account.reverseEntry.fetch(
+  const parsed = (await namespacesProgram.account.reverseEntry!.fetch(
     reverseEntryId
   )) as ReverseEntryData;
   return {

@@ -1,4 +1,7 @@
-use metaplex_token_metadata::{instruction::update_metadata_accounts, state::{Data, Creator as MCreator}};
+use metaplex_token_metadata::{
+    instruction::update_metadata_accounts,
+    state::{Creator as MCreator, Data},
+};
 use {
     crate::{errors::*, state::*},
     anchor_lang::{prelude::*, solana_program::program::invoke_signed},
@@ -29,7 +32,7 @@ pub struct UpdateMetadataArgs {
     pub seller_fee_basis_points: u16,
     /// Array of creators, optional
     pub creators: Option<Vec<Creator>>,
-    pub primary_sale_happened: Option<bool>
+    pub primary_sale_happened: Option<bool>,
 }
 
 pub fn handler(ctx: Context<UpdateEntryMintMetadataCtx>, args: UpdateMetadataArgs) -> ProgramResult {
@@ -57,11 +60,16 @@ pub fn handler(ctx: Context<UpdateEntryMintMetadataCtx>, args: UpdateMetadataArg
                 name: ctx.accounts.entry.name.clone() + "." + &ctx.accounts.namespace.name.to_string(),
                 symbol: "NAME".to_string(),
                 uri: "https://api.cardinal.so/metadata/".to_string() + &ctx.accounts.entry.mint.to_string(),
-                creators: args.creators.map(|creators| creators.iter().map(|c| MCreator {
-                  address: c.address,
-                  verified: c.verified,
-                  share: c.share
-                }).collect()),
+                creators: args.creators.map(|creators| {
+                    creators
+                        .iter()
+                        .map(|c| MCreator {
+                            address: c.address,
+                            verified: c.verified,
+                            share: c.share,
+                        })
+                        .collect()
+                }),
                 seller_fee_basis_points: args.seller_fee_basis_points,
             }),
             args.primary_sale_happened,
