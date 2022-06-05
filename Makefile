@@ -34,4 +34,4 @@ clean-test-keys:
 	LC_ALL=C find programs src -type f -exec sed -i '' -e "s/$$(solana-keygen pubkey ./target/deploy/namespaces-keypair.json)/nameXpT2PwZ2iA6DTNYTotTmiMYusBCYqwBLN2QgF4w/g" {} +
 
 stop: validator.PID
-	kill `cat $<` && rm $<
+	pkill solana-test-validator
