@@ -35,7 +35,7 @@ pub struct UpdateEntryMintMetadataIx {
     pub primary_sale_happened: Option<bool>,
 }
 
-pub fn handler(ctx: Context<UpdateEntryMintMetadataCtx>, args: UpdateMetadataArgs) -> ProgramResult {
+pub fn handler(ctx: Context<UpdateEntryMintMetadataCtx>, ix: UpdateEntryMintMetadataIx) -> ProgramResult {
     let namespace_seeds = &[NAMESPACE_PREFIX.as_bytes(), ctx.accounts.namespace.name.as_bytes(), &[ctx.accounts.namespace.bump]];
     let namespace_signer = &[&namespace_seeds[..]];
 
