@@ -27,7 +27,7 @@ pub struct Creator {
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Default)]
-pub struct UpdateMetadataArgs {
+pub struct UpdateEntryMintMetadataIx {
     /// Royalty basis points that goes to creators in secondary sales (0-10000)
     pub seller_fee_basis_points: u16,
     /// Array of creators, optional
