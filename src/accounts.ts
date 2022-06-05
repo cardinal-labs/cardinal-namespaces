@@ -38,15 +38,13 @@ export async function getNamespace(
 ): Promise<AccountData<NamespaceData>> {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  const provider = new anchor.Provider(connection, null, {});
+  const provider = new anchor.AnchorProvider(connection, null, {});
   const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
     NAMESPACES_IDL,
     NAMESPACES_PROGRAM_ID,
     provider
   );
-  const parsed = (await namespacesProgram.account.namespace!.fetch(
-    namespaceId
-  )) as NamespaceData;
+  const parsed = await namespacesProgram.account.namespace!.fetch(namespaceId);
   return {
     parsed,
     pubkey: namespaceId,
@@ -56,19 +54,29 @@ export async function getNamespace(
 export async function getNamespaces(
   connection: web3.Connection
 ): Promise<AccountData<NamespaceData>[]> {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
-  const coder = new anchor.Coder(NAMESPACES_IDL);
   const programAccounts = await connection.getProgramAccounts(
-    NAMESPACES_PROGRAM_ID
+    NAMESPACES_PROGRAM_ID,
+    {
+      filters: [
+        {
+          memcmp: {
+            offset: 0,
+            bytes: anchor.utils.bytes.bs58.encode(
+              anchor.BorshAccountsCoder.accountDiscriminator("namespace")
+            ),
+          },
+        },
+      ],
+    }
   );
   const namespaces: AccountData<NamespaceData>[] = [];
+  const coder = new anchor.BorshAccountsCoder(NAMESPACES_IDL);
   programAccounts.forEach((account) => {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-      const namespace = coder.accounts.decode(
+      const namespace: NamespaceData = coder.decode(
         "namespace",
         account.account.data
-      ) as NamespaceData;
+      );
       namespaces.push({
         ...account,
         parsed: namespace,
@@ -89,7 +97,7 @@ export async function getNameEntry(
 ): Promise<AccountData<EntryData>> {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  const provider = new anchor.Provider(connection, null, {});
+  const provider = new anchor.AnchorProvider(connection, null, {});
   const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
     NAMESPACES_IDL,
     NAMESPACES_PROGRAM_ID,
@@ -110,9 +118,7 @@ export async function getNameEntry(
     ],
     namespacesProgram.programId
   );
-  const parsed = (await namespacesProgram.account.entry!.fetch(
-    entryId
-  )) as NamespaceData;
+  const parsed = await namespacesProgram.account.entry!.fetch(entryId);
   return {
     parsed,
     pubkey: entryId,
@@ -126,7 +132,7 @@ export async function getNameEntries(
 ): Promise<(AccountData<EntryData> & { name: string })[]> {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  const provider = new anchor.Provider(connection, null, {});
+  const provider = new anchor.AnchorProvider(connection, null, {});
   const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
     NAMESPACES_IDL,
     NAMESPACES_PROGRAM_ID,
@@ -170,7 +176,7 @@ export async function getClaimRequest(
 ): Promise<AccountData<ClaimRequestData>> {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  const provider = new anchor.Provider(connection, null, {});
+  const provider = new anchor.AnchorProvider(connection, null, {});
   const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
     NAMESPACES_IDL,
     NAMESPACES_PROGRAM_ID,
@@ -205,18 +211,29 @@ export async function getPendingClaimRequests(
   connection: web3.Connection
 ): Promise<AccountData<ClaimRequestData>[]> {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-  const coder = new anchor.Coder(NAMESPACES_IDL);
   const programAccounts = await connection.getProgramAccounts(
-    NAMESPACES_PROGRAM_ID
+    NAMESPACES_PROGRAM_ID,
+    {
+      filters: [
+        {
+          memcmp: {
+            offset: 0,
+            bytes: anchor.utils.bytes.bs58.encode(
+              anchor.BorshAccountsCoder.accountDiscriminator("claimRequest")
+            ),
+          },
+        },
+      ],
+    }
   );
   const pendingClaimRequests: AccountData<ClaimRequestData>[] = [];
+  const coder = new anchor.BorshAccountsCoder(NAMESPACES_IDL);
   programAccounts.forEach((account) => {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-      const claimRequest = coder.accounts.decode(
+      const claimRequest: ClaimRequestData = coder.decode(
         "claimRequest",
         account.account.data
-      ) as ClaimRequestData;
+      );
       if (!claimRequest.isApproved) {
         pendingClaimRequests.push({
           ...account,
@@ -236,9 +253,7 @@ export async function getReverseEntry(
 ): Promise<AccountData<ReverseEntryData>> {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const provider = new anchor.Provider(connection, null, {});
+  const provider = new anchor.AnchorProvider(connection, null, {});
   const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
     NAMESPACES_IDL,
     NAMESPACES_PROGRAM_ID,

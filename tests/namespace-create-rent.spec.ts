@@ -17,9 +17,10 @@ import {
   withUpdateClaimRequest,
 } from "../src";
 import { createMint, withFindOrInitAssociatedTokenAccount } from "./utils";
+import { getProvider } from "./workspace";
 
 describe("namespace-create-rent", () => {
-  const provider = anchor.getProvider();
+  const provider = getProvider();
 
   // test params
   const namespaceName = "ns1";

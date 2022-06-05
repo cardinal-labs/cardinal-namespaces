@@ -2,7 +2,7 @@
 
 TEST_KEY := $(shell solana-keygen pubkey ./tests/test-key.json)
 
-all: install test-keys build start test clean-test-keys stop
+all: install test-keys build stop start test clean-test-keys stop
 
 install:
 	yarn install

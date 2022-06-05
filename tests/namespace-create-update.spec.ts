@@ -11,9 +11,10 @@ import {
   withUpdateNamespace,
 } from "../src";
 import { createMint, NAMESPACE_SEED } from "./utils";
+import { getProvider } from "./workspace";
 
 describe("namespace-create-update", () => {
-  const provider = anchor.getProvider();
+  const provider = getProvider();
 
   const mintAuthority = web3.Keypair.generate();
   const NAMESPACE_NAME = "ns2";
