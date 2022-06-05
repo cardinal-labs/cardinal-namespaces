@@ -1,4 +1,7 @@
-use metaplex_token_metadata::{instruction::update_metadata_accounts, state::Data};
+use metaplex_token_metadata::{
+    instruction::update_metadata_accounts,
+    state::{Creator as MCreator, Data},
+};
 use {
     crate::{errors::ErrorCode, state::*},
     anchor_lang::{prelude::*, solana_program::program::invoke_signed},
@@ -9,14 +12,32 @@ pub struct UpdateEntryMintMetadataCtx<'info> {
     namespace: Box<Account<'info, Namespace>>,
     #[account(constraint = entry.namespace == namespace.key() @ ErrorCode::InvalidNamespace)]
     entry: Box<Account<'info, Entry>>,
-    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(constraint = approve_authority.key() == namespace.approve_authority.unwrap() @ ErrorCode::InvalidApproveAuthority)]
+    approve_authority: Signer<'info>,
     #[account(mut)]
+    /// CHECK: This is not dangerous because we don't read or write from this account
     certificate_mint_metadata: UncheckedAccount<'info>,
     /// CHECK: This is not dangerous because we don't read or write from this account
     token_metadata_program: UncheckedAccount<'info>,
 }
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Default)]
+pub struct Creator {
+    pub address: Pubkey,
+    pub verified: bool,
+    // In percentages, NOT basis points ;) Watch out!
+    pub share: u8,
+}
 
-pub fn handler(ctx: Context<UpdateEntryMintMetadataCtx>) -> Result<()> {
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Default)]
+pub struct UpdateEntryMintMetadataIx {
+    /// Royalty basis points that goes to creators in secondary sales (0-10000)
+    pub seller_fee_basis_points: u16,
+    /// Array of creators, optional
+    pub creators: Option<Vec<Creator>>,
+    pub primary_sale_happened: Option<bool>,
+}
+
+pub fn handler(ctx: Context<UpdateEntryMintMetadataCtx>, ix: UpdateEntryMintMetadataIx) -> Result<()> {
     let namespace_seeds = &[NAMESPACE_PREFIX.as_bytes(), ctx.accounts.namespace.name.as_bytes(), &[ctx.accounts.namespace.bump]];
     let namespace_signer = &[&namespace_seeds[..]];
 
@@ -41,10 +62,19 @@ pub fn handler(ctx: Context<UpdateEntryMintMetadataCtx>) -> Result<()> {
                 name: ctx.accounts.entry.name.clone() + "." + &ctx.accounts.namespace.name.to_string(),
                 symbol: "NAME".to_string(),
                 uri: "https://api.cardinal.so/metadata/".to_string() + &ctx.accounts.entry.mint.to_string(),
-                creators: None,
-                seller_fee_basis_points: 0,
+                creators: ix.creators.map(|creators| {
+                    creators
+                        .iter()
+                        .map(|c| MCreator {
+                            address: c.address,
+                            verified: c.verified,
+                            share: c.share,
+                        })
+                        .collect()
+                }),
+                seller_fee_basis_points: ix.seller_fee_basis_points,
             }),
-            None,
+            ix.primary_sale_happened,
         ),
         &[ctx.accounts.certificate_mint_metadata.to_account_info(), ctx.accounts.namespace.to_account_info()],
         namespace_signer,

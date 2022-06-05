@@ -854,6 +854,11 @@ export type Namespaces = {
           isSigner: false;
         },
         {
+          name: "approveAuthority";
+          isMut: false;
+          isSigner: true;
+        },
+        {
           name: "certificateMintMetadata";
           isMut: true;
           isSigner: false;
@@ -864,7 +869,14 @@ export type Namespaces = {
           isSigner: false;
         }
       ];
-      args: [];
+      args: [
+        {
+          name: "args";
+          type: {
+            defined: "UpdateMetadataArgs";
+          };
+        }
+      ];
     }
   ];
   accounts: [
@@ -1149,6 +1161,54 @@ export type Namespaces = {
       };
     },
     {
+      name: "Creator";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "address";
+            type: "publicKey";
+          },
+          {
+            name: "verified";
+            type: "bool";
+          },
+          {
+            name: "share";
+            type: "u8";
+          }
+        ];
+      };
+    },
+    {
+      name: "UpdateMetadataArgs";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "sellerFeeBasisPoints";
+            type: "u16";
+          },
+          {
+            name: "creators";
+            type: {
+              option: {
+                vec: {
+                  defined: "Creator";
+                };
+              };
+            };
+          },
+          {
+            name: "primarySaleHappened";
+            type: {
+              option: "bool";
+            };
+          }
+        ];
+      };
+    },
+    {
       name: "UpdateNamespaceIx";
       type: {
         kind: "struct";
@@ -1278,6 +1338,11 @@ export type Namespaces = {
       code: 6016;
       name: "NamespaceRequiresToken";
       msg: "Namespace requires token";
+    },
+    {
+      code: 6017;
+      name: "AccountDiscriminatorMismatch";
+      msg: "Account discriminator mismatch";
     }
   ];
 };
@@ -2138,6 +2203,11 @@ export const IDL: Namespaces = {
           isSigner: false,
         },
         {
+          name: "approveAuthority",
+          isMut: false,
+          isSigner: true,
+        },
+        {
           name: "certificateMintMetadata",
           isMut: true,
           isSigner: false,
@@ -2148,7 +2218,14 @@ export const IDL: Namespaces = {
           isSigner: false,
         },
       ],
-      args: [],
+      args: [
+        {
+          name: "args",
+          type: {
+            defined: "UpdateMetadataArgs",
+          },
+        },
+      ],
     },
   ],
   accounts: [
@@ -2433,6 +2510,54 @@ export const IDL: Namespaces = {
       },
     },
     {
+      name: "Creator",
+      type: {
+        kind: "struct",
+        fields: [
+          {
+            name: "address",
+            type: "publicKey",
+          },
+          {
+            name: "verified",
+            type: "bool",
+          },
+          {
+            name: "share",
+            type: "u8",
+          },
+        ],
+      },
+    },
+    {
+      name: "UpdateMetadataArgs",
+      type: {
+        kind: "struct",
+        fields: [
+          {
+            name: "sellerFeeBasisPoints",
+            type: "u16",
+          },
+          {
+            name: "creators",
+            type: {
+              option: {
+                vec: {
+                  defined: "Creator",
+                },
+              },
+            },
+          },
+          {
+            name: "primarySaleHappened",
+            type: {
+              option: "bool",
+            },
+          },
+        ],
+      },
+    },
+    {
       name: "UpdateNamespaceIx",
       type: {
         kind: "struct",
@@ -2562,6 +2687,11 @@ export const IDL: Namespaces = {
       code: 6016,
       name: "NamespaceRequiresToken",
       msg: "Namespace requires token",
+    },
+    {
+      code: 6017,
+      name: "AccountDiscriminatorMismatch",
+      msg: "Account discriminator mismatch",
     },
   ],
 };

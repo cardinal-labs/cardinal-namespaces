@@ -1,5 +1,5 @@
 pub mod errors;
-mod instructions;
+pub mod instructions;
 pub mod state;
 
 use anchor_lang::prelude::*;
@@ -91,7 +91,7 @@ pub mod namespaces {
         update_claim_request::handler(ctx, is_approved)
     }
 
-    pub fn update_entry_mint_metadata(ctx: Context<UpdateEntryMintMetadataCtx>) -> Result<()> {
-        update_entry_mint_metadata::handler(ctx)
+    pub fn update_entry_mint_metadata(ctx: Context<UpdateEntryMintMetadataCtx>, args: UpdateEntryMintMetadataIx) -> Result<()> {
+        update_entry_mint_metadata::handler(ctx, args)
     }
 }
