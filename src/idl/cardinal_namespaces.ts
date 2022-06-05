@@ -1,5 +1,5 @@
 export type Namespaces = {
-  version: "0.1.0";
+  version: "1.2.0";
   name: "namespaces";
   instructions: [
     {
@@ -873,7 +873,7 @@ export type Namespaces = {
         {
           name: "args";
           type: {
-            defined: "UpdateMetadataArgs";
+            defined: "UpdateEntryMintMetadataIx";
           };
         }
       ];
@@ -1181,7 +1181,7 @@ export type Namespaces = {
       };
     },
     {
-      name: "UpdateMetadataArgs";
+      name: "UpdateEntryMintMetadataIx";
       type: {
         kind: "struct";
         fields: [
@@ -1338,17 +1338,12 @@ export type Namespaces = {
       code: 6016;
       name: "NamespaceRequiresToken";
       msg: "Namespace requires token";
-    },
-    {
-      code: 6017;
-      name: "AccountDiscriminatorMismatch";
-      msg: "Account discriminator mismatch";
     }
   ];
 };
 
 export const IDL: Namespaces = {
-  version: "0.1.0",
+  version: "1.2.0",
   name: "namespaces",
   instructions: [
     {
@@ -2222,7 +2217,7 @@ export const IDL: Namespaces = {
         {
           name: "args",
           type: {
-            defined: "UpdateMetadataArgs",
+            defined: "UpdateEntryMintMetadataIx",
           },
         },
       ],
@@ -2530,7 +2525,7 @@ export const IDL: Namespaces = {
       },
     },
     {
-      name: "UpdateMetadataArgs",
+      name: "UpdateEntryMintMetadataIx",
       type: {
         kind: "struct",
         fields: [
@@ -2687,11 +2682,6 @@ export const IDL: Namespaces = {
       code: 6016,
       name: "NamespaceRequiresToken",
       msg: "Namespace requires token",
-    },
-    {
-      code: 6017,
-      name: "AccountDiscriminatorMismatch",
-      msg: "Account discriminator mismatch",
     },
   ],
 };
