@@ -26,17 +26,19 @@ pub struct CreateNamespace<'info> {
         payer = payer,
         space = NAMESPACE_SIZE,
         seeds = [NAMESPACE_PREFIX.as_bytes(), ix.name.as_ref()],
-        bump = ix.bump,
+        bump,
     )]
     pub namespace: Account<'info, Namespace>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
     pub authority: AccountInfo<'info>,
+    #[account(mut)]
     pub payer: Signer<'info>,
     pub system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<CreateNamespace>, ix: CreateNamespaceIx) -> ProgramResult {
+pub fn handler(ctx: Context<CreateNamespace>, ix: CreateNamespaceIx) -> Result<()> {
     let namespace = &mut ctx.accounts.namespace;
-    namespace.bump = ix.bump;
+    namespace.bump = *ctx.bumps.get("namespace").unwrap();
     namespace.name = ix.name;
     namespace.update_authority = ix.update_authority;
     namespace.rent_authority = ix.rent_authority;

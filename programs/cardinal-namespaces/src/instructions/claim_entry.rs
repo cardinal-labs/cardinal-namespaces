@@ -10,7 +10,7 @@ use cardinal_certificate::{
     state::CertificateKind,
 };
 use {
-    crate::{errors::*, state::*},
+    crate::{errors::ErrorCode, state::*},
     anchor_lang::prelude::*,
 };
 
@@ -48,22 +48,30 @@ pub struct ClaimEntry<'info> {
     // payment
     #[account(mut, constraint = payment_mint.key() == namespace.payment_mint @ ErrorCode::InvalidPaymentMint)]
     payment_mint: Box<Account<'info, Mint>>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
     namespace_certificate_token_account: UncheckedAccount<'info>,
 
     // CPI accounts
+    /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
     mint_manager: UncheckedAccount<'info>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
     certificate: UncheckedAccount<'info>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
     certificate_mint: UncheckedAccount<'info>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
     certificate_token_account: UncheckedAccount<'info>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
     certificate_payment_token_account: UncheckedAccount<'info>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
     user_certificate_token_account: UncheckedAccount<'info>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
     user_payment_token_account: UncheckedAccount<'info>,
 
@@ -75,7 +83,7 @@ pub struct ClaimEntry<'info> {
     system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<ClaimEntry>, ix: ClaimEntryIx) -> ProgramResult {
+pub fn handler(ctx: Context<ClaimEntry>, ix: ClaimEntryIx) -> Result<()> {
     let entry = &mut ctx.accounts.entry;
     entry.data = Some(ctx.accounts.user.key());
     entry.is_claimed = true;
@@ -83,13 +91,13 @@ pub fn handler(ctx: Context<ClaimEntry>, ix: ClaimEntryIx) -> ProgramResult {
     // duration checks
     if ix.duration != None {
         if ix.duration.unwrap() <= ctx.accounts.namespace.min_rental_seconds {
-            return Err(ErrorCode::RentalDurationTooSmall.into());
+            return Err(error!(ErrorCode::RentalDurationTooSmall));
         }
         if ctx.accounts.namespace.max_rental_seconds != None && ix.duration.unwrap() >= ctx.accounts.namespace.max_rental_seconds.unwrap() {
-            return Err(ErrorCode::RentalDurationTooLarge.into());
+            return Err(error!(ErrorCode::RentalDurationTooLarge));
         }
     } else if ctx.accounts.namespace.max_rental_seconds != None {
-        return Err(ErrorCode::NamespaceRequiresDuration.into());
+        return Err(error!(ErrorCode::NamespaceRequiresDuration));
     }
 
     let namespace_seeds = &[NAMESPACE_PREFIX.as_bytes(), ctx.accounts.namespace.name.as_bytes(), &[ctx.accounts.namespace.bump]];

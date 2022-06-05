@@ -1,6 +1,6 @@
 use anchor_spl::token::{self, Token, TokenAccount, Transfer};
 use {
-    crate::{errors::*, state::*},
+    crate::{errors::ErrorCode, state::*},
     anchor_lang::prelude::*,
 };
 
@@ -23,7 +23,7 @@ pub struct CollectGlobalFundsCtx<'info> {
     pub token_program: Program<'info, Token>,
 }
 
-pub fn handler(ctx: Context<CollectGlobalFundsCtx>, amount: u64) -> ProgramResult {
+pub fn handler(ctx: Context<CollectGlobalFundsCtx>, amount: u64) -> Result<()> {
     // get PDA seeds to sign with
     let global_context_seeds = &[GLOBAL_CONTEXT_PREFIX.as_bytes(), &[ctx.accounts.global_context.bump]];
     let global_context_signer = &[&global_context_seeds[..]];

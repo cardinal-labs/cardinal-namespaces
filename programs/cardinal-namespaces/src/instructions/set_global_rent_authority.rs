@@ -1,5 +1,5 @@
 use {
-    crate::{errors::*, state::*},
+    crate::{errors::ErrorCode, state::*},
     anchor_lang::prelude::*,
 };
 
@@ -17,7 +17,7 @@ pub struct SetGlobalNamespaceRentAuthorityCtx<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<SetGlobalNamespaceRentAuthorityCtx>, rent_authority: Pubkey) -> ProgramResult {
+pub fn handler(ctx: Context<SetGlobalNamespaceRentAuthorityCtx>, rent_authority: Pubkey) -> Result<()> {
     let global_context = &mut ctx.accounts.global_context;
     global_context.rent_authority = rent_authority;
     Ok(())

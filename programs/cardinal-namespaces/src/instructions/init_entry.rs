@@ -26,24 +26,29 @@ pub struct InitEntry<'info> {
         // todo choose size once data is finalized
         space = ENTRY_SIZE,
         seeds = [ENTRY_SEED.as_bytes(), namespace.key().as_ref(), ix.name.as_bytes()],
-        bump = ix.entry_bump,
+        bump,
     )]
     entry: Account<'info, Entry>,
     #[account(mut)]
     payer: Signer<'info>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
     namespace_certificate_token_account: UncheckedAccount<'info>,
 
     // cpi accounts
+    /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
     mint_manager: UncheckedAccount<'info>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
     certificate_mint: UncheckedAccount<'info>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
     certificate_mint_metadata: UncheckedAccount<'info>,
 
     // programs
     certificate_program: Program<'info, CardinalCertificate>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
     token_metadata_program: UncheckedAccount<'info>,
     token_program: Program<'info, Token>,
     associated_token: Program<'info, AssociatedToken>,
@@ -51,11 +56,11 @@ pub struct InitEntry<'info> {
     system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<InitEntry>, ix: InitEntryIx) -> ProgramResult {
+pub fn handler(ctx: Context<InitEntry>, ix: InitEntryIx) -> Result<()> {
     let entry = &mut ctx.accounts.entry;
     entry.namespace = ctx.accounts.namespace.key();
     entry.name = ix.name.clone();
-    entry.bump = ix.entry_bump;
+    entry.bump = *ctx.bumps.get("entry").unwrap();
     entry.data = None;
     entry.mint = ctx.accounts.certificate_mint.key();
     entry.is_claimed = false;

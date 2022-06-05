@@ -1,7 +1,7 @@
 use anchor_spl::token::{Token, TokenAccount};
 use cardinal_certificate::{self, cpi::accounts::RevokeCertificateCtx, program::CardinalCertificate};
 use {
-    crate::{errors::*, state::*},
+    crate::{errors::ErrorCode, state::*},
     anchor_lang::prelude::*,
 };
 
@@ -38,18 +38,25 @@ pub struct RevokeEntryCtx<'info> {
     pub invalidator: Signer<'info>,
 
     // CPI accounts
+    /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
     mint_manager: UncheckedAccount<'info>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
     certificate: UncheckedAccount<'info>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
     certificate_mint: UncheckedAccount<'info>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
     certificate_token_account: UncheckedAccount<'info>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
     certificate_payment_token_account: UncheckedAccount<'info>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
     user_certificate_token_account: UncheckedAccount<'info>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
     user_payment_token_account: UncheckedAccount<'info>,
 
@@ -58,7 +65,7 @@ pub struct RevokeEntryCtx<'info> {
     token_program: Program<'info, Token>,
 }
 
-pub fn handler(ctx: Context<RevokeEntryCtx>) -> ProgramResult {
+pub fn handler(ctx: Context<RevokeEntryCtx>) -> Result<()> {
     let entry = &mut ctx.accounts.entry;
     entry.data = None;
     entry.is_claimed = false;

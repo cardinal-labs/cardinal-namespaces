@@ -1,5 +1,5 @@
 use {
-    crate::{errors::*, state::*},
+    crate::{errors::ErrorCode, state::*},
     anchor_lang::prelude::*,
 };
 
@@ -27,7 +27,7 @@ pub struct RevokeReverseEntryCtx<'info> {
     pub invalidator: Signer<'info>,
 }
 
-pub fn handler(ctx: Context<RevokeReverseEntryCtx>) -> ProgramResult {
+pub fn handler(ctx: Context<RevokeReverseEntryCtx>) -> Result<()> {
     let entry = &mut ctx.accounts.entry;
     entry.reverse_entry = None;
     Ok(())
