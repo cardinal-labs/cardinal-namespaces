@@ -3,7 +3,7 @@ use cardinal_certificate::{
     state::{Certificate, CertificateState},
 };
 use {
-    crate::{errors::*, state::*},
+    crate::{errors::ErrorCode, state::*},
     anchor_lang::prelude::*,
 };
 
@@ -28,7 +28,7 @@ pub struct InvalidateUnmanagedEntryCtx<'info> {
     pub invalidator: Signer<'info>,
 }
 
-pub fn handler(ctx: Context<InvalidateUnmanagedEntryCtx>) -> ProgramResult {
+pub fn handler(ctx: Context<InvalidateUnmanagedEntryCtx>) -> Result<()> {
     let entry = &mut ctx.accounts.entry;
     entry.data = None;
     entry.is_claimed = false;

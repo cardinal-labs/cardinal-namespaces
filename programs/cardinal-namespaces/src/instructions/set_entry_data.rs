@@ -1,7 +1,7 @@
 use anchor_spl::token::TokenAccount;
 use cardinal_certificate::{self};
 use {
-    crate::{errors::*, state::*},
+    crate::{errors::ErrorCode, state::*},
     anchor_lang::prelude::*,
 };
 
@@ -37,7 +37,7 @@ pub struct SetEntryData<'info> {
     system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<SetEntryData>, data: Pubkey) -> ProgramResult {
+pub fn handler(ctx: Context<SetEntryData>, data: Pubkey) -> Result<()> {
     let entry = &mut ctx.accounts.entry;
     entry.data = Some(data);
     Ok(())

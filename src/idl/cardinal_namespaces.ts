@@ -17,7 +17,7 @@ export type Namespaces = {
         },
         {
           name: "payer";
-          isMut: false;
+          isMut: true;
           isSigner: true;
         },
         {
@@ -143,7 +143,7 @@ export type Namespaces = {
         },
         {
           name: "payer";
-          isMut: false;
+          isMut: true;
           isSigner: true;
         },
         {
@@ -533,7 +533,7 @@ export type Namespaces = {
         },
         {
           name: "payer";
-          isMut: false;
+          isMut: true;
           isSigner: true;
         },
         {
@@ -1366,7 +1366,7 @@ export const IDL: Namespaces = {
         },
         {
           name: "payer",
-          isMut: false,
+          isMut: true,
           isSigner: true,
         },
         {
@@ -1492,7 +1492,7 @@ export const IDL: Namespaces = {
         },
         {
           name: "payer",
-          isMut: false,
+          isMut: true,
           isSigner: true,
         },
         {
@@ -1882,7 +1882,7 @@ export const IDL: Namespaces = {
         },
         {
           name: "payer",
-          isMut: false,
+          isMut: true,
           isSigner: true,
         },
         {

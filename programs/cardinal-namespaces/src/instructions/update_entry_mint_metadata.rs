@@ -3,7 +3,7 @@ use metaplex_token_metadata::{
     state::{Creator as MCreator, Data},
 };
 use {
-    crate::{errors::*, state::*},
+    crate::{errors::ErrorCode, state::*},
     anchor_lang::{prelude::*, solana_program::program::invoke_signed},
 };
 
@@ -15,7 +15,9 @@ pub struct UpdateEntryMintMetadataCtx<'info> {
     #[account(constraint = approve_authority.key() == namespace.approve_authority.unwrap() @ ErrorCode::InvalidApproveAuthority)]
     approve_authority: Signer<'info>,
     #[account(mut)]
+    /// CHECK: This is not dangerous because we don't read or write from this account
     certificate_mint_metadata: UncheckedAccount<'info>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
     token_metadata_program: UncheckedAccount<'info>,
 }
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Default)]

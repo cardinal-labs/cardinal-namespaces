@@ -1,5 +1,5 @@
 use {
-    crate::{errors::*, state::*},
+    crate::{errors::ErrorCode, state::*},
     anchor_lang::prelude::*,
 };
 
@@ -15,7 +15,7 @@ pub struct UpdateClaimRequestCtx<'info> {
     rent_request: Account<'info, ClaimRequest>,
 }
 
-pub fn handler(ctx: Context<UpdateClaimRequestCtx>, is_approved: bool) -> ProgramResult {
+pub fn handler(ctx: Context<UpdateClaimRequestCtx>, is_approved: bool) -> Result<()> {
     let rent_request = &mut ctx.accounts.rent_request;
     rent_request.is_approved = is_approved;
     Ok(())
