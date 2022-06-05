@@ -37,7 +37,7 @@ pub struct UpdateEntryMintMetadataIx {
     pub primary_sale_happened: Option<bool>,
 }
 
-pub fn handler(ctx: Context<UpdateEntryMintMetadataCtx>, ix: UpdateEntryMintMetadataIx) -> ProgramResult {
+pub fn handler(ctx: Context<UpdateEntryMintMetadataCtx>, ix: UpdateEntryMintMetadataIx) -> Result<()> {
     let namespace_seeds = &[NAMESPACE_PREFIX.as_bytes(), ctx.accounts.namespace.name.as_bytes(), &[ctx.accounts.namespace.bump]];
     let namespace_signer = &[&namespace_seeds[..]];
 
@@ -62,7 +62,7 @@ pub fn handler(ctx: Context<UpdateEntryMintMetadataCtx>, ix: UpdateEntryMintMeta
                 name: ctx.accounts.entry.name.clone() + "." + &ctx.accounts.namespace.name.to_string(),
                 symbol: "NAME".to_string(),
                 uri: "https://api.cardinal.so/metadata/".to_string() + &ctx.accounts.entry.mint.to_string(),
-                creators: args.creators.map(|creators| {
+                creators: ix.creators.map(|creators| {
                     creators
                         .iter()
                         .map(|c| MCreator {
@@ -72,9 +72,9 @@ pub fn handler(ctx: Context<UpdateEntryMintMetadataCtx>, ix: UpdateEntryMintMeta
                         })
                         .collect()
                 }),
-                seller_fee_basis_points: args.seller_fee_basis_points,
+                seller_fee_basis_points: ix.seller_fee_basis_points,
             }),
-            args.primary_sale_happened,
+            ix.primary_sale_happened,
         ),
         &[ctx.accounts.certificate_mint_metadata.to_account_info(), ctx.accounts.namespace.to_account_info()],
         namespace_signer,
