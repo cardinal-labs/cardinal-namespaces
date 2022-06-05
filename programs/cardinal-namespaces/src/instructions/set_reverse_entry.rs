@@ -1,8 +1,7 @@
-use anchor_lang::Discriminator;
 use anchor_spl::token::TokenAccount;
 use cardinal_certificate::{self};
 use {
-    crate::{errors::*, state::*},
+    crate::{errors::ErrorCode, state::*},
     anchor_lang::prelude::*,
 };
 
@@ -21,7 +20,7 @@ pub struct SetReverseEntryCtx<'info> {
         payer = payer,
         space = REVERSE_ENTRY_SIZE,
         seeds = [REVERSE_ENTRY_SEED.as_bytes(), user.key().as_ref()],
-        bump = reverse_entry_bump,
+        bump,
     )]
     reverse_entry: Box<Account<'info, ReverseEntry>>,
 
@@ -42,24 +41,17 @@ pub struct SetReverseEntryCtx<'info> {
 
     #[account(mut)]
     user: Signer<'info>,
+    #[account(mut)]
     payer: Signer<'info>,
     system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<SetReverseEntryCtx>, reverse_entry_bump: u8) -> ProgramResult {
+pub fn handler(ctx: Context<SetReverseEntryCtx>, _reverse_entry_bump: u8) -> Result<()> {
     let entry = &mut ctx.accounts.entry;
     entry.reverse_entry = Some(ctx.accounts.reverse_entry.key());
 
-    // discriminator check
-    let acct = ctx.accounts.reverse_entry.to_account_info();
-    let data: &[u8] = &acct.try_borrow_data()?;
-    let disc_bytes = &data[..8];
-    if disc_bytes != ReverseEntry::discriminator() && disc_bytes.iter().any(|a| a != &0) {
-        return Err(ErrorCode::AccountDiscriminatorMismatch.into());
-    }
-
     let reverse_entry = &mut ctx.accounts.reverse_entry;
-    reverse_entry.bump = reverse_entry_bump;
+    reverse_entry.bump = *ctx.bumps.get("reverse_entry").unwrap();
     reverse_entry.namespace_name = ctx.accounts.namespace.name.clone();
     reverse_entry.entry_name = entry.name.clone();
     Ok(())

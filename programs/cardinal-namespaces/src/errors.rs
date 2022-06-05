@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-#[error]
+#[error_code]
 pub enum ErrorCode {
     #[msg("Owner mint is invalid")]
     InvalidOwnerMint,
@@ -36,6 +36,4 @@ pub enum ErrorCode {
     InvalidApproveAuthority,
     #[msg("Namespace requires token")]
     NamespaceRequiresToken,
-    #[msg("Account discriminator mismatch")]
-    AccountDiscriminatorMismatch,
 }

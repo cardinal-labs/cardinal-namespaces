@@ -26,7 +26,7 @@ pub struct UpdateNamepsace<'info> {
     pub update_authority: Signer<'info>,
 }
 
-pub fn handler(ctx: Context<UpdateNamepsace>, ix: UpdateNamespaceIx) -> ProgramResult {
+pub fn handler(ctx: Context<UpdateNamepsace>, ix: UpdateNamespaceIx) -> Result<()> {
     let namespace = &mut ctx.accounts.namespace;
     namespace.update_authority = ix.update_authority;
     namespace.rent_authority = ix.rent_authority;

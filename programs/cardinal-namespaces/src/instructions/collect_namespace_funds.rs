@@ -1,6 +1,6 @@
 use anchor_spl::token::{self, Token, TokenAccount, Transfer};
 use {
-    crate::{errors::*, state::*},
+    crate::{errors::ErrorCode, state::*},
     anchor_lang::prelude::*,
 };
 
@@ -30,7 +30,7 @@ pub struct CollectNamespaceFundsCtx<'info> {
     pub token_program: Program<'info, Token>,
 }
 
-pub fn handler(ctx: Context<CollectNamespaceFundsCtx>, amount: u64) -> ProgramResult {
+pub fn handler(ctx: Context<CollectNamespaceFundsCtx>, amount: u64) -> Result<()> {
     // get PDA seeds to sign with
     let namespace_seeds = &[NAMESPACE_PREFIX.as_bytes(), ctx.accounts.namespace.name.as_bytes(), &[ctx.accounts.namespace.bump]];
     let namespace_signer = &[&namespace_seeds[..]];

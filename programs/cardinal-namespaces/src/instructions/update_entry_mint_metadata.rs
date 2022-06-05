@@ -1,6 +1,6 @@
 use metaplex_token_metadata::{instruction::update_metadata_accounts, state::Data};
 use {
-    crate::{errors::*, state::*},
+    crate::{errors::ErrorCode, state::*},
     anchor_lang::{prelude::*, solana_program::program::invoke_signed},
 };
 
@@ -9,12 +9,14 @@ pub struct UpdateEntryMintMetadataCtx<'info> {
     namespace: Box<Account<'info, Namespace>>,
     #[account(constraint = entry.namespace == namespace.key() @ ErrorCode::InvalidNamespace)]
     entry: Box<Account<'info, Entry>>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
     certificate_mint_metadata: UncheckedAccount<'info>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
     token_metadata_program: UncheckedAccount<'info>,
 }
 
-pub fn handler(ctx: Context<UpdateEntryMintMetadataCtx>) -> ProgramResult {
+pub fn handler(ctx: Context<UpdateEntryMintMetadataCtx>) -> Result<()> {
     let namespace_seeds = &[NAMESPACE_PREFIX.as_bytes(), ctx.accounts.namespace.name.as_bytes(), &[ctx.accounts.namespace.bump]];
     let namespace_signer = &[&namespace_seeds[..]];
 

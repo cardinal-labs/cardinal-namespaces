@@ -17,7 +17,7 @@ export type Namespaces = {
         },
         {
           name: "payer";
-          isMut: false;
+          isMut: true;
           isSigner: true;
         },
         {
@@ -143,7 +143,7 @@ export type Namespaces = {
         },
         {
           name: "payer";
-          isMut: false;
+          isMut: true;
           isSigner: true;
         },
         {
@@ -533,7 +533,7 @@ export type Namespaces = {
         },
         {
           name: "payer";
-          isMut: false;
+          isMut: true;
           isSigner: true;
         },
         {
@@ -1278,11 +1278,6 @@ export type Namespaces = {
       code: 6016;
       name: "NamespaceRequiresToken";
       msg: "Namespace requires token";
-    },
-    {
-      code: 6017;
-      name: "AccountDiscriminatorMismatch";
-      msg: "Account discriminator mismatch";
     }
   ];
 };
@@ -1306,7 +1301,7 @@ export const IDL: Namespaces = {
         },
         {
           name: "payer",
-          isMut: false,
+          isMut: true,
           isSigner: true,
         },
         {
@@ -1432,7 +1427,7 @@ export const IDL: Namespaces = {
         },
         {
           name: "payer",
-          isMut: false,
+          isMut: true,
           isSigner: true,
         },
         {
@@ -1822,7 +1817,7 @@ export const IDL: Namespaces = {
         },
         {
           name: "payer",
-          isMut: false,
+          isMut: true,
           isSigner: true,
         },
         {
@@ -2567,11 +2562,6 @@ export const IDL: Namespaces = {
       code: 6016,
       name: "NamespaceRequiresToken",
       msg: "Namespace requires token",
-    },
-    {
-      code: 6017,
-      name: "AccountDiscriminatorMismatch",
-      msg: "Account discriminator mismatch",
     },
   ],
 };
