@@ -26,7 +26,13 @@ Program addresses are the same on devnet, testnet, and mainnet-beta.
 
 - Namespaces: [`nameXpT2PwZ2iA6DTNYTotTmiMYusBCYqwBLN2QgF4w`](https://explorer.solana.com/address/nameXpT2PwZ2iA6DTNYTotTmiMYusBCYqwBLN2QgF4w)
 
-## Documentation
+## Getting Started
+
+```
+git clone https://github.com/cardinal-labs/cardinal-namespaces.git
+cd cardinal-namespaces
+make
+```
 
 ## Questions & Support
 
