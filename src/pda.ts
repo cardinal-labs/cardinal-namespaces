@@ -1,5 +1,5 @@
 import { utils } from "@project-serum/anchor";
-import * as web3 from "@solana/web3.js";
+import { PublicKey } from "@solana/web3.js";
 
 import {
   CLAIM_REQUEST_SEED,
@@ -16,8 +16,8 @@ import {
  */
 export const findNamespaceId = async (
   namespaceName: string
-): Promise<[web3.PublicKey, number]> => {
-  return web3.PublicKey.findProgramAddress(
+): Promise<[PublicKey, number]> => {
+  return PublicKey.findProgramAddress(
     [
       utils.bytes.utf8.encode(NAMESPACE_SEED),
       utils.bytes.utf8.encode(namespaceName),
@@ -31,10 +31,10 @@ export const findNamespaceId = async (
  * @returns
  */
 export const findNameEntryId = async (
-  namespaceId: web3.PublicKey,
+  namespaceId: PublicKey,
   entryName: string
-): Promise<[web3.PublicKey, number]> => {
-  return web3.PublicKey.findProgramAddress(
+): Promise<[PublicKey, number]> => {
+  return PublicKey.findProgramAddress(
     [
       utils.bytes.utf8.encode(ENTRY_SEED),
       namespaceId.toBytes(),
@@ -49,11 +49,11 @@ export const findNameEntryId = async (
  * @returns
  */
 export const findClaimRequestId = async (
-  namespaceId: web3.PublicKey,
+  namespaceId: PublicKey,
   entryName: string,
-  requestor: web3.PublicKey
-): Promise<[web3.PublicKey, number]> => {
-  return web3.PublicKey.findProgramAddress(
+  requestor: PublicKey
+): Promise<[PublicKey, number]> => {
+  return PublicKey.findProgramAddress(
     [
       utils.bytes.utf8.encode(CLAIM_REQUEST_SEED),
       namespaceId.toBytes(),
@@ -69,9 +69,9 @@ export const findClaimRequestId = async (
  * @returns
  */
 export const findReverseEntryId = async (
-  pubkey: web3.PublicKey
-): Promise<[web3.PublicKey, number]> => {
-  return web3.PublicKey.findProgramAddress(
+  pubkey: PublicKey
+): Promise<[PublicKey, number]> => {
+  return PublicKey.findProgramAddress(
     [utils.bytes.utf8.encode(REVERSE_ENTRY_SEED), pubkey.toBytes()],
     NAMESPACES_PROGRAM_ID
   );
@@ -81,10 +81,8 @@ export const findReverseEntryId = async (
  * Finds the namespace id.
  * @returns
  */
-export const findGlobalContextId = async (): Promise<
-  [web3.PublicKey, number]
-> => {
-  return web3.PublicKey.findProgramAddress(
+export const findGlobalContextId = async (): Promise<[PublicKey, number]> => {
+  return PublicKey.findProgramAddress(
     [utils.bytes.utf8.encode(GLOBAL_CONTEXT_SEED)],
     NAMESPACES_PROGRAM_ID
   );

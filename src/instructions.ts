@@ -9,8 +9,10 @@ import * as mplTokenMetadata from "@metaplex-foundation/mpl-token-metadata";
 import * as anchor from "@project-serum/anchor";
 import type { Wallet } from "@saberhq/solana-contrib";
 import * as splToken from "@solana/spl-token";
-import * as web3 from "@solana/web3.js";
+import type { Connection, Transaction } from "@solana/web3.js";
+import { PublicKey, SystemProgram, SYSVAR_RENT_PUBKEY } from "@solana/web3.js";
 
+import type { NAMESPACES_PROGRAM } from ".";
 import {
   CLAIM_REQUEST_SEED,
   ENTRY_SEED,
@@ -20,14 +22,13 @@ import {
   NAMESPACES_PROGRAM_ID,
   REVERSE_ENTRY_SEED,
 } from ".";
-import type { NAMESPACES_PROGRAM } from "./constants";
 
 export async function withInit(
-  connection: web3.Connection,
+  connection: Connection,
   wallet: Wallet,
   rentalPercentage: number,
-  transaction: web3.Transaction
-): Promise<web3.Transaction> {
+  transaction: Transaction
+): Promise<Transaction> {
   const provider = new anchor.AnchorProvider(connection, wallet, {});
   const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
     NAMESPACES_IDL,
@@ -35,7 +36,7 @@ export async function withInit(
     provider
   );
 
-  const [globalContextId] = await web3.PublicKey.findProgramAddress(
+  const [globalContextId] = await PublicKey.findProgramAddress(
     [anchor.utils.bytes.utf8.encode(GLOBAL_CONTEXT_SEED)],
     namespacesProgram.programId
   );
@@ -59,20 +60,20 @@ export async function withInit(
 }
 
 export async function withCreateNamespace(
-  connection: web3.Connection,
+  connection: Connection,
   wallet: Wallet,
   name: string,
-  updateAuthority: web3.PublicKey,
-  rentAuthority: web3.PublicKey,
-  approveAuthority: web3.PublicKey | null,
+  updateAuthority: PublicKey,
+  rentAuthority: PublicKey,
+  approveAuthority: PublicKey | null,
   schema: number,
   paymentAmountDaily: anchor.BN,
-  paymentMint: web3.PublicKey,
+  paymentMint: PublicKey,
   minRentalSeconds: anchor.BN,
   maxRentalSeconds: anchor.BN | null,
   transferableEntries: boolean,
-  transaction: web3.Transaction
-): Promise<web3.Transaction> {
+  transaction: Transaction
+): Promise<Transaction> {
   const provider = new anchor.AnchorProvider(connection, wallet, {});
   const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
     NAMESPACES_IDL,
@@ -80,7 +81,7 @@ export async function withCreateNamespace(
     provider
   );
 
-  const [namespaceId, bump] = await web3.PublicKey.findProgramAddress(
+  const [namespaceId, bump] = await PublicKey.findProgramAddress(
     [
       anchor.utils.bytes.utf8.encode(NAMESPACE_SEED),
       anchor.utils.bytes.utf8.encode(name),
@@ -117,19 +118,19 @@ export async function withCreateNamespace(
 }
 
 export async function withUpdateNamespace(
-  connection: web3.Connection,
+  connection: Connection,
   wallet: Wallet,
   name: string,
-  updateAuthority: web3.PublicKey,
-  rentAuthority: web3.PublicKey,
-  approveAuthority: web3.PublicKey | null,
+  updateAuthority: PublicKey,
+  rentAuthority: PublicKey,
+  approveAuthority: PublicKey | null,
   paymentAmountDaily: anchor.BN,
-  paymentMint: web3.PublicKey,
+  paymentMint: PublicKey,
   minRentalSeconds: anchor.BN,
   maxRentalSeconds: anchor.BN | null,
   transferableEntries: boolean,
-  transaction: web3.Transaction
-): Promise<web3.Transaction> {
+  transaction: Transaction
+): Promise<Transaction> {
   const provider = new anchor.AnchorProvider(connection, wallet, {});
   const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
     NAMESPACES_IDL,
@@ -137,7 +138,7 @@ export async function withUpdateNamespace(
     provider
   );
 
-  const [namespaceId] = await web3.PublicKey.findProgramAddress(
+  const [namespaceId] = await PublicKey.findProgramAddress(
     [
       anchor.utils.bytes.utf8.encode(NAMESPACE_SEED),
       anchor.utils.bytes.utf8.encode(name),
@@ -169,13 +170,13 @@ export async function withUpdateNamespace(
 }
 
 export async function withInitEntry(
-  connection: web3.Connection,
+  connection: Connection,
   wallet: Wallet,
-  certificateMintId: web3.PublicKey,
+  certificateMintId: PublicKey,
   namespaceName: string,
   entryName: string,
-  transaction: web3.Transaction
-): Promise<web3.Transaction> {
+  transaction: Transaction
+): Promise<Transaction> {
   const provider = new anchor.AnchorProvider(connection, wallet, {});
   const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
     NAMESPACES_IDL,
@@ -183,7 +184,7 @@ export async function withInitEntry(
     provider
   );
 
-  const [namespaceId] = await web3.PublicKey.findProgramAddress(
+  const [namespaceId] = await PublicKey.findProgramAddress(
     [
       anchor.utils.bytes.utf8.encode(NAMESPACE_SEED),
       anchor.utils.bytes.utf8.encode(namespaceName),
@@ -191,7 +192,7 @@ export async function withInitEntry(
     namespacesProgram.programId
   );
 
-  const [entryId, entryBump] = await web3.PublicKey.findProgramAddress(
+  const [entryId, entryBump] = await PublicKey.findProgramAddress(
     [
       anchor.utils.bytes.utf8.encode(ENTRY_SEED),
       namespaceId.toBytes(),
@@ -200,16 +201,15 @@ export async function withInitEntry(
     namespacesProgram.programId
   );
 
-  const [mintManagerId, mintManagerBump] =
-    await web3.PublicKey.findProgramAddress(
-      [
-        anchor.utils.bytes.utf8.encode(MINT_MANAGER_SEED),
-        certificateMintId.toBytes(),
-      ],
-      CERTIFICATE_PROGRAM_ID
-    );
+  const [mintManagerId, mintManagerBump] = await PublicKey.findProgramAddress(
+    [
+      anchor.utils.bytes.utf8.encode(MINT_MANAGER_SEED),
+      certificateMintId.toBytes(),
+    ],
+    CERTIFICATE_PROGRAM_ID
+  );
 
-  const [certificateMintMetadataId] = await web3.PublicKey.findProgramAddress(
+  const [certificateMintMetadataId] = await PublicKey.findProgramAddress(
     [
       Buffer.from(mplTokenMetadata.MetadataProgram.PREFIX),
       mplTokenMetadata.MetadataProgram.PUBKEY.toBuffer(),
@@ -223,7 +223,7 @@ export async function withInitEntry(
   );
 
   transaction.add(
-    web3.SystemProgram.createAccount({
+    SystemProgram.createAccount({
       fromPubkey: provider.wallet.publicKey,
       newAccountPubkey: certificateMintId,
       lamports: mintBalanceNeeded,
@@ -266,7 +266,7 @@ export async function withInitEntry(
           tokenMetadataProgram: mplTokenMetadata.MetadataProgram.PUBKEY,
           tokenProgram: splToken.TOKEN_PROGRAM_ID,
           associatedToken: splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
-          rent: web3.SYSVAR_RENT_PUBKEY,
+          rent: SYSVAR_RENT_PUBKEY,
           systemProgram: anchor.web3.SystemProgram.programId,
         },
       }
@@ -276,20 +276,20 @@ export async function withInitEntry(
 }
 
 export async function withCreateClaimRequest(
-  connection: web3.Connection,
+  connection: Connection,
   wallet: Wallet,
   namespaceName: string,
   entryName: string,
-  user: web3.PublicKey,
-  transaction: web3.Transaction
-): Promise<web3.Transaction> {
+  user: PublicKey,
+  transaction: Transaction
+): Promise<Transaction> {
   const provider = new anchor.AnchorProvider(connection, wallet, {});
   const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
     NAMESPACES_IDL,
     NAMESPACES_PROGRAM_ID,
     provider
   );
-  const [namespaceId] = await web3.PublicKey.findProgramAddress(
+  const [namespaceId] = await PublicKey.findProgramAddress(
     [
       anchor.utils.bytes.utf8.encode(NAMESPACE_SEED),
       anchor.utils.bytes.utf8.encode(namespaceName),
@@ -297,16 +297,15 @@ export async function withCreateClaimRequest(
     namespacesProgram.programId
   );
 
-  const [claimRequestId, claimRequestBump] =
-    await web3.PublicKey.findProgramAddress(
-      [
-        anchor.utils.bytes.utf8.encode(CLAIM_REQUEST_SEED),
-        namespaceId.toBytes(),
-        anchor.utils.bytes.utf8.encode(entryName),
-        user.toBytes(),
-      ],
-      namespacesProgram.programId
-    );
+  const [claimRequestId, claimRequestBump] = await PublicKey.findProgramAddress(
+    [
+      anchor.utils.bytes.utf8.encode(CLAIM_REQUEST_SEED),
+      namespaceId.toBytes(),
+      anchor.utils.bytes.utf8.encode(entryName),
+      user.toBytes(),
+    ],
+    namespacesProgram.programId
+  );
 
   transaction.add(
     namespacesProgram.instruction.createClaimRequest(
@@ -327,20 +326,20 @@ export async function withCreateClaimRequest(
 }
 
 export async function withUpdateClaimRequest(
-  connection: web3.Connection,
+  connection: Connection,
   wallet: Wallet,
   namespaceName: string,
-  claimRequestId: web3.PublicKey,
+  claimRequestId: PublicKey,
   isApproved: boolean,
-  transaction: web3.Transaction
-): Promise<web3.Transaction> {
+  transaction: Transaction
+): Promise<Transaction> {
   const provider = new anchor.AnchorProvider(connection, wallet, {});
   const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
     NAMESPACES_IDL,
     NAMESPACES_PROGRAM_ID,
     provider
   );
-  const [namespaceId] = await web3.PublicKey.findProgramAddress(
+  const [namespaceId] = await PublicKey.findProgramAddress(
     [
       anchor.utils.bytes.utf8.encode(NAMESPACE_SEED),
       anchor.utils.bytes.utf8.encode(namespaceName),
@@ -360,21 +359,21 @@ export async function withUpdateClaimRequest(
 }
 
 export async function withClaimEntry(
-  connection: web3.Connection,
+  connection: Connection,
   wallet: Wallet,
   namespaceName: string,
   entryName: string,
-  certificateMintId: web3.PublicKey,
+  certificateMintId: PublicKey,
   duration: number,
-  transaction: web3.Transaction
-): Promise<web3.Transaction> {
+  transaction: Transaction
+): Promise<Transaction> {
   const provider = new anchor.AnchorProvider(connection, wallet, {});
   const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
     NAMESPACES_IDL,
     NAMESPACES_PROGRAM_ID,
     provider
   );
-  const [namespaceId] = await web3.PublicKey.findProgramAddress(
+  const [namespaceId] = await PublicKey.findProgramAddress(
     [
       anchor.utils.bytes.utf8.encode(NAMESPACE_SEED),
       anchor.utils.bytes.utf8.encode(namespaceName),
@@ -382,7 +381,7 @@ export async function withClaimEntry(
     namespacesProgram.programId
   );
 
-  const [entryId] = await web3.PublicKey.findProgramAddress(
+  const [entryId] = await PublicKey.findProgramAddress(
     [
       anchor.utils.bytes.utf8.encode(ENTRY_SEED),
       namespaceId.toBytes(),
@@ -391,7 +390,7 @@ export async function withClaimEntry(
     namespacesProgram.programId
   );
 
-  const [claimRequestId] = await web3.PublicKey.findProgramAddress(
+  const [claimRequestId] = await PublicKey.findProgramAddress(
     [
       anchor.utils.bytes.utf8.encode(CLAIM_REQUEST_SEED),
       namespaceId.toBytes(),
@@ -405,16 +404,15 @@ export async function withClaimEntry(
     namespaceId
   );
 
-  const [certificateId, certificateBump] =
-    await web3.PublicKey.findProgramAddress(
-      [
-        anchor.utils.bytes.utf8.encode(CERTIFICATE_SEED),
-        certificateMintId.toBuffer(),
-      ],
-      CERTIFICATE_PROGRAM_ID
-    );
+  const [certificateId, certificateBump] = await PublicKey.findProgramAddress(
+    [
+      anchor.utils.bytes.utf8.encode(CERTIFICATE_SEED),
+      certificateMintId.toBuffer(),
+    ],
+    CERTIFICATE_PROGRAM_ID
+  );
 
-  const [mintManagerId] = await web3.PublicKey.findProgramAddress(
+  const [mintManagerId] = await PublicKey.findProgramAddress(
     [
       anchor.utils.bytes.utf8.encode(MINT_MANAGER_SEED),
       certificateMintId.toBytes(),
@@ -495,7 +493,7 @@ export async function withClaimEntry(
           certificateProgram: CERTIFICATE_PROGRAM_ID,
           tokenProgram: splToken.TOKEN_PROGRAM_ID,
           associatedToken: splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
-          rent: web3.SYSVAR_RENT_PUBKEY,
+          rent: SYSVAR_RENT_PUBKEY,
           systemProgram: anchor.web3.SystemProgram.programId,
         },
       }
@@ -505,20 +503,20 @@ export async function withClaimEntry(
 }
 
 export async function withSetEntryData(
-  connection: web3.Connection,
+  connection: Connection,
   wallet: Wallet,
   namespaceName: string,
   entryName: string,
-  entryData: web3.PublicKey,
-  transaction: web3.Transaction
-): Promise<web3.Transaction> {
+  entryData: PublicKey,
+  transaction: Transaction
+): Promise<Transaction> {
   const provider = new anchor.AnchorProvider(connection, wallet, {});
   const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
     NAMESPACES_IDL,
     NAMESPACES_PROGRAM_ID,
     provider
   );
-  const [namespaceId] = await web3.PublicKey.findProgramAddress(
+  const [namespaceId] = await PublicKey.findProgramAddress(
     [
       anchor.utils.bytes.utf8.encode(NAMESPACE_SEED),
       anchor.utils.bytes.utf8.encode(namespaceName),
@@ -526,7 +524,7 @@ export async function withSetEntryData(
     namespacesProgram.programId
   );
 
-  const [entryId] = await web3.PublicKey.findProgramAddress(
+  const [entryId] = await PublicKey.findProgramAddress(
     [
       anchor.utils.bytes.utf8.encode(ENTRY_SEED),
       namespaceId.toBytes(),
@@ -566,20 +564,20 @@ export async function withSetEntryData(
 }
 
 export async function withSetReverseEntry(
-  connection: web3.Connection,
+  connection: Connection,
   wallet: Wallet,
   namespaceName: string,
   entryName: string,
-  certificateMintId: web3.PublicKey,
-  transaction: web3.Transaction
-): Promise<web3.Transaction> {
+  certificateMintId: PublicKey,
+  transaction: Transaction
+): Promise<Transaction> {
   const provider = new anchor.AnchorProvider(connection, wallet, {});
   const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
     NAMESPACES_IDL,
     NAMESPACES_PROGRAM_ID,
     provider
   );
-  const [namespaceId] = await web3.PublicKey.findProgramAddress(
+  const [namespaceId] = await PublicKey.findProgramAddress(
     [
       anchor.utils.bytes.utf8.encode(NAMESPACE_SEED),
       anchor.utils.bytes.utf8.encode(namespaceName),
@@ -587,7 +585,7 @@ export async function withSetReverseEntry(
     namespacesProgram.programId
   );
 
-  const [entryId] = await web3.PublicKey.findProgramAddress(
+  const [entryId] = await PublicKey.findProgramAddress(
     [
       anchor.utils.bytes.utf8.encode(ENTRY_SEED),
       namespaceId.toBytes(),
@@ -596,14 +594,13 @@ export async function withSetReverseEntry(
     namespacesProgram.programId
   );
 
-  const [reverseEntryId, reverseEntryBump] =
-    await web3.PublicKey.findProgramAddress(
-      [
-        anchor.utils.bytes.utf8.encode(REVERSE_ENTRY_SEED),
-        wallet.publicKey.toBytes(),
-      ],
-      namespacesProgram.programId
-    );
+  const [reverseEntryId, reverseEntryBump] = await PublicKey.findProgramAddress(
+    [
+      anchor.utils.bytes.utf8.encode(REVERSE_ENTRY_SEED),
+      wallet.publicKey.toBytes(),
+    ],
+    namespacesProgram.programId
+  );
 
   const [certificateId] = await certificate.certificateIdForMint(
     certificateMintId
@@ -637,21 +634,21 @@ export async function withSetReverseEntry(
 }
 
 export async function withRevokeReverseEntry(
-  connection: web3.Connection,
+  connection: Connection,
   wallet: Wallet,
   namespaceName: string,
   entryName: string,
-  reverseEntryId: web3.PublicKey,
-  claimRequestId: web3.PublicKey,
-  transaction: web3.Transaction
-): Promise<web3.Transaction> {
+  reverseEntryId: PublicKey,
+  claimRequestId: PublicKey,
+  transaction: Transaction
+): Promise<Transaction> {
   const provider = new anchor.AnchorProvider(connection, wallet, {});
   const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
     NAMESPACES_IDL,
     NAMESPACES_PROGRAM_ID,
     provider
   );
-  const [namespaceId] = await web3.PublicKey.findProgramAddress(
+  const [namespaceId] = await PublicKey.findProgramAddress(
     [
       anchor.utils.bytes.utf8.encode(NAMESPACE_SEED),
       anchor.utils.bytes.utf8.encode(namespaceName),
@@ -659,7 +656,7 @@ export async function withRevokeReverseEntry(
     namespacesProgram.programId
   );
 
-  const [entryId] = await web3.PublicKey.findProgramAddress(
+  const [entryId] = await PublicKey.findProgramAddress(
     [
       anchor.utils.bytes.utf8.encode(ENTRY_SEED),
       namespaceId.toBytes(),
@@ -683,22 +680,22 @@ export async function withRevokeReverseEntry(
 }
 
 export async function withRevokeEntry(
-  connection: web3.Connection,
+  connection: Connection,
   wallet: Wallet,
   namespaceName: string,
   entryName: string,
-  certificateMintId: web3.PublicKey,
-  certificateOwnerId: web3.PublicKey,
-  claimRequestId: web3.PublicKey,
-  transaction: web3.Transaction
-): Promise<web3.Transaction> {
+  certificateMintId: PublicKey,
+  certificateOwnerId: PublicKey,
+  claimRequestId: PublicKey,
+  transaction: Transaction
+): Promise<Transaction> {
   const provider = new anchor.AnchorProvider(connection, wallet, {});
   const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
     NAMESPACES_IDL,
     NAMESPACES_PROGRAM_ID,
     provider
   );
-  const [namespaceId] = await web3.PublicKey.findProgramAddress(
+  const [namespaceId] = await PublicKey.findProgramAddress(
     [
       anchor.utils.bytes.utf8.encode(NAMESPACE_SEED),
       anchor.utils.bytes.utf8.encode(namespaceName),
@@ -706,7 +703,7 @@ export async function withRevokeEntry(
     namespacesProgram.programId
   );
 
-  const [entryId] = await web3.PublicKey.findProgramAddress(
+  const [entryId] = await PublicKey.findProgramAddress(
     [
       anchor.utils.bytes.utf8.encode(ENTRY_SEED),
       namespaceId.toBytes(),
@@ -719,7 +716,7 @@ export async function withRevokeEntry(
     namespaceId
   );
 
-  const [certificateId] = await web3.PublicKey.findProgramAddress(
+  const [certificateId] = await PublicKey.findProgramAddress(
     [
       anchor.utils.bytes.utf8.encode(CERTIFICATE_SEED),
       certificateMintId.toBuffer(),
@@ -727,7 +724,7 @@ export async function withRevokeEntry(
     CERTIFICATE_PROGRAM_ID
   );
 
-  const [mintManagerId] = await web3.PublicKey.findProgramAddress(
+  const [mintManagerId] = await PublicKey.findProgramAddress(
     [
       anchor.utils.bytes.utf8.encode(MINT_MANAGER_SEED),
       certificateMintId.toBytes(),
@@ -817,13 +814,13 @@ export async function withRevokeEntry(
 }
 
 export async function withUpdateMintMetadata(
-  connection: web3.Connection,
+  connection: Connection,
   wallet: Wallet,
-  namespaceId: web3.PublicKey,
-  entryId: web3.PublicKey,
-  certificateMintId: web3.PublicKey,
-  transaction: web3.Transaction
-): Promise<web3.Transaction> {
+  namespaceId: PublicKey,
+  entryId: PublicKey,
+  certificateMintId: PublicKey,
+  transaction: Transaction
+): Promise<Transaction> {
   const provider = new anchor.AnchorProvider(connection, wallet, {});
   const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
     NAMESPACES_IDL,
@@ -831,7 +828,7 @@ export async function withUpdateMintMetadata(
     provider
   );
 
-  const [certificateMintMetadataId] = await web3.PublicKey.findProgramAddress(
+  const [certificateMintMetadataId] = await PublicKey.findProgramAddress(
     [
       anchor.utils.bytes.utf8.encode(mplTokenMetadata.MetadataProgram.PREFIX),
       mplTokenMetadata.MetadataProgram.PUBKEY.toBuffer(),

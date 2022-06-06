@@ -1,5 +1,6 @@
-import * as anchor from "@project-serum/anchor";
-import * as web3 from "@solana/web3.js";
+import { utils } from "@project-serum/anchor";
+import type { Connection } from "@solana/web3.js";
+import { PublicKey } from "@solana/web3.js";
 
 import { getReverseEntry } from "./accounts";
 import {
@@ -39,8 +40,8 @@ export function displayAddress(address: string, shorten = true): string {
 }
 
 export async function tryGetName(
-  connection: web3.Connection,
-  pubkey: web3.PublicKey
+  connection: Connection,
+  pubkey: PublicKey
 ): Promise<string | undefined> {
   try {
     const reverseEntry = await getReverseEntry(connection, pubkey);
@@ -57,8 +58,8 @@ export async function tryGetName(
 }
 
 export async function nameForDisplay(
-  connection: web3.Connection,
-  pubkey: web3.PublicKey
+  connection: Connection,
+  pubkey: PublicKey
 ): Promise<string> {
   const name = await tryGetName(connection, pubkey);
   return name || displayAddress(pubkey.toString());
@@ -67,20 +68,20 @@ export async function nameForDisplay(
 export async function claimRequestId(
   namespaceName: string,
   entryName: string,
-  user: web3.PublicKey
+  user: PublicKey
 ) {
-  const [namespaceId] = await web3.PublicKey.findProgramAddress(
+  const [namespaceId] = await PublicKey.findProgramAddress(
     [
-      anchor.utils.bytes.utf8.encode(NAMESPACE_SEED),
-      anchor.utils.bytes.utf8.encode(namespaceName),
+      utils.bytes.utf8.encode(NAMESPACE_SEED),
+      utils.bytes.utf8.encode(namespaceName),
     ],
     NAMESPACES_PROGRAM_ID
   );
-  return web3.PublicKey.findProgramAddress(
+  return PublicKey.findProgramAddress(
     [
-      anchor.utils.bytes.utf8.encode(CLAIM_REQUEST_SEED),
+      utils.bytes.utf8.encode(CLAIM_REQUEST_SEED),
       namespaceId.toBytes(),
-      anchor.utils.bytes.utf8.encode(entryName),
+      utils.bytes.utf8.encode(entryName),
       user.toBytes(),
     ],
     NAMESPACES_PROGRAM_ID
@@ -88,26 +89,26 @@ export async function claimRequestId(
 }
 
 export async function nameEntryId(namespaceName: string, entryName: string) {
-  const [namespaceId] = await web3.PublicKey.findProgramAddress(
+  const [namespaceId] = await PublicKey.findProgramAddress(
     [
-      anchor.utils.bytes.utf8.encode(NAMESPACE_SEED),
-      anchor.utils.bytes.utf8.encode(namespaceName),
+      utils.bytes.utf8.encode(NAMESPACE_SEED),
+      utils.bytes.utf8.encode(namespaceName),
     ],
     NAMESPACES_PROGRAM_ID
   );
-  return web3.PublicKey.findProgramAddress(
+  return PublicKey.findProgramAddress(
     [
-      anchor.utils.bytes.utf8.encode(ENTRY_SEED),
+      utils.bytes.utf8.encode(ENTRY_SEED),
       namespaceId.toBytes(),
-      anchor.utils.bytes.utf8.encode(entryName),
+      utils.bytes.utf8.encode(entryName),
     ],
     NAMESPACES_PROGRAM_ID
   );
 }
 
-export const reverseEntryId = (address: web3.PublicKey) => {
-  return web3.PublicKey.findProgramAddress(
-    [anchor.utils.bytes.utf8.encode(REVERSE_ENTRY_SEED), address.toBytes()],
+export const reverseEntryId = (address: PublicKey) => {
+  return PublicKey.findProgramAddress(
+    [utils.bytes.utf8.encode(REVERSE_ENTRY_SEED), address.toBytes()],
     NAMESPACES_PROGRAM_ID
   );
 };
