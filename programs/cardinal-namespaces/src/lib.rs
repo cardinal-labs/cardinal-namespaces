@@ -11,20 +11,12 @@ declare_id!("nameXpT2PwZ2iA6DTNYTotTmiMYusBCYqwBLN2QgF4w");
 pub mod namespaces {
     use super::*;
 
-    pub fn init(ctx: Context<InitializeGlobalNamespaceCtx>, ix: InitializeGlobalNamespaceIx) -> Result<()> {
-        init_global_namespace::handler(ctx, ix)
+    pub fn init(ctx: Context<InitGlobalContextCtx>, ix: InitGlobalContextIx) -> Result<()> {
+        init_global_context::handler(ctx, ix)
     }
 
-    pub fn set_rent_percentage(ctx: Context<UpdateGlobalNamespaceCtx>, rent_percentage: u64) -> Result<()> {
-        update_global_namespace::handler(ctx, rent_percentage)
-    }
-
-    pub fn transfer_global_update_authority(ctx: Context<SetGlobalNamespaceUpdateAuthorityCtx>, update_authority: Pubkey) -> Result<()> {
-        set_global_update_authority::handler(ctx, update_authority)
-    }
-
-    pub fn transfer_global_rent_authority(ctx: Context<SetGlobalNamespaceRentAuthorityCtx>, rent_authority: Pubkey) -> Result<()> {
-        set_global_rent_authority::handler(ctx, rent_authority)
+    pub fn update_global_context(ctx: Context<UpdateGlobalContextCtx>, ix: UpdateGlobalContextIx) -> Result<()> {
+        update_global_context::handler(ctx, ix)
     }
 
     pub fn create_namespace(ctx: Context<CreateNamespace>, ix: CreateNamespaceIx) -> Result<()> {
@@ -37,10 +29,6 @@ pub mod namespaces {
 
     pub fn collect_namespace_funds(ctx: Context<CollectNamespaceFundsCtx>, amount: u64) -> Result<()> {
         collect_namespace_funds::handler(ctx, amount)
-    }
-
-    pub fn collect_global_funds(ctx: Context<CollectGlobalFundsCtx>, amount: u64) -> Result<()> {
-        collect_global_funds::handler(ctx, amount)
     }
 
     pub fn init_entry(ctx: Context<InitEntry>, ix: InitEntryIx) -> Result<()> {

@@ -35,7 +35,7 @@ export async function withInit(
     provider
   );
 
-  const [globalContextId, bump] = await web3.PublicKey.findProgramAddress(
+  const [globalContextId] = await web3.PublicKey.findProgramAddress(
     [anchor.utils.bytes.utf8.encode(GLOBAL_CONTEXT_SEED)],
     namespacesProgram.programId
   );
@@ -43,8 +43,7 @@ export async function withInit(
   transaction.add(
     namespacesProgram.instruction.init(
       {
-        rentPercentage: new anchor.BN(rentalPercentage),
-        bump,
+        feeBasisPoints: new anchor.BN(rentalPercentage),
       },
       {
         accounts: {

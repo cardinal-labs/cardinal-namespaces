@@ -7,12 +7,13 @@ pub const REVERSE_ENTRY_SEED: &str = "reverse-entry";
 pub const CLAIM_REQUEST_SEED: &str = "rent-request";
 
 pub const GLOBAL_CONTEXT_SIZE: usize = 8 + std::mem::size_of::<GlobalContext>() + 24;
+pub const BASIS_POINTS_DIVISOR: u16 = 10000;
 #[account]
 pub struct GlobalContext {
     pub bump: u8,
     pub update_authority: Pubkey,
     pub rent_authority: Pubkey,
-    pub rent_percentage: u64,
+    pub fee_basis_points: u64,
 }
 
 pub const NAMESPACE_SIZE: usize = 8 + std::mem::size_of::<Namespace>() + 80;
@@ -31,7 +32,6 @@ pub struct Namespace {
     pub min_rental_seconds: i64,
     pub max_rental_seconds: Option<i64>,
     pub transferable_entries: bool,
-    //
 }
 
 pub const CLAIM_REQUEST_SIZE: usize = 8 + std::mem::size_of::<ClaimRequest>() + 24;

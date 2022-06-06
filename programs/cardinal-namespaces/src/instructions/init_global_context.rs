@@ -1,14 +1,13 @@
 use {crate::state::*, anchor_lang::prelude::*};
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
-pub struct InitializeGlobalNamespaceIx {
-    pub rent_percentage: u64,
-    pub bump: u8,
+pub struct InitGlobalContextIx {
+    pub fee_basis_points: u64,
 }
 
 #[derive(Accounts)]
-#[instruction(ix: InitializeGlobalNamespaceIx)]
-pub struct InitializeGlobalNamespaceCtx<'info> {
+#[instruction(ix: InitGlobalContextIx)]
+pub struct InitGlobalContextCtx<'info> {
     #[account(
         init,
         payer = payer,
@@ -23,11 +22,11 @@ pub struct InitializeGlobalNamespaceCtx<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<InitializeGlobalNamespaceCtx>, ix: InitializeGlobalNamespaceIx) -> Result<()> {
+pub fn handler(ctx: Context<InitGlobalContextCtx>, ix: InitGlobalContextIx) -> Result<()> {
     let global_context = &mut ctx.accounts.global_context;
     global_context.bump = *ctx.bumps.get("global_context").unwrap();
     global_context.update_authority = ctx.accounts.authority.key();
     global_context.rent_authority = ctx.accounts.authority.key();
-    global_context.rent_percentage = ix.rent_percentage;
+    global_context.fee_basis_points = ix.fee_basis_points;
     Ok(())
 }

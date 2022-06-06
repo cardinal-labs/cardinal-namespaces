@@ -30,13 +30,13 @@ export type Namespaces = {
         {
           name: "ix";
           type: {
-            defined: "InitializeGlobalNamespaceIx";
+            defined: "InitGlobalContextIx";
           };
         }
       ];
     },
     {
-      name: "setRentPercentage";
+      name: "updateGlobalContext";
       accounts: [
         {
           name: "globalContext";
@@ -47,84 +47,14 @@ export type Namespaces = {
           name: "updateAuthority";
           isMut: false;
           isSigner: true;
-        },
-        {
-          name: "payer";
-          isMut: false;
-          isSigner: true;
-        },
-        {
-          name: "systemProgram";
-          isMut: false;
-          isSigner: false;
         }
       ];
       args: [
         {
-          name: "rentPercentage";
-          type: "u64";
-        }
-      ];
-    },
-    {
-      name: "transferGlobalUpdateAuthority";
-      accounts: [
-        {
-          name: "globalContext";
-          isMut: true;
-          isSigner: false;
-        },
-        {
-          name: "updateAuthority";
-          isMut: false;
-          isSigner: true;
-        },
-        {
-          name: "payer";
-          isMut: false;
-          isSigner: true;
-        },
-        {
-          name: "systemProgram";
-          isMut: false;
-          isSigner: false;
-        }
-      ];
-      args: [
-        {
-          name: "updateAuthority";
-          type: "publicKey";
-        }
-      ];
-    },
-    {
-      name: "transferGlobalRentAuthority";
-      accounts: [
-        {
-          name: "globalContext";
-          isMut: true;
-          isSigner: false;
-        },
-        {
-          name: "rentAuthority";
-          isMut: false;
-          isSigner: true;
-        },
-        {
-          name: "payer";
-          isMut: false;
-          isSigner: true;
-        },
-        {
-          name: "systemProgram";
-          isMut: false;
-          isSigner: false;
-        }
-      ];
-      args: [
-        {
-          name: "rentAuthority";
-          type: "publicKey";
+          name: "ix";
+          type: {
+            defined: "UpdateGlobalContextIx";
+          };
         }
       ];
     },
@@ -193,7 +123,7 @@ export type Namespaces = {
           isSigner: false;
         },
         {
-          name: "globalNamespacePaymentAccount";
+          name: "globalContextPaymentAccount";
           isMut: true;
           isSigner: false;
         },
@@ -214,42 +144,6 @@ export type Namespaces = {
         },
         {
           name: "rentAuthorityTokenAccount";
-          isMut: true;
-          isSigner: false;
-        },
-        {
-          name: "tokenProgram";
-          isMut: false;
-          isSigner: false;
-        }
-      ];
-      args: [
-        {
-          name: "amount";
-          type: "u64";
-        }
-      ];
-    },
-    {
-      name: "collectGlobalFunds";
-      accounts: [
-        {
-          name: "globalContext";
-          isMut: false;
-          isSigner: false;
-        },
-        {
-          name: "globalNamespacePaymentAccount";
-          isMut: true;
-          isSigner: false;
-        },
-        {
-          name: "rentAuthority";
-          isMut: false;
-          isSigner: true;
-        },
-        {
-          name: "authorityTokenAccount";
           isMut: true;
           isSigner: false;
         },
@@ -898,7 +792,7 @@ export type Namespaces = {
             type: "publicKey";
           },
           {
-            name: "rentPercentage";
+            name: "feeBasisPoints";
             type: "u64";
           }
         ];
@@ -1145,17 +1039,13 @@ export type Namespaces = {
       };
     },
     {
-      name: "InitializeGlobalNamespaceIx";
+      name: "InitGlobalContextIx";
       type: {
         kind: "struct";
         fields: [
           {
-            name: "rentPercentage";
+            name: "feeBasisPoints";
             type: "u64";
-          },
-          {
-            name: "bump";
-            type: "u8";
           }
         ];
       };
@@ -1203,6 +1093,32 @@ export type Namespaces = {
             name: "primarySaleHappened";
             type: {
               option: "bool";
+            };
+          }
+        ];
+      };
+    },
+    {
+      name: "UpdateGlobalContextIx";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "updateAuthority";
+            type: {
+              option: "publicKey";
+            };
+          },
+          {
+            name: "rentAuthority";
+            type: {
+              option: "publicKey";
+            };
+          },
+          {
+            name: "feeBasisPoints";
+            type: {
+              option: "u64";
             };
           }
         ];
@@ -1296,8 +1212,8 @@ export type Namespaces = {
     },
     {
       code: 6008;
-      name: "InvalidGlobalNamespacePaymentAccount";
-      msg: "Invalid global namespace payment account";
+      name: "InvalidGlobalContextPaymentAccount";
+      msg: "Invalid global context payment account";
     },
     {
       code: 6009;
@@ -1374,13 +1290,13 @@ export const IDL: Namespaces = {
         {
           name: "ix",
           type: {
-            defined: "InitializeGlobalNamespaceIx",
+            defined: "InitGlobalContextIx",
           },
         },
       ],
     },
     {
-      name: "setRentPercentage",
+      name: "updateGlobalContext",
       accounts: [
         {
           name: "globalContext",
@@ -1392,83 +1308,13 @@ export const IDL: Namespaces = {
           isMut: false,
           isSigner: true,
         },
-        {
-          name: "payer",
-          isMut: false,
-          isSigner: true,
-        },
-        {
-          name: "systemProgram",
-          isMut: false,
-          isSigner: false,
-        },
       ],
       args: [
         {
-          name: "rentPercentage",
-          type: "u64",
-        },
-      ],
-    },
-    {
-      name: "transferGlobalUpdateAuthority",
-      accounts: [
-        {
-          name: "globalContext",
-          isMut: true,
-          isSigner: false,
-        },
-        {
-          name: "updateAuthority",
-          isMut: false,
-          isSigner: true,
-        },
-        {
-          name: "payer",
-          isMut: false,
-          isSigner: true,
-        },
-        {
-          name: "systemProgram",
-          isMut: false,
-          isSigner: false,
-        },
-      ],
-      args: [
-        {
-          name: "updateAuthority",
-          type: "publicKey",
-        },
-      ],
-    },
-    {
-      name: "transferGlobalRentAuthority",
-      accounts: [
-        {
-          name: "globalContext",
-          isMut: true,
-          isSigner: false,
-        },
-        {
-          name: "rentAuthority",
-          isMut: false,
-          isSigner: true,
-        },
-        {
-          name: "payer",
-          isMut: false,
-          isSigner: true,
-        },
-        {
-          name: "systemProgram",
-          isMut: false,
-          isSigner: false,
-        },
-      ],
-      args: [
-        {
-          name: "rentAuthority",
-          type: "publicKey",
+          name: "ix",
+          type: {
+            defined: "UpdateGlobalContextIx",
+          },
         },
       ],
     },
@@ -1537,7 +1383,7 @@ export const IDL: Namespaces = {
           isSigner: false,
         },
         {
-          name: "globalNamespacePaymentAccount",
+          name: "globalContextPaymentAccount",
           isMut: true,
           isSigner: false,
         },
@@ -1558,42 +1404,6 @@ export const IDL: Namespaces = {
         },
         {
           name: "rentAuthorityTokenAccount",
-          isMut: true,
-          isSigner: false,
-        },
-        {
-          name: "tokenProgram",
-          isMut: false,
-          isSigner: false,
-        },
-      ],
-      args: [
-        {
-          name: "amount",
-          type: "u64",
-        },
-      ],
-    },
-    {
-      name: "collectGlobalFunds",
-      accounts: [
-        {
-          name: "globalContext",
-          isMut: false,
-          isSigner: false,
-        },
-        {
-          name: "globalNamespacePaymentAccount",
-          isMut: true,
-          isSigner: false,
-        },
-        {
-          name: "rentAuthority",
-          isMut: false,
-          isSigner: true,
-        },
-        {
-          name: "authorityTokenAccount",
           isMut: true,
           isSigner: false,
         },
@@ -2242,7 +2052,7 @@ export const IDL: Namespaces = {
             type: "publicKey",
           },
           {
-            name: "rentPercentage",
+            name: "feeBasisPoints",
             type: "u64",
           },
         ],
@@ -2489,17 +2299,13 @@ export const IDL: Namespaces = {
       },
     },
     {
-      name: "InitializeGlobalNamespaceIx",
+      name: "InitGlobalContextIx",
       type: {
         kind: "struct",
         fields: [
           {
-            name: "rentPercentage",
+            name: "feeBasisPoints",
             type: "u64",
-          },
-          {
-            name: "bump",
-            type: "u8",
           },
         ],
       },
@@ -2547,6 +2353,32 @@ export const IDL: Namespaces = {
             name: "primarySaleHappened",
             type: {
               option: "bool",
+            },
+          },
+        ],
+      },
+    },
+    {
+      name: "UpdateGlobalContextIx",
+      type: {
+        kind: "struct",
+        fields: [
+          {
+            name: "updateAuthority",
+            type: {
+              option: "publicKey",
+            },
+          },
+          {
+            name: "rentAuthority",
+            type: {
+              option: "publicKey",
+            },
+          },
+          {
+            name: "feeBasisPoints",
+            type: {
+              option: "u64",
             },
           },
         ],
@@ -2640,8 +2472,8 @@ export const IDL: Namespaces = {
     },
     {
       code: 6008,
-      name: "InvalidGlobalNamespacePaymentAccount",
-      msg: "Invalid global namespace payment account",
+      name: "InvalidGlobalContextPaymentAccount",
+      msg: "Invalid global context payment account",
     },
     {
       code: 6009,

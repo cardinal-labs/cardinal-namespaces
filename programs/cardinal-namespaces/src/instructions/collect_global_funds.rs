@@ -11,8 +11,8 @@ pub struct CollectGlobalFundsCtx<'info> {
         bump = global_context.bump,
     )]
     pub global_context: Account<'info, GlobalContext>,
-    #[account(mut, constraint = global_namespace_payment_account.owner == global_context.key() @ ErrorCode::InvalidGlobalNamespacePaymentAccount)]
-    pub global_namespace_payment_account: Account<'info, TokenAccount>,
+    #[account(mut, constraint = global_context_payment_account.owner == global_context.key() @ ErrorCode::InvalidGlobalContextPaymentAccount)]
+    pub global_context_payment_account: Account<'info, TokenAccount>,
 
     #[account(constraint = global_context.rent_authority == rent_authority.key())]
     pub rent_authority: Signer<'info>,
@@ -30,7 +30,7 @@ pub fn handler(ctx: Context<CollectGlobalFundsCtx>, amount: u64) -> Result<()> {
 
     // transfer amount to authority
     let cpi_accounts = Transfer {
-        from: ctx.accounts.global_namespace_payment_account.to_account_info(),
+        from: ctx.accounts.global_context_payment_account.to_account_info(),
         to: ctx.accounts.authority_token_account.to_account_info(),
         authority: ctx.accounts.global_context.to_account_info(),
     };

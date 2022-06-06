@@ -2,6 +2,7 @@ import type {
   AccountData,
   ClaimRequestData,
   EntryData,
+  ReverseEntryData,
 } from "@cardinal/namespaces";
 import { NAMESPACES_IDL, NAMESPACES_PROGRAM_ID } from "@cardinal/namespaces";
 import * as anchor from "@project-serum/anchor";
@@ -17,35 +18,39 @@ export async function countEntries(connection: web3.Connection): Promise<void> {
   console.log(`Found ${programAccounts.length} accounts`);
   const namespaceEntries: AccountData<EntryData>[] = [];
   const claimRequests: AccountData<ClaimRequestData>[] = [];
+  const reverseEntries: AccountData<ReverseEntryData>[] = [];
   programAccounts.forEach((account) => {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const entryData = coder.accounts.decode("entry", account.account.data);
       namespaceEntries.push({
         ...account,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         parsed: entryData,
       });
-    } catch (e) {
-      console.log(e);
-    }
+    } catch (e) {}
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const claimRequestData = coder.accounts.decode(
         "claimRequest",
         account.account.data
       );
       claimRequests.push({
         ...account,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         parsed: claimRequestData,
       });
-    } catch (e) {
-      console.log(e);
-    }
+    } catch (e) {}
+
+    try {
+      const reverseEntryData = coder.accounts.decode(
+        "reverseEntry",
+        account.account.data
+      );
+      reverseEntries.push({
+        ...account,
+        parsed: reverseEntryData,
+      });
+    } catch (e) {}
   });
   console.log(
-    `Found (${namespaceEntries.length}) name entries and (${claimRequests.length}) claim requests`
+    `Found (${namespaceEntries.length}) name entries (${claimRequests.length}) reverse entries and (${claimRequests.length}) claim requests`
   );
 }
 
