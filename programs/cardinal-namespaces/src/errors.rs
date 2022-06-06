@@ -18,8 +18,8 @@ pub enum ErrorCode {
     InvalidAuthorityTokenAccount,
     #[msg("Invalid namespace payment account")]
     InvalidNamespacePaymentAccount,
-    #[msg("Invalid global namespace payment account")]
-    InvalidGlobalNamespacePaymentAccount,
+    #[msg("Invalid global context payment account")]
+    InvalidGlobalContextPaymentAccount,
     #[msg("Invalid namespace")]
     InvalidNamespace,
     #[msg("Invalid entry")]
