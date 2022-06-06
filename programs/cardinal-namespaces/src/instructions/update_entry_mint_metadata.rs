@@ -12,8 +12,8 @@ pub struct UpdateEntryMintMetadataCtx<'info> {
     namespace: Box<Account<'info, Namespace>>,
     #[account(constraint = entry.namespace == namespace.key() @ ErrorCode::InvalidNamespace)]
     entry: Box<Account<'info, Entry>>,
-    #[account(constraint = approve_authority.key() == namespace.approve_authority.unwrap() @ ErrorCode::InvalidApproveAuthority)]
-    approve_authority: Signer<'info>,
+    #[account(constraint = update_authority.key() == namespace.update_authority @ ErrorCode::InvalidAuthority)]
+    update_authority: Signer<'info>,
     #[account(mut)]
     /// CHECK: This is not dangerous because we don't read or write from this account
     certificate_mint_metadata: UncheckedAccount<'info>,

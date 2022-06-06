@@ -841,7 +841,7 @@ export async function withUpdateMintMetadata(
     namespacesProgram.instruction.updateEntryMintMetadata({
       accounts: {
         namespace: namespaceId,
-        approveAuthority: provider.wallet.publicKey,
+        updateAuthority: provider.wallet.publicKey,
         entry: entryId,
         certificateMintMetadata: certificateMintMetadataId,
         tokenMetadataProgram: mplTokenMetadata.MetadataProgram.PUBKEY,

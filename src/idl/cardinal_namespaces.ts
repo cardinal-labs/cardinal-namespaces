@@ -1,5 +1,5 @@
 export type Namespaces = {
-  version: "3.1.0";
+  version: "3.1.1";
   name: "namespaces";
   instructions: [
     {
@@ -748,7 +748,7 @@ export type Namespaces = {
           isSigner: false;
         },
         {
-          name: "approveAuthority";
+          name: "updateAuthority";
           isMut: false;
           isSigner: true;
         },
@@ -1259,7 +1259,7 @@ export type Namespaces = {
 };
 
 export const IDL: Namespaces = {
-  version: "3.1.0",
+  version: "3.1.1",
   name: "namespaces",
   instructions: [
     {
@@ -2008,7 +2008,7 @@ export const IDL: Namespaces = {
           isSigner: false,
         },
         {
-          name: "approveAuthority",
+          name: "updateAuthority",
           isMut: false,
           isSigner: true,
         },
