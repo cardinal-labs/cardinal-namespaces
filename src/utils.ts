@@ -1,4 +1,3 @@
-import { NAMESPACES_PROGRAM_ID } from "@cardinal/namespaces";
 import * as anchor from "@project-serum/anchor";
 import * as web3 from "@solana/web3.js";
 
@@ -7,6 +6,7 @@ import {
   CLAIM_REQUEST_SEED,
   ENTRY_SEED,
   NAMESPACE_SEED,
+  NAMESPACES_PROGRAM_ID,
   REVERSE_ENTRY_SEED,
 } from "./constants";
 

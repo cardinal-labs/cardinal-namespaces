@@ -38,19 +38,6 @@
     tiny-invariant "^1.2.0"
     tslib "^2.3.1"
 
-"@cardinal/namespaces@^2.0.42":
-  version "2.0.59"
-  resolved "https://registry.yarnpkg.com/@cardinal/namespaces/-/namespaces-2.0.59.tgz#9e251c3a38f78faca58e208d1c5f2e10fa8c829b"
-  integrity sha512-2waZMfLyzAKi5y7bWBPzuqP/FDSjLS5u9VhsBLfEQbNOR3BHmHrSwrYPpAfV+IrULNBSSg8jobxoD5b94C3GEQ==
-  dependencies:
-    "@cardinal/certificates" "^1.2.3"
-    "@cardinal/namespaces" "^2.0.42"
-    "@metaplex-foundation/mpl-token-metadata" "^0.0.2"
-    "@project-serum/anchor" "^0.20.1"
-    "@saberhq/solana-contrib" "^1.12.23"
-    "@solana/spl-token" "^0.1.8"
-    typescript "^4.5.4"
-
 "@cardinal/stake-pool@^1.1.1":
   version "1.1.8"
   resolved "https://registry.yarnpkg.com/@cardinal/stake-pool/-/stake-pool-1.1.8.tgz#035d81e35cf4d4223c98c351ec22f121c6b7bf79"
@@ -151,15 +138,6 @@
     "@solana/web3.js" "^1.31.0"
     bs58 "^4.0.1"
 
-"@metaplex-foundation/mpl-token-metadata@^0.0.2":
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/@metaplex-foundation/mpl-token-metadata/-/mpl-token-metadata-0.0.2.tgz#02058970320459e2550e90caf54c58bcacbe6bb2"
-  integrity sha512-yKJPhFlX8MkNbSCi1iwHn4xKmguLK/xFhYa+RuYdL2seuT4CKXHj2CnR2AkcdQj46Za4/nR3jZcRFKq7QlnvBw==
-  dependencies:
-    "@metaplex-foundation/mpl-core" "^0.0.2"
-    "@solana/spl-token" "^0.1.8"
-    "@solana/web3.js" "^1.31.0"
-
 "@metaplex-foundation/mpl-token-metadata@^1.2.3", "@metaplex-foundation/mpl-token-metadata@^1.2.4", "@metaplex-foundation/mpl-token-metadata@^1.2.5":
   version "1.2.5"
   resolved "https://registry.yarnpkg.com/@metaplex-foundation/mpl-token-metadata/-/mpl-token-metadata-1.2.5.tgz#1a927b1c7d30cd634a1e4782022712a02f6865c2"
@@ -190,7 +168,7 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@project-serum/anchor@0.20.1", "@project-serum/anchor@^0.20.1":
+"@project-serum/anchor@0.20.1":
   version "0.20.1"
   resolved "https://registry.yarnpkg.com/@project-serum/anchor/-/anchor-0.20.1.tgz#0937807e807e8332aa708cfef4bcb6cbb88b4129"
   integrity sha512-2TuBmGUn9qeYz6sJINJlElrBuPsaUAtYyUsJ3XplEBf1pczrANAgs5ceJUFzdiqGEWLn+84ObSdBeChT/AXYFA==
@@ -3058,7 +3036,7 @@ typedoc@^0.22.11:
     minimatch "^5.0.1"
     shiki "^0.10.1"
 
-typescript@^4.5.4, typescript@^4.5.5:
+typescript@^4.5.5:
   version "4.6.3"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.6.3.tgz#eefeafa6afdd31d725584c67a0eaba80f6fc6c6c"
   integrity sha512-yNIatDa5iaofVozS/uQJEl3JRWLKKGJKh6Yaiv0GLGSuhpFJe7P3SbHZ8/yjAHRQwKRoA6YZqlfjXWmVzoVSMw==

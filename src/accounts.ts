@@ -1,6 +1,6 @@
 import type { AccountData } from "@cardinal/common";
 import * as anchor from "@project-serum/anchor";
-import * as web3 from "@solana/web3.js";
+import type * as web3 from "@solana/web3.js";
 
 import type {
   ClaimRequestData,
@@ -8,27 +8,21 @@ import type {
   NamespaceData,
   ReverseEntryData,
 } from ".";
-import {
-  CLAIM_REQUEST_SEED,
-  ENTRY_SEED,
-  NAMESPACE_SEED,
-  NAMESPACES_IDL,
-  NAMESPACES_PROGRAM_ID,
-  REVERSE_ENTRY_SEED,
-} from ".";
+import { NAMESPACES_IDL, NAMESPACES_PROGRAM_ID } from ".";
 import type { NAMESPACES_PROGRAM } from "./constants";
+import {
+  findClaimRequestId,
+  findGlobalContextId,
+  findNameEntryId,
+  findNamespaceId,
+  findReverseEntryId,
+} from "./pda";
 
 export async function getNamespaceByName(
   connection: web3.Connection,
   namespaceName: string
 ): Promise<AccountData<NamespaceData>> {
-  const [namespaceId] = await web3.PublicKey.findProgramAddress(
-    [
-      anchor.utils.bytes.utf8.encode(NAMESPACE_SEED),
-      anchor.utils.bytes.utf8.encode(namespaceName),
-    ],
-    NAMESPACES_PROGRAM_ID
-  );
+  const [namespaceId] = await findNamespaceId(namespaceName);
   return getNamespace(connection, namespaceId);
 }
 
@@ -44,14 +38,35 @@ export async function getNamespace(
     NAMESPACES_PROGRAM_ID,
     provider
   );
-  const parsed = await namespacesProgram.account.namespace!.fetch(namespaceId);
+  const parsed = await namespacesProgram.account.namespace.fetch(namespaceId);
   return {
     parsed,
     pubkey: namespaceId,
   };
 }
 
-export async function getNamespaces(
+export async function getGlobalContext(
+  connection: web3.Connection
+): Promise<AccountData<NamespaceData>> {
+  const [globalContextId] = await findGlobalContextId();
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const provider = new anchor.AnchorProvider(connection, null, {});
+  const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
+    NAMESPACES_IDL,
+    NAMESPACES_PROGRAM_ID,
+    provider
+  );
+  const parsed = await namespacesProgram.account.globalContext.fetch(
+    globalContextId
+  );
+  return {
+    parsed,
+    pubkey: globalContextId,
+  };
+}
+
+export async function getAllNamespaces(
   connection: web3.Connection
 ): Promise<AccountData<NamespaceData>[]> {
   const programAccounts = await connection.getProgramAccounts(
@@ -103,29 +118,16 @@ export async function getNameEntry(
     NAMESPACES_PROGRAM_ID,
     provider
   );
-  const [namespaceId] = await web3.PublicKey.findProgramAddress(
-    [
-      anchor.utils.bytes.utf8.encode(NAMESPACE_SEED),
-      anchor.utils.bytes.utf8.encode(namespaceName),
-    ],
-    namespacesProgram.programId
-  );
-  const [entryId] = await web3.PublicKey.findProgramAddress(
-    [
-      anchor.utils.bytes.utf8.encode(ENTRY_SEED),
-      namespaceId.toBytes(),
-      anchor.utils.bytes.utf8.encode(entryName),
-    ],
-    namespacesProgram.programId
-  );
-  const parsed = await namespacesProgram.account.entry!.fetch(entryId);
+  const [namespaceId] = await findNamespaceId(namespaceName);
+  const [entryId] = await findNameEntryId(namespaceId, entryName);
+  const parsed = await namespacesProgram.account.entry.fetch(entryId);
   return {
     parsed,
     pubkey: entryId,
   };
 }
 
-export async function getNameEntries(
+export async function getNameEntriesForNamespace(
   connection: web3.Connection,
   namespaceName: string,
   entryNames: string[]
@@ -138,24 +140,9 @@ export async function getNameEntries(
     NAMESPACES_PROGRAM_ID,
     provider
   );
-  const [namespaceId] = await web3.PublicKey.findProgramAddress(
-    [
-      anchor.utils.bytes.utf8.encode(NAMESPACE_SEED),
-      anchor.utils.bytes.utf8.encode(namespaceName),
-    ],
-    namespacesProgram.programId
-  );
+  const [namespaceId] = await findNamespaceId(namespaceName);
   const entryTuples = await Promise.all(
-    entryNames.map((entryName) =>
-      web3.PublicKey.findProgramAddress(
-        [
-          anchor.utils.bytes.utf8.encode(ENTRY_SEED),
-          namespaceId.toBytes(),
-          anchor.utils.bytes.utf8.encode(entryName),
-        ],
-        namespacesProgram.programId
-      )
-    )
+    entryNames.map((entryName) => findNameEntryId(namespaceId, entryName))
   );
   const entryIds = entryTuples.map((tuple) => tuple[0]);
   const result = (await namespacesProgram.account.entry!.fetchMultiple(
@@ -182,25 +169,15 @@ export async function getClaimRequest(
     NAMESPACES_PROGRAM_ID,
     provider
   );
-  const [namespaceId] = await web3.PublicKey.findProgramAddress(
-    [
-      anchor.utils.bytes.utf8.encode(NAMESPACE_SEED),
-      anchor.utils.bytes.utf8.encode(namespaceName),
-    ],
-    namespacesProgram.programId
+  const [namespaceId] = await findNamespaceId(namespaceName);
+  const [claimRequestId] = await findClaimRequestId(
+    namespaceId,
+    entryName,
+    requestor
   );
-  const [claimRequestId] = await web3.PublicKey.findProgramAddress(
-    [
-      anchor.utils.bytes.utf8.encode(CLAIM_REQUEST_SEED),
-      namespaceId.toBytes(),
-      anchor.utils.bytes.utf8.encode(entryName),
-      requestor.toBytes(),
-    ],
-    namespacesProgram.programId
-  );
-  const parsed = (await namespacesProgram.account.claimRequest!.fetch(
+  const parsed = await namespacesProgram.account.claimRequest.fetch(
     claimRequestId
-  )) as ClaimRequestData;
+  );
   return {
     parsed,
     pubkey: claimRequestId,
@@ -259,13 +236,10 @@ export async function getReverseEntry(
     NAMESPACES_PROGRAM_ID,
     provider
   );
-  const [reverseEntryId] = await web3.PublicKey.findProgramAddress(
-    [anchor.utils.bytes.utf8.encode(REVERSE_ENTRY_SEED), pubkey.toBytes()],
-    namespacesProgram.programId
-  );
-  const parsed = (await namespacesProgram.account.reverseEntry!.fetch(
+  const [reverseEntryId] = await findReverseEntryId(pubkey);
+  const parsed = await namespacesProgram.account.reverseEntry.fetch(
     reverseEntryId
-  )) as ReverseEntryData;
+  );
   return {
     parsed,
     pubkey: reverseEntryId,
