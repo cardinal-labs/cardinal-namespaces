@@ -1,6 +1,6 @@
 [package]
 name = "namespaces"
-version = "1.2.1"
+version = "3.1.0"
 description = "Cardinal namespaces service"
 edition = "2021"
 homepage = "https://cardinal.so"
