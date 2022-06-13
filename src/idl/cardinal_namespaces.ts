@@ -614,11 +614,6 @@ export type Namespaces = {
       name: "updateClaimRequest";
       accounts: [
         {
-          name: "claimRequest";
-          isMut: true;
-          isSigner: false;
-        },
-        {
           name: "namespace";
           isMut: false;
           isSigner: false;
@@ -627,6 +622,11 @@ export type Namespaces = {
           name: "approveAuthority";
           isMut: false;
           isSigner: true;
+        },
+        {
+          name: "rentRequest";
+          isMut: true;
+          isSigner: false;
         }
       ];
       args: [
@@ -2312,11 +2312,6 @@ export const IDL: Namespaces = {
       name: "updateClaimRequest",
       accounts: [
         {
-          name: "claimRequest",
-          isMut: true,
-          isSigner: false,
-        },
-        {
           name: "namespace",
           isMut: false,
           isSigner: false,
@@ -2325,6 +2320,11 @@ export const IDL: Namespaces = {
           name: "approveAuthority",
           isMut: false,
           isSigner: true,
+        },
+        {
+          name: "rentRequest",
+          isMut: true,
+          isSigner: false,
         },
       ],
       args: [

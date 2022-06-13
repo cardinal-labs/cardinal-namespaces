@@ -590,7 +590,7 @@ export async function withUpdateClaimRequest(
   connection: Connection,
   wallet: Wallet,
   namespaceName: string,
-  claimRequestId: PublicKey,
+  rentRequestId: PublicKey,
   isApproved: boolean,
   transaction: Transaction
 ): Promise<Transaction> {
@@ -612,7 +612,7 @@ export async function withUpdateClaimRequest(
       accounts: {
         namespace: namespaceId,
         approveAuthority: provider.wallet.publicKey,
-        claimRequest: claimRequestId,
+        rentRequest: rentRequestId,
       },
     })
   );
