@@ -43,7 +43,7 @@ export async function withInit(
   );
 
   transaction.add(
-    namespacesProgram.instruction.init(
+    namespacesProgram.instruction.initGlobalContext(
       {
         feeBasisPoints: new anchor.BN(rentalPercentage),
       },
@@ -347,7 +347,7 @@ export async function withUpdateClaimRequest(
       accounts: {
         namespace: namespaceId,
         approveAuthority: provider.wallet.publicKey,
-        rentRequest: claimRequestId,
+        claimRequest: claimRequestId,
       },
     })
   );
@@ -652,7 +652,7 @@ export async function withRevokeReverseEntry(
     namespacesProgram.programId
   );
 
-  const [entryId] = await PublicKey.findProgramAddress(
+  const [nameEntryId] = await PublicKey.findProgramAddress(
     [
       anchor.utils.bytes.utf8.encode(ENTRY_SEED),
       namespaceId.toBytes(),
@@ -665,7 +665,7 @@ export async function withRevokeReverseEntry(
     namespacesProgram.instruction.revokeReverseEntry({
       accounts: {
         namespace: namespaceId,
-        entry: entryId,
+        nameEntry: nameEntryId,
         reverseEntry: reverseEntryId,
         claimRequest: claimRequestId,
         invalidator: wallet.publicKey,
@@ -826,11 +826,11 @@ export async function withUpdateMintMetadata(
 
   const mintMetadataId = await Metadata.getPDA(mintId);
   transaction.add(
-    namespacesProgram.instruction.updateEntryMintMetadata({
+    namespacesProgram.instruction.updateNameEntryMintMetadata({
       accounts: {
         namespace: namespaceId,
         updateAuthority: provider.wallet.publicKey,
-        entry: entryId,
+        nameEntry: entryId,
         mintMetadata: mintMetadataId,
         tokenMetadataProgram: mplTokenMetadata.MetadataProgram.PUBKEY,
       },
