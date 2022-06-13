@@ -22,7 +22,7 @@ export async function revokeHolder(
   );
   const connection = connectionFor(cluster);
 
-  let txid;
+  let txid: string;
   const checkClaimRequest = await api.tryGetClaimRequest(
     connection,
     NAMESPACE_NAME,
