@@ -39,7 +39,7 @@ pub struct ClaimNameEntryCtx<'info> {
         && claim_request.namespace == namespace.key()
         && claim_request.entry_name == name_entry.name
         && claim_request.requestor == requestor.key()
-        // & claim_request.counter == name_entry.claim_request_counter
+        && claim_request.counter == name_entry.claim_request_counter
         @ ErrorCode::ClaimNotAllowed
     )]
     claim_request: Box<Account<'info, ClaimRequest>>,
@@ -74,6 +74,8 @@ pub fn handler<'key, 'accounts, 'remaining, 'info>(ctx: Context<'key, 'accounts,
     let remaining_accs = &mut ctx.remaining_accounts.iter();
     let name_entry = &mut ctx.accounts.name_entry;
     name_entry.data = Some(ctx.accounts.recipient.key());
+    name_entry.claim_request_counter = name_entry.claim_request_counter.checked_add(1).expect("Add error");
+
     if name_entry.is_claimed {
         return Err(error!(ErrorCode::NameEntryAlreadyClaimed));
     }

@@ -656,6 +656,7 @@ export async function withUpdateClaimRequest(
   connection: Connection,
   wallet: Wallet,
   namespaceName: string,
+  entryName: string,
   rentRequestId: PublicKey,
   isApproved: boolean,
   transaction: Transaction
@@ -667,9 +668,11 @@ export async function withUpdateClaimRequest(
     provider
   );
   const [namespaceId] = await findNamespaceId(namespaceName);
+  const [nameEntryId] = await findNameEntryId(namespaceId, entryName);
   transaction.add(
     namespacesProgram.instruction.updateClaimRequest(isApproved, {
       accounts: {
+        nameEntry: nameEntryId,
         namespace: namespaceId,
         approveAuthority: provider.wallet.publicKey,
         rentRequest: rentRequestId,
