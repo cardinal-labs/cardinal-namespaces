@@ -15,11 +15,7 @@ export const createNamespace = async (name: string) => {
   let transaction = new Transaction();
 
   // kycLcoGB9Lf1j1mLxbaYcR3HUgBywHBxmLJPcvFr5BP
-  const wallet = Keypair.fromSecretKey(
-    utils.bytes.bs58.decode(
-      "2SogHyWWyJxRpNjgjhRGRAWfsNaYYDjYx3Z9FyJLi926N6nC3tWMjEVtzMdKmDJiDvpoeRu3Sjin6g1cLBxib8Ed"
-    )
-  );
+  const wallet = Keypair.fromSecretKey(utils.bytes.bs58.decode(""));
 
   transaction = await withCreateNamespace(
     connection,
@@ -46,11 +42,10 @@ export const createNamespace = async (name: string) => {
   });
 };
 
-// Create passbase namespace
-// createNamespace("passbase")
-//   .then(() => {
-//     console.log("success");
-//   })
-//   .catch((e) => {
-//     console.log("Error:", e);
-//   });
+createNamespace("passbase")
+  .then(() => {
+    console.log("success");
+  })
+  .catch((e) => {
+    console.log("Error:", e);
+  });
