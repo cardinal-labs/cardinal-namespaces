@@ -6,6 +6,11 @@ import { Keypair } from "@solana/web3.js";
 import { connectionFor } from "../common/connection";
 import { utils } from "@project-serum/anchor";
 
+// kycLcoGB9Lf1j1mLxbaYcR3HUgBywHBxmLJPcvFr5BP
+const wallet = Keypair.fromSecretKey(
+  utils.bytes.bs58.decode(process.env.KYC_SECRET_KEY!)
+);
+
 const handler: Handler = async (event) => {
   const webhook = decryptWebhookIfNeeded(event);
   console.log(webhook);
