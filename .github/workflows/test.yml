@@ -17,8 +17,9 @@ env:
   CARGO_TERM_COLOR: always
   SOLANA_VERSION: 1.9.13
   RUST_TOOLCHAIN: nightly
+  SOTERIA_VERSION: 0.0.0
   ANCHOR_GIT: https://github.com/project-serum/anchor
-  ANCHOR_VERSION: 0.20.1
+  ANCHOR_VERSION: 0.24.2
 
 jobs:
   rust-clippy:
@@ -131,13 +132,13 @@ jobs:
       #     name: Local Tests
       #     path: tests/*.json
       #     reporter: mocha-json
-      - name: Upload Test Results
+      - name: upload-integration-tests
         if: always()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: Unit Test Results
           path: tests/out.xml
-      - name: Publish Unit Test Results
+      - name: publish-integration-tests
         uses: EnricoMi/publish-unit-test-result-action/composite@v1
         if: always()
         with:
