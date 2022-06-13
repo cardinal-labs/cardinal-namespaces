@@ -12,6 +12,7 @@ export type PassbaseEvent = { event: string; key: string; status: string };
 export type Request = {
   body: string;
   headers: { [key: string]: string };
+  queryStringParameters: { [key: string]: string };
 };
 
 const WALLET = Keypair.fromSecretKey(
@@ -19,6 +20,7 @@ const WALLET = Keypair.fromSecretKey(
 );
 
 const handler: Handler = async (event: Request) => {
+  const clusterParam = event?.queryStringParameters.cluster;
   const webhook = decryptWebhookIfNeeded(event);
   switch (webhook.event) {
     case "VERIFICATION_COMPLETED":
@@ -35,7 +37,7 @@ const handler: Handler = async (event: Request) => {
         // approve claim request in passbase namespace
 
         const keypair = new Keypair();
-        const connection = connectionFor("devnet");
+        const connection = connectionFor(clusterParam, "devnet");
         await approveClaimRequest(
           connection,
           WALLET,
