@@ -31,7 +31,7 @@ pub struct InitNameEntryMintCtx<'info> {
 
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
-    mint: UncheckedAccount<'info>,
+    mint: Signer<'info>,
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
     mint_metadata: UncheckedAccount<'info>,
@@ -40,6 +40,7 @@ pub struct InitNameEntryMintCtx<'info> {
     master_edition: UncheckedAccount<'info>,
 
     /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(address = mpl_token_metadata::id())]
     token_metadata_program: UncheckedAccount<'info>,
     token_program: Program<'info, Token>,
     associated_token: Program<'info, AssociatedToken>,
@@ -92,7 +93,7 @@ pub fn handler(ctx: Context<InitNameEntryMintCtx>) -> Result<()> {
             Some(vec![MCreator {
                 address: ctx.accounts.namespace.key(),
                 verified: true,
-                share: 0,
+                share: 100,
             }]),
             0,
             true,
@@ -143,8 +144,8 @@ pub fn handler(ctx: Context<InitNameEntryMintCtx>) -> Result<()> {
             *ctx.accounts.master_edition.key,
             *ctx.accounts.mint.key,
             ctx.accounts.namespace.key(),
-            *ctx.accounts.payer.key,
             ctx.accounts.namespace.key(),
+            ctx.accounts.mint_metadata.key(),
             ctx.accounts.payer.key(),
             Some(0),
         ),
@@ -155,6 +156,9 @@ pub fn handler(ctx: Context<InitNameEntryMintCtx>) -> Result<()> {
             ctx.accounts.namespace.to_account_info(),
             ctx.accounts.payer.to_account_info(),
             ctx.accounts.mint_metadata.to_account_info(),
+            ctx.accounts.token_program.to_account_info(),
+            ctx.accounts.system_program.to_account_info(),
+            ctx.accounts.rent.to_account_info(),
         ],
         namespace_signer,
     )?;

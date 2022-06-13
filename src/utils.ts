@@ -58,10 +58,8 @@ export async function tryGetName(
   namespace: PublicKey
 ): Promise<string | undefined> {
   try {
-    const reverseEntry = await getReverseEntry(connection, pubkey, namespace);
+    const reverseEntry = await getReverseEntry(connection, namespace, pubkey);
     return formatName(
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
       reverseEntry.parsed.namespaceName,
       reverseEntry.parsed.entryName
     );
@@ -134,7 +132,7 @@ export const withRemainingAccountsForClaim = async (
   wallet: Wallet,
   namespaceId: PublicKey,
   tokenManagerId: PublicKey,
-  duration: number
+  duration?: number
 ): Promise<AccountMeta[]> => {
   const namespace = await getNamespace(connection, namespaceId);
   if (namespace.parsed.paymentAmountDaily.toNumber() > 0) {
@@ -166,7 +164,7 @@ export const withRemainingAccountsForClaim = async (
         isWritable: false,
       },
     ];
-    if (duration > 0) {
+    if (duration && duration > 0) {
       const [paymentTokenAccountId] = await withRemainingAccountsForPayment(
         transaction,
         connection,

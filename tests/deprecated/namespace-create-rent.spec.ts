@@ -5,6 +5,7 @@ import * as web3 from "@solana/web3.js";
 import assert from "assert";
 
 import {
+  findNamespaceId,
   getClaimRequest,
   getNameEntry,
   getNamespaceByName,
@@ -12,14 +13,14 @@ import {
   withCreateClaimRequest,
   withCreateNamespace,
   withUpdateClaimRequest,
-} from "../src";
+} from "../../src";
 import {
   withClaimEntry,
   withInitEntry,
   withSetReverseEntry,
-} from "../src/deprecated";
-import { createMint, withFindOrInitAssociatedTokenAccount } from "./utils";
-import { getProvider } from "./workspace";
+} from "../../src/deprecated";
+import { createMint, withFindOrInitAssociatedTokenAccount } from "../utils";
+import { getProvider } from "../workspace";
 
 describe("namespace-create-rent", () => {
   const provider = getProvider();
@@ -280,6 +281,9 @@ describe("namespace-create-rent", () => {
 
     const checkReverseEntry = await getReverseEntry(
       provider.connection,
+      (
+        await findNamespaceId(namespaceName)
+      )[0],
       provider.wallet.publicKey
     );
     assert.equal(checkReverseEntry.parsed.entryName, entryName);

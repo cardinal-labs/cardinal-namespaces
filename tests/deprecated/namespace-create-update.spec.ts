@@ -9,9 +9,9 @@ import {
   NAMESPACES_PROGRAM_ID,
   withCreateNamespace,
   withUpdateNamespace,
-} from "../src";
-import { createMint, NAMESPACE_SEED } from "./utils";
-import { getProvider } from "./workspace";
+} from "../../src";
+import { createMint, NAMESPACE_SEED } from "../utils";
+import { getProvider } from "../workspace";
 
 describe("namespace-create-update", () => {
   const provider = getProvider();

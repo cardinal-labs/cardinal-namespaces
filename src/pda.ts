@@ -83,14 +83,14 @@ export const findDeprecatedReverseEntryId = async (
  * @returns
  */
 export const findReverseEntryId = async (
-  pubkey: PublicKey,
-  namespace: PublicKey
+  namespace: PublicKey,
+  user: PublicKey
 ): Promise<[PublicKey, number]> => {
   return PublicKey.findProgramAddress(
     [
       utils.bytes.utf8.encode(REVERSE_ENTRY_SEED),
       namespace.toBuffer(),
-      pubkey.toBytes(),
+      user.toBytes(),
     ],
     NAMESPACES_PROGRAM_ID
   );

@@ -218,7 +218,7 @@ export type Namespaces = {
         {
           name: "mint";
           isMut: true;
-          isSigner: false;
+          isSigner: true;
         },
         {
           name: "mintMetadata";
@@ -1920,7 +1920,7 @@ export const IDL: Namespaces = {
         {
           name: "mint",
           isMut: true,
-          isSigner: false,
+          isSigner: true,
         },
         {
           name: "mintMetadata",
