@@ -55,6 +55,12 @@ functions:
       - http:
           path: /passbase/webhook
           method: post
+  passbase-data:
+    handler: passbase-webhook/handler.data
+    events:
+      - http:
+          path: /passbase/data
+          method: get
 
 custom:
   domains:
