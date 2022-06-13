@@ -49,6 +49,12 @@ functions:
             cacheKeyParameters:
               - name: request.path.url
               - name: request.path.usernames
+  passbase-webhook:
+    handler: passbase-webhook/handler.webhook
+    events:
+      - http:
+          path: /passbase-webhook
+          method: post
   
 
 custom:
