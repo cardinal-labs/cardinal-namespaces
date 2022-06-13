@@ -36,4 +36,12 @@ pub enum ErrorCode {
     InvalidApproveAuthority,
     #[msg("Namespace requires token")]
     NamespaceRequiresToken,
+    #[msg("Mint already initialized")]
+    MintAlreadyInitialized,
+    #[msg("Mint invalid for entry")]
+    InvalidEntryMint,
+    #[msg("Time invalidator program ID is invalid")]
+    InvalidTimeInvalidatorProgramId,
+    #[msg("Invalid token manager")]
+    InvalidTokenManager,
 }

@@ -6,6 +6,7 @@ import {
   withFindOrInitAssociatedTokenAccount,
 } from "@cardinal/certificates";
 import * as mplTokenMetadata from "@metaplex-foundation/mpl-token-metadata";
+import { Metadata } from "@metaplex-foundation/mpl-token-metadata";
 import * as anchor from "@project-serum/anchor";
 import type { Wallet } from "@saberhq/solana-contrib";
 import * as splToken from "@solana/spl-token";
@@ -297,7 +298,7 @@ export async function withCreateClaimRequest(
     namespacesProgram.programId
   );
 
-  const [claimRequestId, claimRequestBump] = await PublicKey.findProgramAddress(
+  const [claimRequestId] = await PublicKey.findProgramAddress(
     [
       anchor.utils.bytes.utf8.encode(CLAIM_REQUEST_SEED),
       namespaceId.toBytes(),
@@ -308,19 +309,14 @@ export async function withCreateClaimRequest(
   );
 
   transaction.add(
-    namespacesProgram.instruction.createClaimRequest(
-      entryName,
-      claimRequestBump,
-      user,
-      {
-        accounts: {
-          namespace: namespaceId,
-          payer: provider.wallet.publicKey,
-          claimRequest: claimRequestId,
-          systemProgram: anchor.web3.SystemProgram.programId,
-        },
-      }
-    )
+    namespacesProgram.instruction.createClaimRequest(entryName, user, {
+      accounts: {
+        namespace: namespaceId,
+        payer: provider.wallet.publicKey,
+        claimRequest: claimRequestId,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      },
+    })
   );
   return transaction;
 }
@@ -818,7 +814,7 @@ export async function withUpdateMintMetadata(
   wallet: Wallet,
   namespaceId: PublicKey,
   entryId: PublicKey,
-  certificateMintId: PublicKey,
+  mintId: PublicKey,
   transaction: Transaction
 ): Promise<Transaction> {
   const provider = new anchor.AnchorProvider(connection, wallet, {});
@@ -828,22 +824,14 @@ export async function withUpdateMintMetadata(
     provider
   );
 
-  const [certificateMintMetadataId] = await PublicKey.findProgramAddress(
-    [
-      anchor.utils.bytes.utf8.encode(mplTokenMetadata.MetadataProgram.PREFIX),
-      mplTokenMetadata.MetadataProgram.PUBKEY.toBuffer(),
-      certificateMintId.toBuffer(),
-    ],
-    mplTokenMetadata.MetadataProgram.PUBKEY
-  );
-
+  const mintMetadataId = await Metadata.getPDA(mintId);
   transaction.add(
     namespacesProgram.instruction.updateEntryMintMetadata({
       accounts: {
         namespace: namespaceId,
         updateAuthority: provider.wallet.publicKey,
         entry: entryId,
-        certificateMintMetadata: certificateMintMetadataId,
+        mintMetadata: mintMetadataId,
         tokenMetadataProgram: mplTokenMetadata.MetadataProgram.PUBKEY,
       },
     })

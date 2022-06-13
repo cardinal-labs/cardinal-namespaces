@@ -5,11 +5,8 @@ use {
 };
 
 #[derive(Accounts)]
-pub struct CollectGlobalFundsCtx<'info> {
-    #[account(
-        seeds = [GLOBAL_CONTEXT_PREFIX.as_bytes()],
-        bump = global_context.bump,
-    )]
+pub struct CollectContextFunds<'info> {
+    #[account(seeds = [GLOBAL_CONTEXT_PREFIX.as_bytes()], bump = global_context.bump)]
     pub global_context: Account<'info, GlobalContext>,
     #[account(mut, constraint = global_context_payment_account.owner == global_context.key() @ ErrorCode::InvalidGlobalContextPaymentAccount)]
     pub global_context_payment_account: Account<'info, TokenAccount>,
@@ -23,7 +20,7 @@ pub struct CollectGlobalFundsCtx<'info> {
     pub token_program: Program<'info, Token>,
 }
 
-pub fn handler(ctx: Context<CollectGlobalFundsCtx>, amount: u64) -> Result<()> {
+pub fn handler(ctx: Context<CollectContextFunds>, amount: u64) -> Result<()> {
     // get PDA seeds to sign with
     let global_context_seeds = &[GLOBAL_CONTEXT_PREFIX.as_bytes(), &[ctx.accounts.global_context.bump]];
     let global_context_signer = &[&global_context_seeds[..]];

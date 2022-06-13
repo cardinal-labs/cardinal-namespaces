@@ -9,14 +9,12 @@ use {
 pub struct RevokeEntryCtx<'info> {
     #[account(mut)]
     pub namespace: Account<'info, Namespace>,
-    #[account(mut, constraint =
-        entry.namespace == namespace.key()
-        @ ErrorCode::InvalidEntry
-    )]
+    #[account(mut, constraint = entry.namespace == namespace.key() @ ErrorCode::InvalidNamespace)]
     pub entry: Box<Account<'info, Entry>>,
     #[account(mut,
         constraint =
         claim_request.is_approved
+        && claim_request.namespace == namespace.key()
         && claim_request.entry_name == entry.name
         @ ErrorCode::ClaimNotAllowed
     )]
@@ -40,25 +38,25 @@ pub struct RevokeEntryCtx<'info> {
     // CPI accounts
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
-    mint_manager: UncheckedAccount<'info>,
+    pub mint_manager: UncheckedAccount<'info>,
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
-    certificate: UncheckedAccount<'info>,
+    pub certificate: UncheckedAccount<'info>,
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
-    certificate_mint: UncheckedAccount<'info>,
+    pub certificate_mint: UncheckedAccount<'info>,
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
-    certificate_token_account: UncheckedAccount<'info>,
+    pub certificate_token_account: UncheckedAccount<'info>,
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
-    certificate_payment_token_account: UncheckedAccount<'info>,
+    pub certificate_payment_token_account: UncheckedAccount<'info>,
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
-    user_certificate_token_account: UncheckedAccount<'info>,
+    pub user_certificate_token_account: UncheckedAccount<'info>,
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
-    user_payment_token_account: UncheckedAccount<'info>,
+    pub user_payment_token_account: UncheckedAccount<'info>,
 
     // programs
     certificate_program: Program<'info, CardinalCertificate>,

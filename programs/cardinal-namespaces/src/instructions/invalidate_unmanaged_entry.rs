@@ -1,10 +1,7 @@
-use cardinal_certificate::{
-    self,
-    state::{Certificate, CertificateState},
-};
 use {
     crate::{errors::ErrorCode, state::*},
     anchor_lang::prelude::*,
+    cardinal_token_manager::state::{TokenManager, TokenManagerState},
 };
 
 #[derive(Accounts)]
@@ -19,12 +16,12 @@ pub struct InvalidateUnmanagedEntryCtx<'info> {
     )]
     pub entry: Account<'info, Entry>,
     #[account(constraint =
-        certificate.mint == entry.mint
-        && certificate.issuer == namespace.key()
-        && certificate.state == CertificateState::Invalidated as u8
+        token_manager.mint == entry.mint
+        && token_manager.issuer == namespace.key()
+        && token_manager.state == TokenManagerState::Invalidated as u8
         @ ErrorCode::InvalidCertificate
     )]
-    pub certificate: Account<'info, Certificate>,
+    pub token_manager: Account<'info, TokenManager>,
     pub invalidator: Signer<'info>,
 }
 

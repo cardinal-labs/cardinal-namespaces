@@ -6,10 +6,7 @@ use {
 #[derive(Accounts)]
 pub struct RevokeReverseEntryCtx<'info> {
     pub namespace: Box<Account<'info, Namespace>>,
-    #[account(constraint =
-        entry.namespace == namespace.key()
-        @ ErrorCode::InvalidEntry
-    )]
+    #[account(constraint = entry.namespace == namespace.key() @ ErrorCode::InvalidEntry)]
     pub entry: Box<Account<'info, Entry>>,
     #[account(
         mut,
@@ -20,6 +17,7 @@ pub struct RevokeReverseEntryCtx<'info> {
     // you have a claim request for this entry
     #[account(mut, constraint =
         claim_request.is_approved
+        && claim_request.namespace == namespace.key()
         && claim_request.entry_name == entry.name
         @ ErrorCode::ClaimNotAllowed
     )]

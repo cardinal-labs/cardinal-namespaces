@@ -44,7 +44,7 @@
     "prepare": "husky install"
   },
   "dependencies": {
-    "@cardinal/certificates": "^1.2.3",
+    "@cardinal/certificates": "^2.0.0",
     "@cardinal/common": "^1.0.10",
     "@cardinal/token-manager": "^1.1.0",
     "@metaplex-foundation/mpl-token-metadata": "^1.2.5",

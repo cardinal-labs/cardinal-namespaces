@@ -17,7 +17,6 @@ pub struct CreateNamespaceIx {
     pub transferable_entries: bool,
 }
 
-// TODO enforce namespace has payment mint ATA created
 #[derive(Accounts)]
 #[instruction(ix: CreateNamespaceIx)]
 pub struct CreateNamespace<'info> {
