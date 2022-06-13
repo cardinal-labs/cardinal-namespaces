@@ -15,6 +15,5 @@ pub struct UpdateClaimRequestCtx<'info> {
 pub fn handler(ctx: Context<UpdateClaimRequestCtx>, is_approved: bool) -> Result<()> {
     let rent_request = &mut ctx.accounts.rent_request;
     rent_request.is_approved = is_approved;
-    rent_request.counter = rent_request.counter.checked_add(1).unwrap();
     Ok(())
 }

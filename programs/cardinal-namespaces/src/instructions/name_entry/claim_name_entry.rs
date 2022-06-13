@@ -39,6 +39,7 @@ pub struct ClaimNameEntryCtx<'info> {
         && claim_request.namespace == namespace.key()
         && claim_request.entry_name == name_entry.name
         && claim_request.requestor == requestor.key()
+        // & claim_request.counter == name_entry.claim_request_counter
         @ ErrorCode::ClaimNotAllowed
     )]
     claim_request: Box<Account<'info, ClaimRequest>>,
