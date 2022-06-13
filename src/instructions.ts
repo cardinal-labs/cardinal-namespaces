@@ -563,7 +563,7 @@ export async function withCreateClaimRequest(
     namespacesProgram.programId
   );
 
-  const [claimRequestId] = await PublicKey.findProgramAddress(
+  const [claimRequestId, claimRequestBump] = await PublicKey.findProgramAddress(
     [
       anchor.utils.bytes.utf8.encode(CLAIM_REQUEST_SEED),
       namespaceId.toBytes(),
@@ -574,14 +574,19 @@ export async function withCreateClaimRequest(
   );
 
   transaction.add(
-    namespacesProgram.instruction.createClaimRequest(entryName, user, {
-      accounts: {
-        namespace: namespaceId,
-        payer: provider.wallet.publicKey,
-        claimRequest: claimRequestId,
-        systemProgram: anchor.web3.SystemProgram.programId,
-      },
-    })
+    namespacesProgram.instruction.createClaimRequest(
+      entryName,
+      claimRequestBump,
+      user,
+      {
+        accounts: {
+          namespace: namespaceId,
+          payer: provider.wallet.publicKey,
+          claimRequest: claimRequestId,
+          systemProgram: anchor.web3.SystemProgram.programId,
+        },
+      }
+    )
   );
   return transaction;
 }

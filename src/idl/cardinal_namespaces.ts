@@ -605,6 +605,10 @@ export type Namespaces = {
           type: "string";
         },
         {
+          name: "claimRequestBump";
+          type: "u8";
+        },
+        {
           name: "user";
           type: "publicKey";
         }
@@ -2301,6 +2305,10 @@ export const IDL: Namespaces = {
         {
           name: "entryName",
           type: "string",
+        },
+        {
+          name: "claimRequestBump",
+          type: "u8",
         },
         {
           name: "user",

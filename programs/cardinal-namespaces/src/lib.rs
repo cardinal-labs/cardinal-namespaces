@@ -71,8 +71,8 @@ pub mod namespaces {
     }
 
     // requests
-    pub fn create_claim_request(ctx: Context<CreateClaimRequestCtx>, entry_name: String, user: Pubkey) -> Result<()> {
-        requests::create_claim_request::handler(ctx, entry_name, user)
+    pub fn create_claim_request(ctx: Context<CreateClaimRequestCtx>, entry_name: String, claim_request_bump: u8, user: Pubkey) -> Result<()> {
+        requests::create_claim_request::handler(ctx, entry_name, claim_request_bump, user)
     }
 
     pub fn update_claim_request(ctx: Context<UpdateClaimRequestCtx>, is_approved: bool) -> Result<()> {
