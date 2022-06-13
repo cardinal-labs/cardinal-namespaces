@@ -36,7 +36,6 @@ pub fn handler(ctx: Context<UpdateNameEntryMintMetadataCtx>, ix: UpdateNameEntry
     let namespace_seeds = &[NAMESPACE_PREFIX.as_bytes(), ctx.accounts.namespace.name.as_bytes(), &[ctx.accounts.namespace.bump]];
     let namespace_signer = &[&namespace_seeds[..]];
 
-
     assert_derivation(
         &mpl_token_metadata::id(),
         &ctx.accounts.mint_metadata.to_account_info(),
