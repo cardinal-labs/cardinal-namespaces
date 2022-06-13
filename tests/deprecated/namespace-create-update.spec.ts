@@ -17,7 +17,7 @@ describe("namespace-create-update", () => {
   const provider = getProvider();
 
   const mintAuthority = web3.Keypair.generate();
-  const NAMESPACE_NAME = "ns2";
+  const NAMESPACE_NAME = `ns2-${Math.random()}`;
   let paymentMint: splToken.Token;
 
   it("Creates a namespace", async () => {

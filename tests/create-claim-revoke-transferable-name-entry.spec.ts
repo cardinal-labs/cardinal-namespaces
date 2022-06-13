@@ -11,7 +11,6 @@ import { expect } from "chai";
 import {
   findClaimRequestId,
   findNamespaceId,
-  findReverseEntryId,
   getClaimRequest,
   getNameEntry,
   getNamespaceByName,
@@ -29,7 +28,7 @@ import {
 import { createMint } from "./utils";
 import { getProvider } from "./workspace";
 
-describe("create-claim-revoke-name-entry", () => {
+describe("create-claim-revoke-transferable-name-entry", () => {
   const provider = getProvider();
 
   // test params
@@ -63,7 +62,7 @@ describe("create-claim-revoke-name-entry", () => {
       paymentMint.publicKey,
       new anchor.BN(0),
       null,
-      false,
+      true,
       transaction
     );
     await expectTXTable(
@@ -218,16 +217,6 @@ describe("create-claim-revoke-name-entry", () => {
       }
     ).to.be.fulfilled;
 
-    const checkClaimRequest = await tryGetAccount(async () =>
-      getClaimRequest(
-        provider.connection,
-        namespaceName,
-        entryName,
-        provider.wallet.publicKey
-      )
-    );
-    expect(checkClaimRequest).to.eq(null);
-
     const checkNamespace = await getNamespaceByName(
       provider.connection,
       namespaceName
@@ -248,7 +237,7 @@ describe("create-claim-revoke-name-entry", () => {
       web3.Keypair.generate()
     ).getAccountInfo(await findAta(mintId, provider.wallet.publicKey));
     expect(checkRecipientTokenAccount.amount.toNumber()).to.eq(1);
-    expect(checkRecipientTokenAccount.isFrozen).to.eq(true);
+    expect(checkRecipientTokenAccount.isFrozen).to.eq(false);
   });
 
   it("Set reverse entry", async () => {
@@ -347,20 +336,11 @@ describe("create-claim-revoke-name-entry", () => {
       ),
       "before",
       {
-        verbosity: "always",
+        verbosity: "error",
         formatLogs: true,
       }
     ).to.be.fulfilled;
 
-    const [reverseEntryId] = await findReverseEntryId(
-      (
-        await findNamespaceId(namespaceName)
-      )[0],
-      provider.wallet.publicKey
-    );
-    expect(entry.parsed.reverseEntry?.toString()).to.eq(
-      reverseEntryId.toString()
-    );
     const checkReverseEntry = await tryGetAccount(async () =>
       getReverseEntry(
         provider.connection,
@@ -379,6 +359,9 @@ describe("create-claim-revoke-name-entry", () => {
     );
     expect(entryAfter.parsed.data).to.eq(null);
     expect(entryAfter.parsed.isClaimed).to.eq(false);
+    expect(entryAfter.parsed.mint.toString()).to.eq(
+      web3.PublicKey.default.toString()
+    );
 
     const checkRecipientTokenAccount = await new splToken.Token(
       provider.connection,
@@ -386,6 +369,6 @@ describe("create-claim-revoke-name-entry", () => {
       TOKEN_PROGRAM_ID,
       web3.Keypair.generate()
     ).getAccountInfo(await findAta(mintId, provider.wallet.publicKey));
-    expect(checkRecipientTokenAccount.amount.toNumber()).to.eq(0);
+    expect(checkRecipientTokenAccount.amount.toNumber()).to.eq(1);
   });
 });

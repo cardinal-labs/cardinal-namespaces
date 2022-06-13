@@ -16,7 +16,7 @@ pub struct RevokeNameEntryCtx<'info> {
         claim_request.is_approved
         && claim_request.namespace == namespace.key()
         && claim_request.entry_name == name_entry.name
-        && claim_request.counter == name_entry.claim_request_counter
+        // && claim_request.counter == name_entry.claim_request_counter
         @ ErrorCode::ClaimNotAllowed
     )]
     pub claim_request: Box<Account<'info, ClaimRequest>>,
@@ -34,7 +34,7 @@ pub struct RevokeNameEntryCtx<'info> {
     pub token_manager_token_account: UncheckedAccount<'info>,
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
-    pub user_recipient_token_account: UncheckedAccount<'info>,
+    pub recipient_token_account: UncheckedAccount<'info>,
 
     // programs
     token_manager_program: Program<'info, CardinalTokenManager>,
@@ -46,6 +46,9 @@ pub fn handler<'key, 'accounts, 'remaining, 'info>(ctx: Context<'key, 'accounts,
     let name_entry = &mut ctx.accounts.name_entry;
     name_entry.data = None;
     name_entry.is_claimed = false;
+    if ctx.accounts.namespace.transferable_entries {
+        name_entry.mint = Pubkey::default();
+    }
 
     let namespace_seeds = &[NAMESPACE_PREFIX.as_bytes(), ctx.accounts.namespace.name.as_bytes(), &[ctx.accounts.namespace.bump]];
     let namespace_signer = &[&namespace_seeds[..]];
@@ -54,7 +57,7 @@ pub fn handler<'key, 'accounts, 'remaining, 'info>(ctx: Context<'key, 'accounts,
         token_manager: ctx.accounts.token_manager.to_account_info(),
         token_manager_token_account: ctx.accounts.token_manager_token_account.to_account_info(),
         mint: ctx.accounts.mint.to_account_info(),
-        recipient_token_account: ctx.accounts.user_recipient_token_account.to_account_info(),
+        recipient_token_account: ctx.accounts.recipient_token_account.to_account_info(),
         invalidator: ctx.accounts.namespace.to_account_info(),
         collector: ctx.accounts.namespace.to_account_info(),
         token_program: ctx.accounts.token_program.to_account_info(),
