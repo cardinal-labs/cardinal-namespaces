@@ -1,7 +1,7 @@
-use cardinal_certificate::{self};
 use {
     crate::{errors::ErrorCode, state::*},
     anchor_lang::prelude::*,
+    cardinal_token_manager::state::TokenManagerState,
 };
 
 #[derive(Accounts)]
@@ -20,12 +20,12 @@ pub struct InvalidateUnmanagedReverseEntryCtx<'info> {
     )]
     pub reverse_entry: Account<'info, ReverseEntry>,
     #[account(constraint =
-        certificate.mint == entry.mint
-        && certificate.issuer == namespace.key()
-        && certificate.state == cardinal_certificate::state::CertificateState::Invalidated as u8
-        @ ErrorCode::InvalidCertificate
+        token_manager.mint == entry.mint
+        && token_manager.issuer == namespace.key()
+        && token_manager.state == TokenManagerState::Invalidated as u8
+        @ ErrorCode::InvalidTokenManager
     )]
-    pub certificate: Account<'info, cardinal_certificate::state::Certificate>,
+    pub token_manager: Account<'info, cardinal_certificate::state::Certificate>,
     pub invalidator: Signer<'info>,
 }
 

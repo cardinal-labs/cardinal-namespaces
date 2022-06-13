@@ -16,12 +16,12 @@ pub struct InvalidateManagedEntryCtx<'info> {
     )]
     pub entry: Account<'info, Entry>,
     #[account(mut, constraint =
-        namespace_certificate_token_account.mint == entry.mint
-        && namespace_certificate_token_account.owner == namespace.key()
-        && namespace_certificate_token_account.amount > 0
+        namespace_token_account.mint == entry.mint
+        && namespace_token_account.owner == namespace.key()
+        && namespace_token_account.amount > 0
         @ ErrorCode::NamespaceRequiresToken
     )]
-    pub namespace_certificate_token_account: Account<'info, TokenAccount>,
+    pub namespace_token_account: Account<'info, TokenAccount>,
     pub invalidator: Signer<'info>,
 }
 

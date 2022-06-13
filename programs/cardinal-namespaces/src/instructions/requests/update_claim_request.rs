@@ -8,10 +8,7 @@ pub struct UpdateClaimRequestCtx<'info> {
     namespace: Account<'info, Namespace>,
     #[account(constraint = approve_authority.key() == namespace.approve_authority.unwrap() @ ErrorCode::InvalidApproveAuthority)]
     approve_authority: Signer<'info>,
-    #[account(
-        mut,
-        constraint = rent_request.namespace == namespace.key() @ ErrorCode::InvalidNamespace
-    )]
+    #[account(mut, constraint = rent_request.namespace == namespace.key() @ ErrorCode::InvalidNamespace)]
     rent_request: Account<'info, ClaimRequest>,
 }
 

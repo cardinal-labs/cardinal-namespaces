@@ -1,12 +1,12 @@
-use anchor_spl::{
-    associated_token::{self, AssociatedToken},
-    token::{self, Token},
-};
-use cardinal_certificate::{self, cpi::accounts::CreateMintManagerCtx, program::CardinalCertificate};
-use metaplex_token_metadata::instruction::create_metadata_accounts;
 use {
     crate::state::*,
     anchor_lang::{prelude::*, solana_program::program::invoke_signed},
+    anchor_spl::{
+        associated_token::{self, AssociatedToken},
+        token::{self, Token},
+    },
+    cardinal_certificate::{self, cpi::accounts::CreateMintManagerCtx, program::CardinalCertificate},
+    mpl_token_metadata::{instruction::create_metadata_accounts, state::Creator as MCreator},
 };
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
@@ -89,8 +89,12 @@ pub fn handler(ctx: Context<InitEntry>, ix: InitEntryIx) -> Result<()> {
             ix.name.clone() + "." + &ctx.accounts.namespace.name.to_string(),
             "NAME".to_string(),
             // generative URL which will inclde image of the name with expiration data
-            "https://api.cardinal.so/metadata/".to_string() + &ctx.accounts.certificate_mint.key().to_string(),
-            None,
+            "https://nft.cardinal.so/metadata/".to_string() + &ctx.accounts.certificate_mint.key().to_string(),
+            Some(vec![MCreator {
+                address: ctx.accounts.namespace.key(),
+                verified: true,
+                share: 0,
+            }]),
             0,
             true,
             true,

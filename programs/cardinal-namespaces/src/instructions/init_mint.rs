@@ -1,0 +1,185 @@
+use mpl_token_metadata::instruction::{create_master_edition_v3, create_metadata_accounts_v2};
+
+use {
+    crate::{errors::ErrorCode, state::*},
+    anchor_lang::{prelude::*, solana_program::program::invoke_signed},
+    anchor_spl::{
+        associated_token::{self, AssociatedToken},
+        token::{self, Token},
+    },
+    mpl_token_metadata::state::Creator as MCreator,
+};
+
+#[derive(AnchorSerialize, AnchorDeserialize)]
+pub struct InitMintIx {
+    /// Royalty basis points that goes to creators in secondary sales (0-10000)
+    pub seller_fee_basis_points: u16,
+    /// Array of creators, optional
+    pub creators: Option<Vec<Creator>>,
+    pub primary_sale_happened: Option<bool>,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Default)]
+pub struct Creator {
+    pub address: Pubkey,
+    pub verified: bool,
+    pub share: u8,
+}
+
+#[derive(Accounts)]
+pub struct InitMintCtx<'info> {
+    namespace: Box<Account<'info, Namespace>>,
+    #[account(mut, constraint = entry.mint == Pubkey::default() @ ErrorCode::MintAlreadyInitialized)]
+    entry: Account<'info, Entry>,
+    #[account(mut)]
+    payer: Signer<'info>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    namespace_token_account: UncheckedAccount<'info>,
+
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    mint: UncheckedAccount<'info>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    mint_metadata: UncheckedAccount<'info>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    master_edition: UncheckedAccount<'info>,
+
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    token_metadata_program: UncheckedAccount<'info>,
+    token_program: Program<'info, Token>,
+    associated_token: Program<'info, AssociatedToken>,
+    rent: Sysvar<'info, Rent>,
+    system_program: Program<'info, System>,
+}
+
+pub fn handler(ctx: Context<InitMintCtx>, ix: InitMintIx) -> Result<()> {
+    let entry = &mut ctx.accounts.entry;
+    entry.namespace = ctx.accounts.namespace.key();
+    entry.mint = ctx.accounts.mint.key();
+
+    let namespace_seeds = &[NAMESPACE_PREFIX.as_bytes(), ctx.accounts.namespace.name.as_bytes(), &[ctx.accounts.namespace.bump]];
+    let namespace_signer = &[&namespace_seeds[..]];
+
+    // initialize mint
+    let cpi_accounts = token::InitializeMint {
+        mint: ctx.accounts.mint.to_account_info(),
+        rent: ctx.accounts.rent.to_account_info(),
+    };
+    let cpi_program = ctx.accounts.token_program.to_account_info();
+    let cpi_context = CpiContext::new(cpi_program, cpi_accounts);
+    token::initialize_mint(cpi_context, 0, &ctx.accounts.namespace.key(), Some(&ctx.accounts.namespace.key()))?;
+
+    // create metadata
+    invoke_signed(
+        &create_metadata_accounts_v2(
+            *ctx.accounts.token_metadata_program.key,
+            *ctx.accounts.mint_metadata.key,
+            *ctx.accounts.mint.key,
+            ctx.accounts.namespace.key(),
+            *ctx.accounts.payer.key,
+            ctx.accounts.namespace.key(),
+            entry.name.clone() + "." + &ctx.accounts.namespace.name.to_string(),
+            "NAME".to_string(),
+            // generative URL which will inclde image of the name with expiration data
+            "https://nft.cardinal.so/metadata/".to_string() + &ctx.accounts.mint.key().to_string(),
+            Some(
+                [
+                    vec![Creator {
+                        address: ctx.accounts.namespace.key(),
+                        verified: true,
+                        share: 0,
+                    }],
+                    ix.creators.unwrap_or(vec![]),
+                ]
+                .concat()
+                .iter()
+                .map(|c| MCreator {
+                    address: c.address,
+                    verified: c.verified,
+                    share: c.share,
+                })
+                .collect(),
+            ),
+            ix.seller_fee_basis_points,
+            true,
+            true,
+            None,
+            None,
+        ),
+        &[
+            ctx.accounts.mint_metadata.to_account_info(),
+            ctx.accounts.mint.to_account_info(),
+            ctx.accounts.namespace.to_account_info(),
+            ctx.accounts.payer.to_account_info(),
+            ctx.accounts.namespace.to_account_info(),
+            ctx.accounts.system_program.to_account_info(),
+            ctx.accounts.rent.to_account_info(),
+        ],
+        namespace_signer,
+    )?;
+
+    // create associated token account for namespace
+    let cpi_accounts = associated_token::Create {
+        payer: ctx.accounts.payer.to_account_info(),
+        associated_token: ctx.accounts.namespace_token_account.to_account_info(),
+        authority: ctx.accounts.namespace.to_account_info(),
+        mint: ctx.accounts.mint.to_account_info(),
+        system_program: ctx.accounts.system_program.to_account_info(),
+        token_program: ctx.accounts.token_program.to_account_info(),
+        rent: ctx.accounts.rent.to_account_info(),
+    };
+    let cpi_program = ctx.accounts.token_program.to_account_info();
+    let cpi_context = CpiContext::new(cpi_program, cpi_accounts);
+    associated_token::create(cpi_context)?;
+
+    // mint single token to namespace token account
+    let cpi_accounts = token::MintTo {
+        mint: ctx.accounts.mint.to_account_info(),
+        to: ctx.accounts.namespace_token_account.to_account_info(),
+        authority: ctx.accounts.namespace.to_account_info(),
+    };
+    let cpi_program = ctx.accounts.token_program.to_account_info();
+    let cpi_context = CpiContext::new(cpi_program, cpi_accounts).with_signer(namespace_signer);
+    token::mint_to(cpi_context, 1)?;
+
+    // create master edition
+    invoke_signed(
+        &create_master_edition_v3(
+            *ctx.accounts.token_metadata_program.key,
+            *ctx.accounts.master_edition.key,
+            *ctx.accounts.mint.key,
+            ctx.accounts.namespace.key(),
+            *ctx.accounts.payer.key,
+            ctx.accounts.namespace.key(),
+            ctx.accounts.payer.key(),
+            Some(0),
+        ),
+        &[
+            ctx.accounts.master_edition.to_account_info(),
+            ctx.accounts.mint.to_account_info(),
+            ctx.accounts.namespace.to_account_info(),
+            ctx.accounts.namespace.to_account_info(),
+            ctx.accounts.payer.to_account_info(),
+            ctx.accounts.mint_metadata.to_account_info(),
+        ],
+        namespace_signer,
+    )?;
+
+    // // NOTE: We could make this a master edition instead of doing this
+    // // init mint manager
+    // let token_manager_program = ctx.accounts.token_manager_program.to_account_info();
+    // let cpi_accounts = cardinal_token_manager::cpi::accounts::CreateMintManagerCtx {
+    //     mint_manager: ctx.accounts.mint_manager.to_account_info(),
+    //     mint: ctx.accounts.stake_mint.to_account_info(),
+    //     freeze_authority: ctx.accounts.stake_pool.to_account_info(),
+    //     payer: ctx.accounts.payer.to_account_info(),
+    //     token_program: ctx.accounts.token_program.to_account_info(),
+    //     system_program: ctx.accounts.system_program.to_account_info(),
+    // };
+    // let cpi_ctx = CpiContext::new(token_manager_program, cpi_accounts).with_signer(stake_pool_signer);
+    // cardinal_token_manager::cpi::create_mint_manager(cpi_ctx)?;
+    Ok(())
+}
