@@ -4,7 +4,7 @@ import { PublicKey } from "@solana/web3.js";
 import * as NAMESPACES_TYPES from "./idl/cardinal_namespaces";
 
 export const NAMESPACES_PROGRAM_ID = new PublicKey(
-  "6m5hFi5AFStJSFKjEMmgm6EfebHw9Yd4DkHK7x1qRY2G"
+  "nameXpT2PwZ2iA6DTNYTotTmiMYusBCYqwBLN2QgF4w"
 );
 
 export const METADATA_CONFIG_SEED = "metadata-config";
