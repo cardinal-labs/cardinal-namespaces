@@ -49,8 +49,8 @@ pub mod namespaces {
         name_entry::revoke_name_entry::handler(ctx)
     }
 
-    pub fn set_name_entry_data(ctx: Context<InvalidateTransferableNameEntryCtx>) -> Result<()> {
-        name_entry::invalidate_transferable_name_entry::handler(ctx)
+    pub fn set_name_entry_data(ctx: Context<SetEntryDataV2Ctx>) -> Result<()> {
+        name_entry::set_name_entry_data::handler(ctx)
     }
 
     pub fn update_name_entry_mint_metadata(ctx: Context<UpdateNameEntryMintMetadataCtx>, ix: UpdateNameEntryMintMetadataIx) -> Result<()> {

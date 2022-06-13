@@ -1,8 +1,16 @@
+import {
+  findAta,
+  withFindOrInitAssociatedTokenAccount,
+} from "@cardinal/common";
+import { PAYMENT_MANAGER_ADDRESS } from "@cardinal/token-manager/dist/cjs/programs/paymentManager";
+import { findPaymentManagerAddress } from "@cardinal/token-manager/dist/cjs/programs/paymentManager/pda";
+import { TIME_INVALIDATOR_ADDRESS } from "@cardinal/token-manager/dist/cjs/programs/timeInvalidator";
+import { findTimeInvalidatorAddress } from "@cardinal/token-manager/dist/cjs/programs/timeInvalidator/pda";
 import { utils } from "@project-serum/anchor";
-import type { Connection } from "@solana/web3.js";
+import type { AccountMeta, Connection, Transaction } from "@solana/web3.js";
 import { PublicKey } from "@solana/web3.js";
 
-import { getReverseEntry } from "./accounts";
+import { getNamespace, getReverseEntry } from "./accounts";
 import {
   CLAIM_REQUEST_SEED,
   ENTRY_SEED,
@@ -111,4 +119,90 @@ export const reverseEntryId = (address: PublicKey) => {
     [utils.bytes.utf8.encode(REVERSE_ENTRY_SEED), address.toBytes()],
     NAMESPACES_PROGRAM_ID
   );
+};
+
+export const withRemainingAccountsForClaim = async (
+  connection: Connection,
+  transaction: Transaction,
+  payer: PublicKey,
+  namespaceId: PublicKey,
+  tokenManagerId: PublicKey,
+  duration: number
+): Promise<AccountMeta[]> => {
+  const namespace = await getNamespace(connection, namespaceId);
+  if (namespace.parsed.paymentAmountDaily.gt(0)) {
+    const [paymentManagerId] = await findPaymentManagerAddress("cardinal");
+    const [timeInvalidatorId] = await findTimeInvalidatorAddress(
+      tokenManagerId
+    );
+    const accounts = [
+      {
+        pubkey: namespace.parsed.paymentMint,
+        isSigner: false,
+        isWritable: false,
+      },
+      {
+        pubkey: paymentManagerId,
+        isSigner: false,
+        isWritable: false,
+      },
+      {
+        pubkey: timeInvalidatorId,
+        isSigner: false,
+        isWritable: false,
+      },
+      {
+        pubkey: TIME_INVALIDATOR_ADDRESS,
+        isSigner: false,
+        isWritable: false,
+      },
+    ];
+    if (duration > 1) {
+      const payerTokenAccountId = await findAta(
+        namespace.parsed.paymentMint,
+        payer
+      );
+      const paymentTokenAccount = await withFindOrInitAssociatedTokenAccount(
+        transaction,
+        connection,
+        namespace.parsed.paymentMint,
+        payer,
+        payer,
+        true
+      );
+      const feeCollectorId = await withFindOrInitAssociatedTokenAccount(
+        transaction,
+        connection,
+        namespace.parsed.paymentMint,
+        paymentManagerId,
+        payer,
+        true
+      );
+      accounts.concat([
+        {
+          pubkey: payerTokenAccountId,
+          isSigner: false,
+          isWritable: false,
+        },
+        {
+          pubkey: paymentTokenAccount,
+          isSigner: false,
+          isWritable: false,
+        },
+        {
+          pubkey: feeCollectorId,
+          isSigner: false,
+          isWritable: false,
+        },
+        {
+          pubkey: PAYMENT_MANAGER_ADDRESS,
+          isSigner: false,
+          isWritable: false,
+        },
+      ]);
+    }
+    return accounts;
+  } else {
+    return [];
+  }
 };

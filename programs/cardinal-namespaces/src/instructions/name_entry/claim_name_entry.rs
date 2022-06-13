@@ -62,8 +62,8 @@ pub struct ClaimNameEntryCtx<'info> {
     #[account(mut)]
     recipient_token_account: UncheckedAccount<'info>,
     /// CHECK: This is not dangerous because we don't read or write from this account
-    #[account(mut)]
-    recipient_payment_token_account: UncheckedAccount<'info>,
+    // #[account(mut)]
+    // recipient_payment_token_account: UncheckedAccount<'info>,
 
     // programs
     token_manager_program: Program<'info, CardinalTokenManager>,
