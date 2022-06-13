@@ -56,7 +56,7 @@ functions:
           path: /passbase/webhook
           method: post
   passbase-data:
-    handler: passbase-webhook/handler.data
+    handler: passbase-data/handler.data
     events:
       - http:
           path: /passbase/data
