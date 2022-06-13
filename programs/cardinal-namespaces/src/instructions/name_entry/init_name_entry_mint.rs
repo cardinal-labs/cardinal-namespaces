@@ -1,15 +1,16 @@
+use anchor_lang::solana_program::program::invoke;
 use mpl_token_metadata::instruction::{create_master_edition_v3, create_metadata_accounts_v2};
 
 use {
     crate::{errors::ErrorCode, state::*},
-    anchor_lang::{prelude::*, solana_program::program::invoke_signed},
+    anchor_lang::{prelude::*, solana_program::program::invoke_signed, solana_program::program_pack::Pack},
     anchor_spl::{
         associated_token::{self, AssociatedToken},
         token::{self, Token},
     },
     mpl_token_metadata::state::Creator as MCreator,
+    spl_token::solana_program::system_instruction,
 };
-
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Default)]
 pub struct Creator {
     pub address: Pubkey,
@@ -53,6 +54,18 @@ pub fn handler(ctx: Context<InitNameEntryMintCtx>) -> Result<()> {
 
     let namespace_seeds = &[NAMESPACE_PREFIX.as_bytes(), ctx.accounts.namespace.name.as_bytes(), &[ctx.accounts.namespace.bump]];
     let namespace_signer = &[&namespace_seeds[..]];
+
+    // create account for mint
+    invoke(
+        &system_instruction::create_account(
+            ctx.accounts.payer.key,
+            ctx.accounts.mint.key,
+            ctx.accounts.rent.minimum_balance(spl_token::state::Mint::LEN),
+            spl_token::state::Mint::LEN as u64,
+            &spl_token::id(),
+        ),
+        &[ctx.accounts.payer.to_account_info(), ctx.accounts.mint.to_account_info()],
+    )?;
 
     // initialize mint
     let cpi_accounts = token::InitializeMint {
