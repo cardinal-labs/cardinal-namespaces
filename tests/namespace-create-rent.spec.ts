@@ -9,13 +9,15 @@ import {
   getNameEntry,
   getNamespaceByName,
   getReverseEntry,
-  withClaimEntry,
   withCreateClaimRequest,
   withCreateNamespace,
-  withInitEntry,
-  withSetReverseEntry,
   withUpdateClaimRequest,
 } from "../src";
+import {
+  withClaimEntry,
+  withInitEntry,
+  withSetReverseEntry,
+} from "../src/deprecated";
 import { createMint, withFindOrInitAssociatedTokenAccount } from "./utils";
 import { getProvider } from "./workspace";
 

@@ -178,8 +178,9 @@ export async function withClaimNameEntry(
   entryName: string,
   mintId: PublicKey,
   duration: number,
-  requestor: PublicKey,
-  recipient: PublicKey
+  requestor = wallet.publicKey,
+  recipient = wallet.publicKey,
+  payer = wallet.publicKey
 ): Promise<Transaction> {
   const provider = new anchor.AnchorProvider(connection, wallet, {});
   const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
@@ -214,10 +215,6 @@ export async function withClaimNameEntry(
     namespacesProgram.programId
   );
 
-  const namespace = await namespacesProgram.account.namespace.fetch(
-    namespaceId
-  );
-
   const [tokenManagerId] = await findTokenManagerAddress(mintId);
 
   const namespaceTokenAccountId =
@@ -241,9 +238,9 @@ export async function withClaimNameEntry(
   const recipientTokenAccount = await withFindOrInitAssociatedTokenAccount(
     transaction,
     provider.connection,
-    namespace.paymentMint,
+    mintId,
     recipient,
-    provider.wallet.publicKey,
+    payer,
     true
   );
 
@@ -252,10 +249,10 @@ export async function withClaimNameEntry(
   const remainingAccountsForClaim = await withRemainingAccountsForClaim(
     connection,
     transaction,
-    provider.wallet.publicKey,
+    wallet,
     namespaceId,
     tokenManagerId,
-    duration > 0 ? new anchor.BN(duration) : 0
+    duration > 0 ? duration : 0
   );
 
   transaction.add(
@@ -269,7 +266,7 @@ export async function withClaimNameEntry(
           nameEntry: entryId,
           requestor: requestor,
           recipient: recipient,
-          payer: provider.wallet.publicKey,
+          payer: payer,
           claimRequest: claimRequestId,
           mint: mintId,
           namespaceTokenAccount: namespaceTokenAccountId,

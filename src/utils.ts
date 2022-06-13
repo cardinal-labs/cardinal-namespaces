@@ -1,18 +1,23 @@
 import {
   findAta,
+  tryGetAccount,
   withFindOrInitAssociatedTokenAccount,
 } from "@cardinal/common";
 import { PAYMENT_MANAGER_ADDRESS } from "@cardinal/token-manager/dist/cjs/programs/paymentManager";
+import { getPaymentManager } from "@cardinal/token-manager/dist/cjs/programs/paymentManager/accounts";
 import { findPaymentManagerAddress } from "@cardinal/token-manager/dist/cjs/programs/paymentManager/pda";
 import { TIME_INVALIDATOR_ADDRESS } from "@cardinal/token-manager/dist/cjs/programs/timeInvalidator";
 import { findTimeInvalidatorAddress } from "@cardinal/token-manager/dist/cjs/programs/timeInvalidator/pda";
+import { withRemainingAccountsForPayment } from "@cardinal/token-manager/dist/cjs/programs/tokenManager";
 import { utils } from "@project-serum/anchor";
+import type { Wallet } from "@saberhq/solana-contrib";
 import type { AccountMeta, Connection, Transaction } from "@solana/web3.js";
 import { PublicKey } from "@solana/web3.js";
 
 import { getNamespace, getReverseEntry } from "./accounts";
 import {
   CLAIM_REQUEST_SEED,
+  DEFAULT_PAYMENT_MANAGER,
   ENTRY_SEED,
   NAMESPACE_SEED,
   NAMESPACES_PROGRAM_ID,
@@ -49,10 +54,11 @@ export function displayAddress(address: string, shorten = true): string {
 
 export async function tryGetName(
   connection: Connection,
-  pubkey: PublicKey
+  pubkey: PublicKey,
+  namespace: PublicKey
 ): Promise<string | undefined> {
   try {
-    const reverseEntry = await getReverseEntry(connection, pubkey);
+    const reverseEntry = await getReverseEntry(connection, pubkey, namespace);
     return formatName(
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -67,9 +73,10 @@ export async function tryGetName(
 
 export async function nameForDisplay(
   connection: Connection,
-  pubkey: PublicKey
+  pubkey: PublicKey,
+  namespace: PublicKey
 ): Promise<string> {
-  const name = await tryGetName(connection, pubkey);
+  const name = await tryGetName(connection, pubkey, namespace);
   return name || displayAddress(pubkey.toString());
 }
 
@@ -124,14 +131,16 @@ export const reverseEntryId = (address: PublicKey) => {
 export const withRemainingAccountsForClaim = async (
   connection: Connection,
   transaction: Transaction,
-  payer: PublicKey,
+  wallet: Wallet,
   namespaceId: PublicKey,
   tokenManagerId: PublicKey,
   duration: number
 ): Promise<AccountMeta[]> => {
   const namespace = await getNamespace(connection, namespaceId);
-  if (namespace.parsed.paymentAmountDaily.gt(0)) {
-    const [paymentManagerId] = await findPaymentManagerAddress("cardinal");
+  if (namespace.parsed.paymentAmountDaily.toNumber() > 0) {
+    const [paymentManagerId] = await findPaymentManagerAddress(
+      DEFAULT_PAYMENT_MANAGER
+    );
     const [timeInvalidatorId] = await findTimeInvalidatorAddress(
       tokenManagerId
     );
@@ -157,25 +166,30 @@ export const withRemainingAccountsForClaim = async (
         isWritable: false,
       },
     ];
-    if (duration > 1) {
-      const payerTokenAccountId = await findAta(
-        namespace.parsed.paymentMint,
-        payer
-      );
-      const paymentTokenAccount = await withFindOrInitAssociatedTokenAccount(
+    if (duration > 0) {
+      const [paymentTokenAccountId] = await withRemainingAccountsForPayment(
         transaction,
         connection,
+        wallet,
         namespace.parsed.paymentMint,
-        payer,
-        payer,
-        true
+        namespaceId,
+        paymentManagerId
+      );
+      const payerTokenAccountId = await findAta(
+        namespace.parsed.paymentMint,
+        wallet.publicKey
+      );
+      const paymentManagerData = await tryGetAccount(() =>
+        getPaymentManager(connection, paymentManagerId)
       );
       const feeCollectorId = await withFindOrInitAssociatedTokenAccount(
         transaction,
         connection,
         namespace.parsed.paymentMint,
-        paymentManagerId,
-        payer,
+        paymentManagerData
+          ? paymentManagerData.parsed.feeCollector
+          : PublicKey.default,
+        wallet.publicKey,
         true
       );
       accounts.concat([
@@ -185,7 +199,7 @@ export const withRemainingAccountsForClaim = async (
           isWritable: false,
         },
         {
-          pubkey: paymentTokenAccount,
+          pubkey: paymentTokenAccountId,
           isSigner: false,
           isWritable: false,
         },
