@@ -9,13 +9,15 @@ import {
   getNameEntry,
   getNamespaceByName,
   getReverseEntry,
-  withClaimEntry,
   withCreateClaimRequest,
   withCreateNamespace,
-  withInitEntry,
-  withSetReverseEntry,
   withUpdateClaimRequest,
 } from "../src";
+import {
+  withClaimEntry,
+  withInitEntry,
+  withSetReverseEntry,
+} from "../src/deprecated";
 import { createMint, withFindOrInitAssociatedTokenAccount } from "./utils";
 import { getProvider } from "./workspace";
 
@@ -23,7 +25,7 @@ describe("namespace-create-rent", () => {
   const provider = getProvider();
 
   // test params
-  const namespaceName = "ns1";
+  const namespaceName = `ns-${Math.random()}`;
   const entryName = "testname";
   const mintAuthority = web3.Keypair.generate();
   const paymentAmountDaily = new anchor.BN(864000);

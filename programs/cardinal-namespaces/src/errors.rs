@@ -24,8 +24,6 @@ pub enum ErrorCode {
     InvalidNamespace,
     #[msg("Invalid entry")]
     InvalidEntry,
-    #[msg("Invalid certificate")]
-    InvalidCertificate,
     #[msg("Invalid payment mint")]
     InvalidPaymentMint,
     #[msg("Invalid reverse entry")]
@@ -36,4 +34,16 @@ pub enum ErrorCode {
     InvalidApproveAuthority,
     #[msg("Namespace requires token")]
     NamespaceRequiresToken,
+    #[msg("Mint already initialized")]
+    MintAlreadyInitialized,
+    #[msg("Mint invalid for entry")]
+    InvalidEntryMint,
+    #[msg("Time invalidator program ID is invalid")]
+    InvalidTimeInvalidatorProgramId,
+    #[msg("Invalid token manager")]
+    InvalidTokenManager,
+    #[msg("Name Entry already claimed")]
+    NameEntryAlreadyClaimed,
+    #[msg("Invalid certificate")]
+    InvalidCertificate,
 }

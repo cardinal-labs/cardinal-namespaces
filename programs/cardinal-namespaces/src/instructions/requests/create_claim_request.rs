@@ -1,7 +1,7 @@
 use {crate::state::*, anchor_lang::prelude::*};
 
 #[derive(Accounts)]
-#[instruction(entry_name: String, claim_request_bump: u8, user: Pubkey)]
+#[instruction(entry_name: String, user: Pubkey)]
 pub struct CreateClaimRequestCtx<'info> {
     namespace: Account<'info, Namespace>,
     #[account(mut)]
@@ -17,7 +17,7 @@ pub struct CreateClaimRequestCtx<'info> {
     system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<CreateClaimRequestCtx>, entry_name: String, _claim_request_bump: u8, user: Pubkey) -> Result<()> {
+pub fn handler(ctx: Context<CreateClaimRequestCtx>, entry_name: String, user: Pubkey) -> Result<()> {
     let claim_request = &mut ctx.accounts.claim_request;
     claim_request.bump = *ctx.bumps.get("claim_request").unwrap();
     claim_request.requestor = user;

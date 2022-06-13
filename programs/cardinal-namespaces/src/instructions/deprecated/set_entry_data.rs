@@ -37,8 +37,8 @@ pub struct SetEntryData<'info> {
     system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<SetEntryData>, data: Pubkey) -> Result<()> {
+pub fn handler(ctx: Context<SetEntryData>, _data: Pubkey) -> Result<()> {
     let entry = &mut ctx.accounts.entry;
-    entry.data = Some(data);
+    entry.data = Some(ctx.accounts.user.key());
     Ok(())
 }

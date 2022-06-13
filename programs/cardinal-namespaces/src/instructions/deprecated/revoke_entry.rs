@@ -8,34 +8,32 @@ use {
 #[derive(Accounts)]
 pub struct RevokeEntryCtx<'info> {
     #[account(mut)]
-    pub namespace: Account<'info, Namespace>,
-    #[account(mut, constraint =
-        entry.namespace == namespace.key()
-        @ ErrorCode::InvalidEntry
-    )]
-    pub entry: Box<Account<'info, Entry>>,
+    namespace: Account<'info, Namespace>,
+    #[account(mut, constraint = entry.namespace == namespace.key() @ ErrorCode::InvalidNamespace)]
+    entry: Box<Account<'info, Entry>>,
     #[account(mut,
         constraint =
         claim_request.is_approved
+        && claim_request.namespace == namespace.key()
         && claim_request.entry_name == entry.name
         @ ErrorCode::ClaimNotAllowed
     )]
-    pub claim_request: Box<Account<'info, ClaimRequest>>,
+    claim_request: Box<Account<'info, ClaimRequest>>,
 
     #[account(mut, constraint =
         namespace_certificate_token_account.mint == entry.mint
         && namespace_certificate_token_account.owner == namespace.key()
         @ ErrorCode::NamespaceRequiresToken
     )]
-    pub namespace_certificate_token_account: Box<Account<'info, TokenAccount>>,
+    namespace_certificate_token_account: Box<Account<'info, TokenAccount>>,
     #[account(mut, constraint =
         // TODO parse certificate here and use certificate payment mint? in case it has changed in the namespace
         namespace_payment_token_account.mint == namespace.payment_mint
         && namespace_payment_token_account.owner == namespace.key()
         @ ErrorCode::NamespaceRequiresToken
     )]
-    pub namespace_payment_token_account: Box<Account<'info, TokenAccount>>,
-    pub invalidator: Signer<'info>,
+    namespace_payment_token_account: Box<Account<'info, TokenAccount>>,
+    invalidator: Signer<'info>,
 
     // CPI accounts
     /// CHECK: This is not dangerous because we don't read or write from this account

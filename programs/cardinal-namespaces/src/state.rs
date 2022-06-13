@@ -42,6 +42,7 @@ pub struct ClaimRequest {
     pub is_approved: bool,
     pub namespace: Pubkey,
     pub entry_name: String,
+    pub counter: u32,
 }
 
 pub const ENTRY_SIZE: usize = 8 + std::mem::size_of::<Entry>() + 24;
@@ -54,6 +55,7 @@ pub struct Entry {
     pub reverse_entry: Option<Pubkey>,
     pub mint: Pubkey,
     pub is_claimed: bool,
+    pub claim_request_counter: u32,
 }
 
 pub const REVERSE_ENTRY_SIZE: usize = 8 + std::mem::size_of::<ReverseEntry>() + 24 + 24;
