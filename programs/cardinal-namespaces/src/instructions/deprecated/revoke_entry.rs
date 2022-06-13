@@ -8,9 +8,9 @@ use {
 #[derive(Accounts)]
 pub struct RevokeEntryCtx<'info> {
     #[account(mut)]
-    pub namespace: Account<'info, Namespace>,
+    namespace: Account<'info, Namespace>,
     #[account(mut, constraint = entry.namespace == namespace.key() @ ErrorCode::InvalidNamespace)]
-    pub entry: Box<Account<'info, Entry>>,
+    entry: Box<Account<'info, Entry>>,
     #[account(mut,
         constraint =
         claim_request.is_approved
@@ -18,45 +18,45 @@ pub struct RevokeEntryCtx<'info> {
         && claim_request.entry_name == entry.name
         @ ErrorCode::ClaimNotAllowed
     )]
-    pub claim_request: Box<Account<'info, ClaimRequest>>,
+    claim_request: Box<Account<'info, ClaimRequest>>,
 
     #[account(mut, constraint =
         namespace_certificate_token_account.mint == entry.mint
         && namespace_certificate_token_account.owner == namespace.key()
         @ ErrorCode::NamespaceRequiresToken
     )]
-    pub namespace_certificate_token_account: Box<Account<'info, TokenAccount>>,
+    namespace_certificate_token_account: Box<Account<'info, TokenAccount>>,
     #[account(mut, constraint =
         // TODO parse certificate here and use certificate payment mint? in case it has changed in the namespace
         namespace_payment_token_account.mint == namespace.payment_mint
         && namespace_payment_token_account.owner == namespace.key()
         @ ErrorCode::NamespaceRequiresToken
     )]
-    pub namespace_payment_token_account: Box<Account<'info, TokenAccount>>,
-    pub invalidator: Signer<'info>,
+    namespace_payment_token_account: Box<Account<'info, TokenAccount>>,
+    invalidator: Signer<'info>,
 
     // CPI accounts
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
-    pub mint_manager: UncheckedAccount<'info>,
+    mint_manager: UncheckedAccount<'info>,
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
-    pub certificate: UncheckedAccount<'info>,
+    certificate: UncheckedAccount<'info>,
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
-    pub certificate_mint: UncheckedAccount<'info>,
+    certificate_mint: UncheckedAccount<'info>,
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
-    pub certificate_token_account: UncheckedAccount<'info>,
+    certificate_token_account: UncheckedAccount<'info>,
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
-    pub certificate_payment_token_account: UncheckedAccount<'info>,
+    certificate_payment_token_account: UncheckedAccount<'info>,
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
-    pub user_certificate_token_account: UncheckedAccount<'info>,
+    user_certificate_token_account: UncheckedAccount<'info>,
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
-    pub user_payment_token_account: UncheckedAccount<'info>,
+    user_payment_token_account: UncheckedAccount<'info>,
 
     // programs
     certificate_program: Program<'info, CardinalCertificate>,

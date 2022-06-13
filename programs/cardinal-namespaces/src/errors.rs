@@ -24,8 +24,6 @@ pub enum ErrorCode {
     InvalidNamespace,
     #[msg("Invalid entry")]
     InvalidEntry,
-    #[msg("Invalid certificate")]
-    InvalidCertificate,
     #[msg("Invalid payment mint")]
     InvalidPaymentMint,
     #[msg("Invalid reverse entry")]
@@ -44,4 +42,8 @@ pub enum ErrorCode {
     InvalidTimeInvalidatorProgramId,
     #[msg("Invalid token manager")]
     InvalidTokenManager,
+    #[msg("Name Entry already claimed")]
+    NameEntryAlreadyClaimed,
+    #[msg("Invalid certificate")]
+    InvalidCertificate,
 }
