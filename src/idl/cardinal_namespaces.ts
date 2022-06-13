@@ -1,5 +1,5 @@
 export type Namespaces = {
-  version: "4.0.0";
+  version: "4.0.2";
   name: "namespaces";
   instructions: [
     {
@@ -1697,7 +1697,7 @@ export type Namespaces = {
 };
 
 export const IDL: Namespaces = {
-  version: "4.0.0",
+  version: "4.0.2",
   name: "namespaces",
   instructions: [
     {
