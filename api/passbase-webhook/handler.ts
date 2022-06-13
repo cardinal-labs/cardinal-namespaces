@@ -6,13 +6,6 @@ import { Keypair } from "@solana/web3.js";
 import { connectionFor } from "../common/connection";
 import { utils } from "@project-serum/anchor";
 
-// kycLcoGB9Lf1j1mLxbaYcR3HUgBywHBxmLJPcvFr5BP
-const wallet = Keypair.fromSecretKey(
-  utils.bytes.bs58.decode(
-    "2SogHyWWyJxRpNjgjhRGRAWfsNaYYDjYx3Z9FyJLi926N6nC3tWMjEVtzMdKmDJiDvpoeRu3Sjin6g1cLBxib8Ed"
-  )
-);
-
 const handler: Handler = async (event) => {
   const webhook = decryptWebhookIfNeeded(event);
   console.log(webhook);
@@ -66,9 +59,7 @@ const handler: Handler = async (event) => {
 const getIdentity = async (uuid: string) => {
   const apiUrl = `https://api.passbase.com/verification/v1/identities/${uuid}`;
   const headers = {
-    "x-api-key":
-      process.env.PASSBASE_SECRET_KEY ||
-      "6KGtQueEyEhzsFChC45U3UNc2Z3xiA1IxpeewKaUk7orzw9DYpysekVjm8cow7o3XvgaMMGpCaROgLf24aqJOkAZ5BW9oUDwW9ZKryrqxLWSaI6yy7HmFpbsHPkijFVW",
+    "x-api-key": process.env.PASSBASE_SECRET_KEY!,
   };
 
   const response = (await fetch(apiUrl, { headers: headers })).json();
@@ -80,7 +71,7 @@ const decryptWebhook = (body) => {
   const iv = encryptedResult.slice(0, 16);
   const cipher = crypto.createDecipheriv(
     "aes-256-cbc",
-    process.env.PASSBASE_WEBHOOK_SECRET || "pbQQnWXaTyPEK2FeXR5dMYQX9cd3SsHz",
+    process.env.PASSBASE_WEBHOOK_SECRET!,
     iv
   );
   const decryptedResultBytes = Buffer.concat([
