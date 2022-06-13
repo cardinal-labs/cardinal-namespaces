@@ -1,18 +1,28 @@
 import { withFindOrInitAssociatedTokenAccount } from "@cardinal/certificates";
-import { TOKEN_MANAGER_ADDRESS } from "@cardinal/token-manager/dist/cjs/programs/tokenManager";
+import { findAta } from "@cardinal/common";
+import {
+  getRemainingAccountsForKind,
+  TokenManagerKind,
+  TOKEN_MANAGER_ADDRESS,
+  withRemainingAccountsForReturn,
+} from "@cardinal/token-manager/dist/cjs/programs/tokenManager";
+import { getTokenManager } from "@cardinal/token-manager/dist/cjs/programs/tokenManager/accounts";
 import {
   findMintCounterId,
   findTokenManagerAddress,
 } from "@cardinal/token-manager/dist/cjs/programs/tokenManager/pda";
 import * as mplTokenMetadata from "@metaplex-foundation/mpl-token-metadata";
-import { Metadata } from "@metaplex-foundation/mpl-token-metadata";
+import {
+  MasterEdition,
+  Metadata,
+} from "@metaplex-foundation/mpl-token-metadata";
 import * as anchor from "@project-serum/anchor";
 import type { Wallet } from "@saberhq/solana-contrib";
 import * as splToken from "@solana/spl-token";
-import type { Connection, Transaction } from "@solana/web3.js";
-import { PublicKey, SYSVAR_RENT_PUBKEY } from "@solana/web3.js";
+import type { Connection, Keypair, Transaction } from "@solana/web3.js";
+import { PublicKey, SystemProgram, SYSVAR_RENT_PUBKEY } from "@solana/web3.js";
 
-import type { NAMESPACES_PROGRAM } from ".";
+import { getNameEntry, NAMESPACES_PROGRAM } from ".";
 import {
   CLAIM_REQUEST_SEED,
   ENTRY_SEED,
@@ -20,8 +30,11 @@ import {
   NAMESPACE_SEED,
   NAMESPACES_IDL,
   NAMESPACES_PROGRAM_ID,
-  REVERSE_ENTRY_SEED,
   withRemainingAccountsForClaim,
+  findNamespaceId,
+  findNameEntryId,
+  findReverseEntryId,
+  findClaimRequestId,
 } from ".";
 
 export async function withInit(
@@ -171,13 +184,13 @@ export async function withUpdateNamespace(
 }
 
 export async function withClaimNameEntry(
+  transaction: Transaction,
   connection: Connection,
   wallet: Wallet,
-  transaction: Transaction,
   namespaceName: string,
   entryName: string,
   mintId: PublicKey,
-  duration: number,
+  duration?: number,
   requestor = wallet.publicKey,
   recipient = wallet.publicKey,
   payer = wallet.publicKey
@@ -252,13 +265,18 @@ export async function withClaimNameEntry(
     wallet,
     namespaceId,
     tokenManagerId,
-    duration > 0 ? duration : 0
+    duration && duration > 0 ? duration : undefined
+  );
+
+  const remainingAccountsForKind = await getRemainingAccountsForKind(
+    mintId,
+    TokenManagerKind.Edition
   );
 
   transaction.add(
     namespacesProgram.instruction.claimNameEntry(
       {
-        duration: duration > 0 ? new anchor.BN(duration) : null,
+        duration: duration && duration > 0 ? new anchor.BN(duration) : null,
       },
       {
         accounts: {
@@ -274,15 +292,16 @@ export async function withClaimNameEntry(
           tokenManagerTokenAccount: tokenManagerTokenAccountId,
           mintCounter: mintCounterId,
           recipientTokenAccount: recipientTokenAccount,
-
-          // programs
           tokenManagerProgram: TOKEN_MANAGER_ADDRESS,
           tokenProgram: splToken.TOKEN_PROGRAM_ID,
           associatedToken: splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
           rent: SYSVAR_RENT_PUBKEY,
           systemProgram: anchor.web3.SystemProgram.programId,
         },
-        remainingAccounts: remainingAccountsForClaim,
+        remainingAccounts: [
+          ...remainingAccountsForClaim,
+          ...remainingAccountsForKind,
+        ],
       }
     )
   );
@@ -290,11 +309,11 @@ export async function withClaimNameEntry(
 }
 
 export async function withInitNameEntry(
+  transaction: Transaction,
   connection: Connection,
   wallet: Wallet,
   namespaceName: string,
-  entryName: string,
-  transaction: Transaction
+  entryName: string
 ): Promise<Transaction> {
   const provider = new anchor.AnchorProvider(connection, wallet, {});
   const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
@@ -338,14 +357,79 @@ export async function withInitNameEntry(
   return transaction;
 }
 
+export async function withInitNameEntryMint(
+  transaction: Transaction,
+  connection: Connection,
+  wallet: Wallet,
+  namespaceName: string,
+  entryName: string,
+  mintKeypair: Keypair
+): Promise<Transaction> {
+  const provider = new anchor.AnchorProvider(connection, wallet, {});
+  const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
+    NAMESPACES_IDL,
+    NAMESPACES_PROGRAM_ID,
+    provider
+  );
+
+  const [namespaceId] = await PublicKey.findProgramAddress(
+    [
+      anchor.utils.bytes.utf8.encode(NAMESPACE_SEED),
+      anchor.utils.bytes.utf8.encode(namespaceName),
+    ],
+    namespacesProgram.programId
+  );
+
+  const [entryId] = await PublicKey.findProgramAddress(
+    [
+      anchor.utils.bytes.utf8.encode(ENTRY_SEED),
+      namespaceId.toBytes(),
+      anchor.utils.bytes.utf8.encode(entryName),
+    ],
+    namespacesProgram.programId
+  );
+
+  const namespaceTokenAccountId =
+    await splToken.Token.getAssociatedTokenAddress(
+      splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
+      splToken.TOKEN_PROGRAM_ID,
+      mintKeypair.publicKey,
+      namespaceId,
+      true
+    );
+
+  const mintMetadataId = await Metadata.getPDA(mintKeypair.publicKey);
+  const mintMasterEditionId = await MasterEdition.getPDA(mintKeypair.publicKey);
+
+  transaction.add(
+    namespacesProgram.instruction.initNameEntryMint({
+      accounts: {
+        namespace: namespaceId,
+        nameEntry: entryId,
+        payer: provider.wallet.publicKey,
+        namespaceTokenAccount: namespaceTokenAccountId,
+        mint: mintKeypair.publicKey,
+        mintMetadata: mintMetadataId,
+        masterEdition: mintMasterEditionId,
+        tokenMetadataProgram: mplTokenMetadata.MetadataProgram.PUBKEY,
+        tokenProgram: splToken.TOKEN_PROGRAM_ID,
+        associatedToken: splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
+        rent: SYSVAR_RENT_PUBKEY,
+        systemProgram: SystemProgram.programId,
+      },
+    })
+  );
+  return transaction;
+}
+
 export async function withRevokeNameEntry(
+  transaction: Transaction,
   connection: Connection,
   wallet: Wallet,
   namespaceName: string,
   entryName: string,
   mintId: PublicKey,
-  claimRequestId: PublicKey,
-  transaction: Transaction
+  claimRequestId: PublicKey
 ): Promise<Transaction> {
   const provider = new anchor.AnchorProvider(connection, wallet, {});
   const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
@@ -370,11 +454,10 @@ export async function withRevokeNameEntry(
     namespacesProgram.programId
   );
 
-  const namespace = await namespacesProgram.account.namespace.fetch(
-    namespaceId
-  );
-
+  const nameEntry = await getNameEntry(connection, namespaceName, entryName);
   const [tokenManagerId] = await findTokenManagerAddress(mintId);
+  const tokenManagerData = await getTokenManager(connection, tokenManagerId);
+
   const tokenManagerTokenAccount = await withFindOrInitAssociatedTokenAccount(
     transaction,
     connection,
@@ -384,12 +467,22 @@ export async function withRevokeNameEntry(
     true
   );
 
-  const userRecipientTokenAccount = await withFindOrInitAssociatedTokenAccount(
+  const recipientTokenAccount = await findAta(
+    nameEntry.parsed.mint,
+    provider.wallet.publicKey,
+    true
+  );
+
+  const remainingAccountsForKind = await getRemainingAccountsForKind(
+    mintId,
+    TokenManagerKind.Edition
+  );
+
+  const remainingAccountsForReturn = await withRemainingAccountsForReturn(
     transaction,
-    provider.connection,
-    namespace.paymentMint,
-    provider.wallet.publicKey,
-    provider.wallet.publicKey,
+    connection,
+    wallet,
+    tokenManagerData,
     true
   );
 
@@ -400,17 +493,18 @@ export async function withRevokeNameEntry(
         nameEntry: entryId,
         claimRequest: claimRequestId,
         invalidator: provider.wallet.publicKey,
-
         tokenManager: tokenManagerId,
         mint: mintId,
         tokenManagerTokenAccount: tokenManagerTokenAccount,
-        userRecipientTokenAccount: userRecipientTokenAccount,
-
-        // programs
+        recipientTokenAccount: recipientTokenAccount,
         tokenManagerProgram: TOKEN_MANAGER_ADDRESS,
         tokenProgram: splToken.TOKEN_PROGRAM_ID,
         rent: SYSVAR_RENT_PUBKEY,
       },
+      remainingAccounts: [
+        ...remainingAccountsForKind,
+        ...remainingAccountsForReturn,
+      ],
     })
   );
   return transaction;
@@ -475,12 +569,11 @@ export async function withSetEntryData(
 }
 
 export async function withSetNamespaceReverseEntry(
+  transaction: Transaction,
   connection: Connection,
   wallet: Wallet,
   namespaceName: string,
   entryName: string,
-  certificateMintId: PublicKey,
-  transaction: Transaction,
   mintId: PublicKey
 ): Promise<Transaction> {
   const provider = new anchor.AnchorProvider(connection, wallet, {});
@@ -489,29 +582,11 @@ export async function withSetNamespaceReverseEntry(
     NAMESPACES_PROGRAM_ID,
     provider
   );
-  const [namespaceId] = await PublicKey.findProgramAddress(
-    [
-      anchor.utils.bytes.utf8.encode(NAMESPACE_SEED),
-      anchor.utils.bytes.utf8.encode(namespaceName),
-    ],
-    namespacesProgram.programId
-  );
-
-  const [entryId] = await PublicKey.findProgramAddress(
-    [
-      anchor.utils.bytes.utf8.encode(ENTRY_SEED),
-      namespaceId.toBytes(),
-      anchor.utils.bytes.utf8.encode(entryName),
-    ],
-    namespacesProgram.programId
-  );
-
-  const [reverseEntryId] = await PublicKey.findProgramAddress(
-    [
-      anchor.utils.bytes.utf8.encode(REVERSE_ENTRY_SEED),
-      wallet.publicKey.toBytes(),
-    ],
-    namespacesProgram.programId
+  const [namespaceId] = await findNamespaceId(namespaceName);
+  const [entryId] = await findNameEntryId(namespaceId, entryName);
+  const [reverseEntryId] = await findReverseEntryId(
+    namespaceId,
+    wallet.publicKey
   );
 
   const userTokenAccountId = await splToken.Token.getAssociatedTokenAddress(
@@ -520,18 +595,15 @@ export async function withSetNamespaceReverseEntry(
     mintId,
     provider.wallet.publicKey
   );
-  const [tokenManagerId] = await findTokenManagerAddress(certificateMintId);
-
+  const [tokenManagerId] = await findTokenManagerAddress(mintId);
   transaction.add(
     namespacesProgram.instruction.setNamespaceReverseEntry({
       accounts: {
         namespace: namespaceId,
         nameEntry: entryId,
         reverseEntry: reverseEntryId,
-
         userTokenAccount: userTokenAccountId,
         tokenManager: tokenManagerId,
-
         user: provider.wallet.publicKey,
         payer: provider.wallet.publicKey,
         systemProgram: anchor.web3.SystemProgram.programId,
@@ -555,22 +627,11 @@ export async function withCreateClaimRequest(
     NAMESPACES_PROGRAM_ID,
     provider
   );
-  const [namespaceId] = await PublicKey.findProgramAddress(
-    [
-      anchor.utils.bytes.utf8.encode(NAMESPACE_SEED),
-      anchor.utils.bytes.utf8.encode(namespaceName),
-    ],
-    namespacesProgram.programId
-  );
-
-  const [claimRequestId, claimRequestBump] = await PublicKey.findProgramAddress(
-    [
-      anchor.utils.bytes.utf8.encode(CLAIM_REQUEST_SEED),
-      namespaceId.toBytes(),
-      anchor.utils.bytes.utf8.encode(entryName),
-      user.toBytes(),
-    ],
-    namespacesProgram.programId
+  const [namespaceId] = await findNamespaceId(namespaceName);
+  const [claimRequestId, claimRequestBump] = await findClaimRequestId(
+    namespaceId,
+    entryName,
+    user
   );
 
   transaction.add(
@@ -605,13 +666,7 @@ export async function withUpdateClaimRequest(
     NAMESPACES_PROGRAM_ID,
     provider
   );
-  const [namespaceId] = await PublicKey.findProgramAddress(
-    [
-      anchor.utils.bytes.utf8.encode(NAMESPACE_SEED),
-      anchor.utils.bytes.utf8.encode(namespaceName),
-    ],
-    namespacesProgram.programId
-  );
+  const [namespaceId] = await findNamespaceId(namespaceName);
   transaction.add(
     namespacesProgram.instruction.updateClaimRequest(isApproved, {
       accounts: {
@@ -625,13 +680,13 @@ export async function withUpdateClaimRequest(
 }
 
 export async function withRevokeReverseEntry(
+  transaction: Transaction,
   connection: Connection,
   wallet: Wallet,
   namespaceName: string,
   entryName: string,
   reverseEntryId: PublicKey,
-  claimRequestId: PublicKey,
-  transaction: Transaction
+  claimRequestId: PublicKey
 ): Promise<Transaction> {
   const provider = new anchor.AnchorProvider(connection, wallet, {});
   const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
@@ -639,23 +694,8 @@ export async function withRevokeReverseEntry(
     NAMESPACES_PROGRAM_ID,
     provider
   );
-  const [namespaceId] = await PublicKey.findProgramAddress(
-    [
-      anchor.utils.bytes.utf8.encode(NAMESPACE_SEED),
-      anchor.utils.bytes.utf8.encode(namespaceName),
-    ],
-    namespacesProgram.programId
-  );
-
-  const [nameEntryId] = await PublicKey.findProgramAddress(
-    [
-      anchor.utils.bytes.utf8.encode(ENTRY_SEED),
-      namespaceId.toBytes(),
-      anchor.utils.bytes.utf8.encode(entryName),
-    ],
-    namespacesProgram.programId
-  );
-
+  const [namespaceId] = await findNamespaceId(namespaceName);
+  const [nameEntryId] = await findNameEntryId(namespaceId, entryName);
   transaction.add(
     namespacesProgram.instruction.revokeReverseEntry({
       accounts: {

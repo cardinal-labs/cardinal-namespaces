@@ -39,7 +39,7 @@ pub struct ClaimNameEntryCtx<'info> {
         && claim_request.namespace == namespace.key()
         && claim_request.entry_name == name_entry.name
         && claim_request.requestor == requestor.key()
-        && claim_request.counter == name_entry.claim_request_counter
+        // & claim_request.counter == name_entry.claim_request_counter
         @ ErrorCode::ClaimNotAllowed
     )]
     claim_request: Box<Account<'info, ClaimRequest>>,
@@ -61,9 +61,6 @@ pub struct ClaimNameEntryCtx<'info> {
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
     recipient_token_account: UncheckedAccount<'info>,
-    /// CHECK: This is not dangerous because we don't read or write from this account
-    // #[account(mut)]
-    // recipient_payment_token_account: UncheckedAccount<'info>,
 
     // programs
     token_manager_program: Program<'info, CardinalTokenManager>,
@@ -155,13 +152,13 @@ pub fn handler<'key, 'accounts, 'remaining, 'info>(ctx: Context<'key, 'accounts,
         // payment_mint
         let payment_mint_account_info = next_account_info(remaining_accs)?;
         let payment_mint = Account::<Mint>::try_from(payment_mint_account_info)?;
-        if !(payment_mint.key() != ctx.accounts.namespace.payment_mint) {
+        if payment_mint.key() != ctx.accounts.namespace.payment_mint {
             return Err(error!(ErrorCode::InvalidPaymentMint));
         }
         payment_manager_account_info = Some(next_account_info(remaining_accs)?);
         time_invalidator_account_info = Some(next_account_info(remaining_accs)?);
         time_invalidator_program = Some(next_account_info(remaining_accs)?);
-        if !(time_invalidator_program.expect("Expected time_invalidator_program").key() != cardinal_time_invalidator::id()) {
+        if time_invalidator_program.expect("Expected time_invalidator_program").key() != cardinal_time_invalidator::id() {
             return Err(error!(ErrorCode::InvalidTimeInvalidatorProgramId));
         }
 
@@ -198,7 +195,7 @@ pub fn handler<'key, 'accounts, 'remaining, 'info>(ctx: Context<'key, 'accounts,
     // token manager issue
     let cpi_accounts = cardinal_token_manager::cpi::accounts::IssueCtx {
         token_manager: ctx.accounts.token_manager.to_account_info(),
-        token_manager_token_account: ctx.accounts.namespace_token_account.to_account_info(),
+        token_manager_token_account: ctx.accounts.token_manager_token_account.to_account_info(),
         issuer: ctx.accounts.namespace.to_account_info(),
         issuer_token_account: ctx.accounts.namespace_token_account.to_account_info(),
         payer: ctx.accounts.payer.to_account_info(),

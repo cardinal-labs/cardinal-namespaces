@@ -231,8 +231,8 @@ export async function getPendingClaimRequests(
 
 export async function getReverseEntry(
   connection: Connection,
-  pubkey: PublicKey,
-  namespace?: PublicKey
+  namespace: PublicKey,
+  pubkey: PublicKey
 ): Promise<AccountData<ReverseEntryData>> {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
@@ -246,7 +246,7 @@ export async function getReverseEntry(
     if (!namespace) {
       throw new Error("Skipping to deprecated version");
     }
-    const [reverseEntryId] = await findReverseEntryId(pubkey, namespace);
+    const [reverseEntryId] = await findReverseEntryId(namespace, pubkey);
     const parsed = await namespacesProgram.account.reverseEntry.fetch(
       reverseEntryId
     );
