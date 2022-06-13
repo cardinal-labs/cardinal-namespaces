@@ -1,3 +1,4 @@
+import type { Commitment, ConnectionConfig } from "@solana/web3.js";
 import { Connection } from "@solana/web3.js";
 
 const networkURLs: { [key: string]: { primary: string; secondary?: string } } =
@@ -19,22 +20,24 @@ const networkURLs: { [key: string]: { primary: string; secondary?: string } } =
 
 export const connectionFor = (
   cluster: string | null,
-  defaultCluster = "mainnet"
+  defaultCluster = "mainnet",
+  commitmentOrConfig?: Commitment | ConnectionConfig
 ) => {
   return new Connection(
     process.env.RPC_URL || networkURLs[cluster || defaultCluster].primary,
-    "recent"
+    commitmentOrConfig || "recent"
   );
 };
 
 export const secondaryConnectionFor = (
   cluster: string | null,
-  defaultCluster = "mainnet"
+  defaultCluster = "mainnet",
+  commitmentOrConfig?: Commitment | ConnectionConfig
 ) => {
   return new Connection(
     process.env.RPC_URL ||
       networkURLs[cluster || defaultCluster].secondary ||
       networkURLs[cluster || defaultCluster].primary,
-    "recent"
+    commitmentOrConfig || "recent"
   );
 };
