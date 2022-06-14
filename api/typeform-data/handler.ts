@@ -12,7 +12,7 @@ export type Request = {
   queryStringParameters?: { [key: string]: string };
 };
 
-export const TYPEFORM_NAMESPACE = "empiredao-registration";
+export const TYPEFORM_NAMESPACE = "EmpireDAO";
 const BLOCKTIME_THRESHOLD = 60 * 5;
 const TYPEFORM_FORM_ID = process.env.TYPEFORM_ID || "";
 const TYPEFORM_API_KEY = process.env.TYPEFORM_API_KEY || "";

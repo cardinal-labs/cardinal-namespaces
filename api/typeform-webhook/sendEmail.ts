@@ -2,20 +2,23 @@ import { SES } from "aws-sdk";
 import type { SendEmailRequest } from "aws-sdk/clients/ses";
 
 const verificationSuccessfulEmail = (firstName: string, claimURL: string) => `
+<div>
+<img src="https://identity.cardinal.so/logos/empiredao-banner.png" alt="EmpireDAO" style="width: 100%;">
 <p>
 Hi ${firstName}, <br/><br/>
 
-You’ve been successfully verified to access EmpireDAO Soho. <br/><br/>
+Thanks for filling out the EmpireDAO Soho Registration form. <br/><br/>
 
-Next, claim your non-transferrable Registration NFT to access the building. Note that the wallet you claim your NFT must be your mobile hot wallet — you will be scanning a QR code at the door to access the building. <br/><br/>
+Next, claim your non-transferrable Registration NFT. Click <b><a href=${claimURL} target="_blank">here</a></b> to open a QR code and scan it with your hot wallet. <br/><br/>
 
-If you’re on a laptop, click <a href=${claimURL}>here</a> to open a QR code to scan from your hot wallet. <br/><br/>
+Note that the only mobile wallets we currently support are <b>Phantom</b> and <b>Solflare</b>. <br/><br/>
 
-If you’re on your phone, click this link to open your Solana wallet and claim your NFT directly. <br/><br/>
+At EmpireDAO, you will be asked to scan a QR code with the wallet holding this NFT, confirming registration by signing a message. <br/><br/>
 
-Best,
+Best,<br/>
 EmpireDAO & Cardinal
-</p>`;
+</p>
+</div>`;
 
 export const sendEmail = (
   destination: string,
