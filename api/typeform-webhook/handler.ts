@@ -79,16 +79,16 @@ const handler: Handler = async (event: Request) => {
       transaction.recentBlockhash = (
         await connection.getRecentBlockhash("max")
       ).blockhash;
-      txid = await sendAndConfirmTransaction(connection, transaction, [wallet], {
-        maxRetries: 3,
-      });
+      txid = await sendAndConfirmTransaction(connection, transaction, [wallet]);
     }
 
     // Send Email to user to claim NFT
     const claimURL = `https://identity.cardinal.so/${TYPEFORM_NAMESPACE}/${responseId}?otp=${utils.bytes.bs58.encode(
       keypair.secretKey
     )}&cluster=${cluster}`;
-    console.log(`Successfuly created Claim URL for ${firstName} with transaction ID ${txid}: ${claimURL}`);
+    console.log(
+      `Successfuly created Claim URL for ${firstName} with transaction ID ${txid}: ${claimURL}`
+    );
     await retryFn(async () => await sendEmail(email, firstName, claimURL), 3);
     console.log(`Successfuly sent email to user: ${email}`);
     return {
