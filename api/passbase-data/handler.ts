@@ -1,10 +1,12 @@
-import { getReverseEntry } from "@cardinal/namespaces";
+import { findNamespaceId, getReverseEntry } from "@cardinal/namespaces";
 import { utils } from "@project-serum/anchor";
 import { Keypair, PublicKey } from "@solana/web3.js";
 import type { Handler } from "aws-lambda";
 import fetch from "node-fetch";
 
 import { connectionFor } from "../common/connection";
+
+const PASSBASE_NAMESPACE = "passbase";
 
 export type Request = {
   body: string;
@@ -94,11 +96,13 @@ const handler: Handler = async (event: Request) => {
   }
 
   // TODO get Passbase ID from on-chain
+  const [namespaceId] = await findNamespaceId(PASSBASE_NAMESPACE);
   const nameEntryData = await getReverseEntry(
     connection,
+    namespaceId,
     new PublicKey(address)
   );
-  const identityId = uuidFromString(nameEntryData.parsed.entryName as string);
+  const identityId = uuidFromString(nameEntryData.parsed.entryName);
   const identity = await getIdentity(identityId);
 
   const resource =

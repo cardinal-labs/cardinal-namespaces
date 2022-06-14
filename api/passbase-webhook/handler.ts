@@ -7,20 +7,27 @@ import fetch from "node-fetch";
 
 import { connectionFor } from "../common/connection";
 import { approveClaimRequest } from "../twitter-approver/api";
+import { sendEmail } from "./sendEmail";
 
 export type PassbaseEvent = { event: string; key: string; status: string };
 export type Request = {
   body: string;
   headers: { [key: string]: string };
-  queryStringParameters: { [key: string]: string };
+  queryStringParameters?: { [key: string]: string };
 };
 
-const WALLET = Keypair.fromSecretKey(
-  utils.bytes.bs58.decode(process.env.TWITTER_SOLANA_KEY || "")
+// kycLcoGB9Lf1j1mLxbaYcR3HUgBywHBxmLJPcvFr5BP
+const wallet = Keypair.fromSecretKey(
+  utils.bytes.bs58.decode(
+    process.env.KYC_SECRET_KEY ||
+      "2SogHyWWyJxRpNjgjhRGRAWfsNaYYDjYx3Z9FyJLi926N6nC3tWMjEVtzMdKmDJiDvpoeRu3Sjin6g1cLBxib8Ed"
+  )
 );
 
 const handler: Handler = async (event: Request) => {
-  const clusterParam = event?.queryStringParameters.cluster;
+  console.log("handler");
+  const clusterParam = event?.queryStringParameters?.cluster || null;
+  console.log(event);
   const webhook = decryptWebhookIfNeeded(event);
   switch (webhook.event) {
     case "VERIFICATION_COMPLETED":
@@ -30,6 +37,7 @@ const handler: Handler = async (event: Request) => {
       };
       break;
     case "VERIFICATION_REVIEWED":
+      console.log(webhook);
       const uuid = webhook.key;
       const userData = await getIdentity(uuid);
       const uuidNoDash = uuid.replace(/-/g, "");
@@ -40,7 +48,7 @@ const handler: Handler = async (event: Request) => {
         const connection = connectionFor(clusterParam, "devnet");
         await approveClaimRequest(
           connection,
-          WALLET,
+          wallet,
           "passbase",
           uuidNoDash,
           keypair.publicKey
@@ -53,6 +61,7 @@ const handler: Handler = async (event: Request) => {
         );
 
         // send email to user with private key of keypair
+        sendEmail(userData.owner.email, userData.owner.first_name);
       }
       return {
         statusCode: 200,
@@ -68,14 +77,14 @@ const handler: Handler = async (event: Request) => {
 
 const getIdentity = async (
   uuid: string
-): Promise<{ owner: { first_name: string } }> => {
+): Promise<{ owner: { first_name: string; email: string } }> => {
   const apiUrl = `https://api.passbase.com/verification/v1/identities/${uuid}`;
   const headers = {
     "x-api-key": process.env.PASSBASE_SECRET_KEY!,
   };
 
   const response = (await fetch(apiUrl, { headers: headers })).json();
-  return response as Promise<{ owner: { first_name: string } }>;
+  return response as Promise<{ owner: { first_name: string; email: string } }>;
 };
 
 const decryptWebhook = (body: string): PassbaseEvent => {
