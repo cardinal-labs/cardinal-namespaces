@@ -28,25 +28,25 @@ export type TypeformResponse = {
 };
 
 const handler: Handler = async (event: Request) => {
-  const test = event?.queryStringParameters?.test;
-  if (test) {
-    const typeformData = await getTypeformResponse(
-      "t009laq8qewah1t009ned5nrq5icl5o0"
-    );
-    const imageAnswer = typeformData!.answers[typeformData!.answers.length - 1];
-    const base64EncodedImage = await getTypeformResponseBase64EncodedFile(
-      imageAnswer.file_url || ""
-    );
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
-        name: `${typeformData!.answers[0].text || ""} ${
-          typeformData!.answers[1]?.text || ""
-        }`,
-        image: base64EncodedImage,
-      }),
-    };
-  }
+  // const test = event?.queryStringParameters?.test;
+  // if (test) {
+  //   const typeformData = await getTypeformResponse(
+  //     "t009laq8qewah1t009ned5nrq5icl5o0"
+  //   );
+  //   const imageAnswer = typeformData!.answers[typeformData!.answers.length - 1];
+  //   const base64EncodedImage = await getTypeformResponseBase64EncodedFile(
+  //     imageAnswer.file_url || ""
+  //   );
+  //   return {
+  //     statusCode: 200,
+  //     body: JSON.stringify({
+  //       name: `${typeformData!.answers[0].text || ""} ${
+  //         typeformData!.answers[1]?.text || ""
+  //       }`,
+  //       image: base64EncodedImage,
+  //     }),
+  //   };
+  // }
 
   const clusterParam = event?.queryStringParameters?.cluster;
   const keypairParam = event?.queryStringParameters?.keypair;
@@ -99,6 +99,11 @@ const handler: Handler = async (event: Request) => {
   if (Date.now() / 1000 - (transaction.blockTime ?? 0) > BLOCKTIME_THRESHOLD) {
     return {
       statusCode: 403,
+      headers: {
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Origin": "*", // Required for CORS support to work
+        "Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS
+      },
       body: JSON.stringify({ message: "Transaction has expired" }),
     };
   }
@@ -116,6 +121,11 @@ const handler: Handler = async (event: Request) => {
   if (!typeformData) {
     return {
       statusCode: 404,
+      headers: {
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Origin": "*", // Required for CORS support to work
+        "Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS
+      },
       body: JSON.stringify({ error: "Response not found " }),
     };
   }
@@ -127,6 +137,11 @@ const handler: Handler = async (event: Request) => {
 
   return {
     statusCode: 200,
+    headers: {
+      "Access-Control-Allow-Methods": "*",
+      "Access-Control-Allow-Origin": "*", // Required for CORS support to work
+      "Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS
+    },
     body: JSON.stringify({
       name: `${typeformData.answers[0].text || ""} ${
         typeformData.answers[1]?.text || ""

@@ -24,7 +24,6 @@ import { PublicKey, SystemProgram, SYSVAR_RENT_PUBKEY } from "@solana/web3.js";
 
 import { getNameEntry, NAMESPACES_PROGRAM } from ".";
 import {
-  CLAIM_REQUEST_SEED,
   ENTRY_SEED,
   GLOBAL_CONTEXT_SEED,
   NAMESPACE_SEED,
@@ -192,7 +191,6 @@ export async function withClaimNameEntry(
   mintId: PublicKey,
   duration?: number,
   requestor = wallet.publicKey,
-  recipient = wallet.publicKey,
   payer = wallet.publicKey
 ): Promise<Transaction> {
   const provider = new anchor.AnchorProvider(connection, wallet, {});
@@ -201,33 +199,13 @@ export async function withClaimNameEntry(
     NAMESPACES_PROGRAM_ID,
     provider
   );
-  const [namespaceId] = await PublicKey.findProgramAddress(
-    [
-      anchor.utils.bytes.utf8.encode(NAMESPACE_SEED),
-      anchor.utils.bytes.utf8.encode(namespaceName),
-    ],
-    namespacesProgram.programId
+  const [namespaceId] = await findNamespaceId(namespaceName);
+  const [entryId] = await findNameEntryId(namespaceId, entryName);
+  const [claimRequestId] = await findClaimRequestId(
+    namespaceId,
+    entryName,
+    requestor
   );
-
-  const [entryId] = await PublicKey.findProgramAddress(
-    [
-      anchor.utils.bytes.utf8.encode(ENTRY_SEED),
-      namespaceId.toBytes(),
-      anchor.utils.bytes.utf8.encode(entryName),
-    ],
-    namespacesProgram.programId
-  );
-
-  const [claimRequestId] = await PublicKey.findProgramAddress(
-    [
-      anchor.utils.bytes.utf8.encode(CLAIM_REQUEST_SEED),
-      namespaceId.toBytes(),
-      anchor.utils.bytes.utf8.encode(entryName),
-      provider.wallet.publicKey.toBytes(),
-    ],
-    namespacesProgram.programId
-  );
-
   const [tokenManagerId] = await findTokenManagerAddress(mintId);
 
   const namespaceTokenAccountId =
@@ -252,7 +230,7 @@ export async function withClaimNameEntry(
     transaction,
     provider.connection,
     mintId,
-    recipient,
+    wallet.publicKey,
     payer,
     true
   );
@@ -283,7 +261,7 @@ export async function withClaimNameEntry(
           namespace: namespaceId,
           nameEntry: entryId,
           requestor: requestor,
-          recipient: recipient,
+          recipient: wallet.publicKey,
           payer: payer,
           claimRequest: claimRequestId,
           mint: mintId,

@@ -89,6 +89,7 @@ pub fn handler(ctx: Context<ClaimEntry>, ix: ClaimEntryIx) -> Result<()> {
     let entry = &mut ctx.accounts.entry;
     entry.data = Some(ctx.accounts.user.key());
     entry.is_claimed = true;
+    entry.claim_request_counter = entry.claim_request_counter.checked_add(1).expect("Add error");
 
     // duration checks
     if ix.duration != None {

@@ -86,10 +86,10 @@ pub fn handler(ctx: Context<InitEntry>, ix: InitEntryIx) -> Result<()> {
             ctx.accounts.namespace.key(),
             *ctx.accounts.payer.key,
             ctx.accounts.namespace.key(),
-            ix.name.clone() + "." + &ctx.accounts.namespace.name.to_string(),
+            ctx.accounts.namespace.name.clone(),
             "NAME".to_string(),
             // generative URL which will inclde image of the name with expiration data
-            "https://nft.cardinal.so/metadata/".to_string() + &ctx.accounts.certificate_mint.key().to_string(),
+            "https://nft.cardinal.so/metadata/".to_string() + &ctx.accounts.certificate_mint.key().to_string() + &"?name=".to_string() + &ctx.accounts.namespace.name.to_string(),
             Some(vec![MCreator {
                 address: ctx.accounts.namespace.key(),
                 verified: true,

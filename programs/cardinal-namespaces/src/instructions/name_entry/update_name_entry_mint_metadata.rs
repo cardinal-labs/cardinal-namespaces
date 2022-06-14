@@ -76,7 +76,7 @@ pub fn handler(ctx: Context<UpdateNameEntryMintMetadataCtx>, ix: UpdateNameEntry
                 uses: None,
             }),
             ix.primary_sale_happened,
-            Some(true),
+            None,
         ),
         &[ctx.accounts.mint_metadata.to_account_info(), ctx.accounts.namespace.to_account_info()],
         namespace_signer,
