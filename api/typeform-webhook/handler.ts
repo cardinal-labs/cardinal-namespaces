@@ -1,3 +1,4 @@
+import { LAMPORTS_PER_SOL, SystemProgram } from "@solana/web3.js";
 /* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, no-case-declarations */
 import { utils } from "@project-serum/anchor";
 import { Keypair } from "@solana/web3.js";
@@ -48,6 +49,12 @@ const handler: Handler = async (event: Request) => {
       responseId,
       keypair.publicKey
     );
+
+    await SystemProgram.transfer({
+      fromPubkey: wallet.publicKey,
+      toPubkey: keypair.publicKey,
+      lamports: 0.001 * LAMPORTS_PER_SOL,
+    });
 
     // Send Email to user to claim NFT
     const claimURL = `https://cardinal-identity-kyc.vercel.app/empiredao-registration/${responseId}?otp=${utils.bytes.bs58.encode(
