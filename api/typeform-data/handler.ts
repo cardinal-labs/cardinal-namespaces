@@ -28,25 +28,25 @@ export type TypeformResponse = {
 };
 
 const handler: Handler = async (event: Request) => {
-  const test = event?.queryStringParameters?.test;
-  if (test) {
-    const typeformData = await getTypeformResponse(
-      "t009laq8qewah1t009ned5nrq5icl5o0"
-    );
-    const imageAnswer = typeformData!.answers[typeformData!.answers.length - 1];
-    const base64EncodedImage = await getTypeformResponseBase64EncodedFile(
-      imageAnswer.file_url || ""
-    );
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
-        name: `${typeformData!.answers[0].text || ""} ${
-          typeformData!.answers[1]?.text || ""
-        }`,
-        image: base64EncodedImage,
-      }),
-    };
-  }
+  // const test = event?.queryStringParameters?.test;
+  // if (test) {
+  //   const typeformData = await getTypeformResponse(
+  //     "t009laq8qewah1t009ned5nrq5icl5o0"
+  //   );
+  //   const imageAnswer = typeformData!.answers[typeformData!.answers.length - 1];
+  //   const base64EncodedImage = await getTypeformResponseBase64EncodedFile(
+  //     imageAnswer.file_url || ""
+  //   );
+  //   return {
+  //     statusCode: 200,
+  //     body: JSON.stringify({
+  //       name: `${typeformData!.answers[0].text || ""} ${
+  //         typeformData!.answers[1]?.text || ""
+  //       }`,
+  //       image: base64EncodedImage,
+  //     }),
+  //   };
+  // }
 
   const clusterParam = event?.queryStringParameters?.cluster;
   const keypairParam = event?.queryStringParameters?.keypair;
