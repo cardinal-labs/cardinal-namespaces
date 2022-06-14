@@ -14,10 +14,8 @@ export type Request = {
 
 export const TYPEFORM_NAMESPACE = "empiredao-registration";
 const BLOCKTIME_THRESHOLD = 60 * 5;
-const TYPEFORM_FORM_ID = "bBm4JZm8";
-const TYPEFORM_API_KEY =
-  process.env.TYPEFORM_API_KEY ||
-  "tfp_GFeDvRqtXSh5y1uiymtw5W92jkXWqWVYkdqYsaZam3Hb_3w5qrC6JwatCvb";
+const TYPEFORM_FORM_ID = process.env.TYPEFORM_ID || "";
+const TYPEFORM_API_KEY = process.env.TYPEFORM_API_KEY || "";
 
 export type TypeformResponse = {
   answers: {
@@ -30,6 +28,26 @@ export type TypeformResponse = {
 };
 
 const handler: Handler = async (event: Request) => {
+  const test = event?.queryStringParameters?.test;
+  if (test) {
+    const typeformData = await getTypeformResponse(
+      "t009laq8qewah1t009ned5nrq5icl5o0"
+    );
+    const imageAnswer = typeformData!.answers[typeformData!.answers.length - 1];
+    const base64EncodedImage = await getTypeformResponseBase64EncodedFile(
+      imageAnswer.file_url || ""
+    );
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        name: `${typeformData!.answers[0].text || ""} ${
+          typeformData!.answers[1]?.text || ""
+        }`,
+        image: base64EncodedImage,
+      }),
+    };
+  }
+
   const clusterParam = event?.queryStringParameters?.cluster;
   const keypairParam = event?.queryStringParameters?.keypair;
   if (!keypairParam) {
@@ -77,7 +95,7 @@ const handler: Handler = async (event: Request) => {
   //   };
   // }
 
-  // check blocktime
+  //check blocktime
   if (Date.now() / 1000 - (transaction.blockTime ?? 0) > BLOCKTIME_THRESHOLD) {
     return {
       statusCode: 403,
@@ -102,9 +120,19 @@ const handler: Handler = async (event: Request) => {
     };
   }
 
+  const imageAnswer = typeformData.answers[typeformData.answers.length - 1];
+  const base64EncodedImage = await getTypeformResponseBase64EncodedFile(
+    imageAnswer.file_url || ""
+  );
+
   return {
     statusCode: 200,
-    body: JSON.stringify(typeformData),
+    body: JSON.stringify({
+      name: `${typeformData.answers[0].text || ""} ${
+        typeformData.answers[1]?.text || ""
+      }`,
+      image: base64EncodedImage,
+    }),
   };
 };
 
@@ -124,6 +152,18 @@ const getTypeformResponse = async (
     items: TypeformResponse[];
   };
   return typeformResponse.items.find((r) => r.token === entryName);
+};
+
+const getTypeformResponseBase64EncodedFile = async (
+  fileUrl: string
+): Promise<string> => {
+  const response = await fetch(fileUrl, {
+    headers: {
+      Authorization: `bearer ${TYPEFORM_API_KEY}`,
+    },
+  });
+  const buffer = await response.buffer();
+  return buffer.toString("base64");
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access

@@ -79,6 +79,7 @@ functions:
   typeform-data:
     handler: typeform-data/handler.data
     environment:
+      TYPEFORM_ID: ${ssm:/TYPEFORM_ID~true}
       TYPEFORM_API_KEY: ${ssm:/TYPEFORM_API_KEY~true}
     events:
       - http:
