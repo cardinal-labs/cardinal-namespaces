@@ -17,6 +17,7 @@ import { NAMESPACES_IDL, NAMESPACES_PROGRAM_ID } from ".";
 import type { NAMESPACES_PROGRAM } from "./constants";
 import {
   findClaimRequestId,
+  findDeprecatedReverseEntryId,
   findGlobalContextId,
   findNameEntryId,
   findNamespaceId,
@@ -230,6 +231,7 @@ export async function getPendingClaimRequests(
 
 export async function getReverseEntry(
   connection: Connection,
+  namespace: PublicKey,
   pubkey: PublicKey
 ): Promise<AccountData<ReverseEntryData>> {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -240,22 +242,37 @@ export async function getReverseEntry(
     NAMESPACES_PROGRAM_ID,
     provider
   );
-  const [reverseEntryId] = await findReverseEntryId(pubkey);
-  const parsed = await namespacesProgram.account.reverseEntry.fetch(
-    reverseEntryId
-  );
-  return {
-    parsed,
-    pubkey: reverseEntryId,
-  };
+  try {
+    if (!namespace) {
+      throw new Error("Skipping to deprecated version");
+    }
+    const [reverseEntryId] = await findReverseEntryId(namespace, pubkey);
+    const parsed = await namespacesProgram.account.reverseEntry.fetch(
+      reverseEntryId
+    );
+    return {
+      parsed,
+      pubkey: reverseEntryId,
+    };
+  } catch (e) {
+    const [reverseEntryId] = await findDeprecatedReverseEntryId(pubkey);
+    const parsed = await namespacesProgram.account.reverseEntry.fetch(
+      reverseEntryId
+    );
+    return {
+      parsed,
+      pubkey: reverseEntryId,
+    };
+  }
 }
 
 export async function tryGetReverseEntry(
   connection: Connection,
-  pubkey: PublicKey
+  pubkey: PublicKey,
+  namespace: PublicKey
 ): Promise<AccountData<ReverseEntryData> | null> {
   try {
-    return await getReverseEntry(connection, pubkey);
+    return await getReverseEntry(connection, pubkey, namespace);
   } catch (e) {
     console.log(`Failed to get reverse entry`);
     return null;

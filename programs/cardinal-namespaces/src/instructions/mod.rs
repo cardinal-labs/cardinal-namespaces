@@ -1,49 +1,43 @@
-// namespaces
-pub mod collect_namespace_funds;
-pub mod create_namespace;
-pub mod init_global_context;
-pub mod update_global_context;
-pub mod update_namespace;
-// claim request
-pub mod create_claim_request;
-pub mod update_claim_request;
-// entry
-pub mod claim_entry;
-pub mod init_entry;
-pub mod set_entry_data;
+// deprecated
+#[deprecated]
+pub mod deprecated;
+pub use deprecated::claim_entry::*;
+pub use deprecated::init_entry::*;
+pub use deprecated::revoke_entry::*;
+pub use deprecated::set_entry_data::*;
+pub use deprecated::set_reverse_entry::*;
 
-pub mod revoke_entry;
-pub mod revoke_reverse_entry;
+// global_context
+pub mod global_context;
+pub use global_context::collect_global_context_funds::*;
+pub use global_context::init_global_context::*;
+pub use global_context::update_global_context::*;
 
-pub mod invalidate_managed_entry;
-pub mod invalidate_managed_reverse_entry;
-pub mod invalidate_unmanaged_entry;
-pub mod invalidate_unmanaged_reverse_entry;
-// reverse entry
-pub mod set_reverse_entry;
-pub mod update_entry_mint_metadata;
+// name_entry
+pub mod name_entry;
+pub use name_entry::claim_name_entry::*;
+pub use name_entry::init_name_entry::*;
+pub use name_entry::init_name_entry_mint::*;
+pub use name_entry::invalidate_expired_name_entry::*;
+pub use name_entry::invalidate_transferable_name_entry::*;
+pub use name_entry::revoke_name_entry::*;
+pub use name_entry::set_name_entry_data::*;
+pub use name_entry::update_name_entry_mint_metadata::*;
 
-// namespaces
-pub use collect_namespace_funds::*;
-pub use create_namespace::*;
-pub use update_namespace::*;
-// claim request
-pub use create_claim_request::*;
-pub use update_claim_request::*;
-// entry
-pub use claim_entry::*;
-pub use init_entry::*;
-pub use set_entry_data::*;
+// namespace
+pub mod namespace;
+pub use namespace::collect_namespace_funds::*;
+pub use namespace::create_namespace::*;
+pub use namespace::update_namespace::*;
 
-pub use revoke_entry::*;
-pub use revoke_reverse_entry::*;
+// requests
+pub mod requests;
+pub use requests::create_claim_request::*;
+pub use requests::update_claim_request::*;
 
-pub use invalidate_managed_entry::*;
-pub use invalidate_managed_reverse_entry::*;
-pub use invalidate_unmanaged_entry::*;
-pub use invalidate_unmanaged_reverse_entry::*;
-// reverse entry
-pub use init_global_context::*;
-pub use set_reverse_entry::*;
-pub use update_entry_mint_metadata::*;
-pub use update_global_context::*;
+// reverse_name_entry
+pub mod reverse_name_entry;
+pub use reverse_name_entry::invalidate_expired_reverse_name_entry::*;
+pub use reverse_name_entry::invalidate_transferable_reverse_name_entry::*;
+pub use reverse_name_entry::revoke_reverse_name_entry::*;
+pub use reverse_name_entry::set_namespace_reverse_name_entry::*;

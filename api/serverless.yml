@@ -71,7 +71,7 @@ functions:
       AWS_ACCESS_KEY_ID: AKIAVZF53PXUQ2G6QAMB
       AWS_SECRET_ACCESS_KEY: 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
   passbase-data:
-    handler: passbase-webhook/handler.data
+    handler: passbase-data/handler.data
     events:
       - http:
           path: /passbase/data

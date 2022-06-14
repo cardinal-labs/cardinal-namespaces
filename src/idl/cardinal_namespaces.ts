@@ -1,9 +1,45 @@
 export type Namespaces = {
-  version: "3.2.0";
+  version: "4.1.0";
   name: "namespaces";
   instructions: [
     {
-      name: "init";
+      name: "collectGlobalContextFunds";
+      accounts: [
+        {
+          name: "globalContext";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "globalContextPaymentAccount";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "rentAuthority";
+          isMut: false;
+          isSigner: true;
+        },
+        {
+          name: "authorityTokenAccount";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "tokenProgram";
+          isMut: false;
+          isSigner: false;
+        }
+      ];
+      args: [
+        {
+          name: "amount";
+          type: "u64";
+        }
+      ];
+    },
+    {
+      name: "initGlobalContext";
       accounts: [
         {
           name: "globalContext";
@@ -55,6 +91,431 @@ export type Namespaces = {
           type: {
             defined: "UpdateGlobalContextIx";
           };
+        }
+      ];
+    },
+    {
+      name: "claimNameEntry";
+      accounts: [
+        {
+          name: "namespace";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "nameEntry";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "requestor";
+          isMut: true;
+          isSigner: true;
+        },
+        {
+          name: "recipient";
+          isMut: true;
+          isSigner: true;
+        },
+        {
+          name: "payer";
+          isMut: true;
+          isSigner: true;
+        },
+        {
+          name: "claimRequest";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "mint";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "namespaceTokenAccount";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "tokenManager";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "tokenManagerTokenAccount";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "mintCounter";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "recipientTokenAccount";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "tokenManagerProgram";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "tokenProgram";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "associatedToken";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "rent";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "systemProgram";
+          isMut: false;
+          isSigner: false;
+        }
+      ];
+      args: [
+        {
+          name: "ix";
+          type: {
+            defined: "ClaimNameEntryIx";
+          };
+        }
+      ];
+    },
+    {
+      name: "initNameEntryMint";
+      accounts: [
+        {
+          name: "namespace";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "nameEntry";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "payer";
+          isMut: true;
+          isSigner: true;
+        },
+        {
+          name: "namespaceTokenAccount";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "mint";
+          isMut: true;
+          isSigner: true;
+        },
+        {
+          name: "mintMetadata";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "masterEdition";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "tokenMetadataProgram";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "tokenProgram";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "associatedToken";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "rent";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "systemProgram";
+          isMut: false;
+          isSigner: false;
+        }
+      ];
+      args: [];
+    },
+    {
+      name: "initNameEntry";
+      accounts: [
+        {
+          name: "namespace";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "nameEntry";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "payer";
+          isMut: true;
+          isSigner: true;
+        },
+        {
+          name: "systemProgram";
+          isMut: false;
+          isSigner: false;
+        }
+      ];
+      args: [
+        {
+          name: "ix";
+          type: {
+            defined: "InitNameEntryIx";
+          };
+        }
+      ];
+    },
+    {
+      name: "invalidateExpiredNameEntry";
+      accounts: [
+        {
+          name: "namespace";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "nameEntry";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "namespaceTokenAccount";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "invalidator";
+          isMut: false;
+          isSigner: true;
+        }
+      ];
+      args: [];
+    },
+    {
+      name: "invalidateTransferableNameEntry";
+      accounts: [
+        {
+          name: "namespace";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "nameEntry";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "tokenManager";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "invalidator";
+          isMut: false;
+          isSigner: true;
+        }
+      ];
+      args: [];
+    },
+    {
+      name: "revokeNameEntry";
+      accounts: [
+        {
+          name: "namespace";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "nameEntry";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "claimRequest";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "invalidator";
+          isMut: false;
+          isSigner: true;
+        },
+        {
+          name: "tokenManager";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "mint";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "tokenManagerTokenAccount";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "recipientTokenAccount";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "tokenManagerProgram";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "tokenProgram";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "rent";
+          isMut: false;
+          isSigner: false;
+        }
+      ];
+      args: [];
+    },
+    {
+      name: "setNameEntryData";
+      accounts: [
+        {
+          name: "namespace";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "nameEntry";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "userTokenAccount";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "tokenManager";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "user";
+          isMut: true;
+          isSigner: true;
+        }
+      ];
+      args: [];
+    },
+    {
+      name: "updateNameEntryMintMetadata";
+      accounts: [
+        {
+          name: "namespace";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "nameEntry";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "updateAuthority";
+          isMut: false;
+          isSigner: true;
+        },
+        {
+          name: "mintMetadata";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "tokenMetadataProgram";
+          isMut: false;
+          isSigner: false;
+        }
+      ];
+      args: [
+        {
+          name: "ix";
+          type: {
+            defined: "UpdateNameEntryMintMetadataIx";
+          };
+        }
+      ];
+    },
+    {
+      name: "collectNamespaceFunds";
+      accounts: [
+        {
+          name: "globalContext";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "globalContextPaymentAccount";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "namespace";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "namespacePaymentAccount";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "rentAuthority";
+          isMut: false;
+          isSigner: true;
+        },
+        {
+          name: "rentAuthorityTokenAccount";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "tokenProgram";
+          isMut: false;
+          isSigner: false;
+        }
+      ];
+      args: [
+        {
+          name: "amount";
+          type: "u64";
         }
       ];
     },
@@ -115,16 +576,50 @@ export type Namespaces = {
       ];
     },
     {
-      name: "collectNamespaceFunds";
+      name: "createClaimRequest";
       accounts: [
         {
-          name: "globalContext";
+          name: "namespace";
           isMut: false;
           isSigner: false;
         },
         {
-          name: "globalContextPaymentAccount";
+          name: "payer";
           isMut: true;
+          isSigner: true;
+        },
+        {
+          name: "claimRequest";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "systemProgram";
+          isMut: false;
+          isSigner: false;
+        }
+      ];
+      args: [
+        {
+          name: "entryName";
+          type: "string";
+        },
+        {
+          name: "claimRequestBump";
+          type: "u8";
+        },
+        {
+          name: "user";
+          type: "publicKey";
+        }
+      ];
+    },
+    {
+      name: "updateClaimRequest";
+      accounts: [
+        {
+          name: "nameEntry";
+          isMut: false;
           isSigner: false;
         },
         {
@@ -133,32 +628,161 @@ export type Namespaces = {
           isSigner: false;
         },
         {
-          name: "namespacePaymentAccount";
-          isMut: true;
-          isSigner: false;
-        },
-        {
-          name: "rentAuthority";
+          name: "approveAuthority";
           isMut: false;
           isSigner: true;
         },
         {
-          name: "rentAuthorityTokenAccount";
+          name: "rentRequest";
           isMut: true;
-          isSigner: false;
-        },
-        {
-          name: "tokenProgram";
-          isMut: false;
           isSigner: false;
         }
       ];
       args: [
         {
-          name: "amount";
-          type: "u64";
+          name: "isApproved";
+          type: "bool";
         }
       ];
+    },
+    {
+      name: "invalidateExpiredReverseEntry";
+      accounts: [
+        {
+          name: "namespace";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "nameEntry";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "reverseNameEntry";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "namespaceTokenAccount";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "invalidator";
+          isMut: false;
+          isSigner: true;
+        }
+      ];
+      args: [];
+    },
+    {
+      name: "invalidateTransferableReverseEntry";
+      accounts: [
+        {
+          name: "namespace";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "nameEntry";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "reverseNameEntry";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "tokenManager";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "invalidator";
+          isMut: false;
+          isSigner: true;
+        }
+      ];
+      args: [];
+    },
+    {
+      name: "revokeReverseEntry";
+      accounts: [
+        {
+          name: "namespace";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "nameEntry";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "reverseEntry";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "claimRequest";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "invalidator";
+          isMut: false;
+          isSigner: true;
+        }
+      ];
+      args: [];
+    },
+    {
+      name: "setNamespaceReverseEntry";
+      accounts: [
+        {
+          name: "namespace";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "nameEntry";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "reverseEntry";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "userTokenAccount";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "tokenManager";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "user";
+          isMut: true;
+          isSigner: true;
+        },
+        {
+          name: "payer";
+          isMut: true;
+          isSigner: true;
+        },
+        {
+          name: "systemProgram";
+          isMut: false;
+          isSigner: false;
+        }
+      ];
+      args: [];
     },
     {
       name: "initEntry";
@@ -523,254 +1147,6 @@ export type Namespaces = {
         }
       ];
       args: [];
-    },
-    {
-      name: "revokeReverseEntry";
-      accounts: [
-        {
-          name: "namespace";
-          isMut: false;
-          isSigner: false;
-        },
-        {
-          name: "entry";
-          isMut: false;
-          isSigner: false;
-        },
-        {
-          name: "reverseEntry";
-          isMut: true;
-          isSigner: false;
-        },
-        {
-          name: "claimRequest";
-          isMut: true;
-          isSigner: false;
-        },
-        {
-          name: "invalidator";
-          isMut: false;
-          isSigner: true;
-        }
-      ];
-      args: [];
-    },
-    {
-      name: "invalidateManagedEntry";
-      accounts: [
-        {
-          name: "namespace";
-          isMut: false;
-          isSigner: false;
-        },
-        {
-          name: "entry";
-          isMut: true;
-          isSigner: false;
-        },
-        {
-          name: "namespaceCertificateTokenAccount";
-          isMut: true;
-          isSigner: false;
-        },
-        {
-          name: "invalidator";
-          isMut: false;
-          isSigner: true;
-        }
-      ];
-      args: [];
-    },
-    {
-      name: "invalidateManagedReverseEntry";
-      accounts: [
-        {
-          name: "namespace";
-          isMut: false;
-          isSigner: false;
-        },
-        {
-          name: "entry";
-          isMut: true;
-          isSigner: false;
-        },
-        {
-          name: "reverseEntry";
-          isMut: true;
-          isSigner: false;
-        },
-        {
-          name: "namespaceCertificateTokenAccount";
-          isMut: true;
-          isSigner: false;
-        },
-        {
-          name: "invalidator";
-          isMut: false;
-          isSigner: true;
-        }
-      ];
-      args: [];
-    },
-    {
-      name: "invalidateUnmanagedEntry";
-      accounts: [
-        {
-          name: "namespace";
-          isMut: false;
-          isSigner: false;
-        },
-        {
-          name: "entry";
-          isMut: true;
-          isSigner: false;
-        },
-        {
-          name: "certificate";
-          isMut: false;
-          isSigner: false;
-        },
-        {
-          name: "invalidator";
-          isMut: false;
-          isSigner: true;
-        }
-      ];
-      args: [];
-    },
-    {
-      name: "invalidateUnmanagedReverseEntry";
-      accounts: [
-        {
-          name: "namespace";
-          isMut: false;
-          isSigner: false;
-        },
-        {
-          name: "entry";
-          isMut: true;
-          isSigner: false;
-        },
-        {
-          name: "reverseEntry";
-          isMut: true;
-          isSigner: false;
-        },
-        {
-          name: "certificate";
-          isMut: false;
-          isSigner: false;
-        },
-        {
-          name: "invalidator";
-          isMut: false;
-          isSigner: true;
-        }
-      ];
-      args: [];
-    },
-    {
-      name: "createClaimRequest";
-      accounts: [
-        {
-          name: "namespace";
-          isMut: false;
-          isSigner: false;
-        },
-        {
-          name: "payer";
-          isMut: true;
-          isSigner: true;
-        },
-        {
-          name: "claimRequest";
-          isMut: true;
-          isSigner: false;
-        },
-        {
-          name: "systemProgram";
-          isMut: false;
-          isSigner: false;
-        }
-      ];
-      args: [
-        {
-          name: "entryName";
-          type: "string";
-        },
-        {
-          name: "claimRequestBump";
-          type: "u8";
-        },
-        {
-          name: "user";
-          type: "publicKey";
-        }
-      ];
-    },
-    {
-      name: "updateClaimRequest";
-      accounts: [
-        {
-          name: "namespace";
-          isMut: false;
-          isSigner: false;
-        },
-        {
-          name: "approveAuthority";
-          isMut: false;
-          isSigner: true;
-        },
-        {
-          name: "rentRequest";
-          isMut: true;
-          isSigner: false;
-        }
-      ];
-      args: [
-        {
-          name: "isApproved";
-          type: "bool";
-        }
-      ];
-    },
-    {
-      name: "updateEntryMintMetadata";
-      accounts: [
-        {
-          name: "namespace";
-          isMut: false;
-          isSigner: false;
-        },
-        {
-          name: "entry";
-          isMut: false;
-          isSigner: false;
-        },
-        {
-          name: "updateAuthority";
-          isMut: false;
-          isSigner: true;
-        },
-        {
-          name: "certificateMintMetadata";
-          isMut: true;
-          isSigner: false;
-        },
-        {
-          name: "tokenMetadataProgram";
-          isMut: false;
-          isSigner: false;
-        }
-      ];
-      args: [
-        {
-          name: "args";
-          type: {
-            defined: "UpdateEntryMintMetadataIx";
-          };
-        }
-      ];
     }
   ];
   accounts: [
@@ -878,6 +1254,10 @@ export type Namespaces = {
           {
             name: "entryName";
             type: "string";
+          },
+          {
+            name: "counter";
+            type: "u32";
           }
         ];
       };
@@ -918,6 +1298,10 @@ export type Namespaces = {
           {
             name: "isClaimed";
             type: "bool";
+          },
+          {
+            name: "claimRequestCounter";
+            type: "u32";
           }
         ];
       };
@@ -958,6 +1342,20 @@ export type Namespaces = {
           {
             name: "certificateBump";
             type: "u8";
+          }
+        ];
+      };
+    },
+    {
+      name: "ClaimNameEntryIx";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "duration";
+            type: {
+              option: "i64";
+            };
           }
         ];
       };
@@ -1051,6 +1449,18 @@ export type Namespaces = {
       };
     },
     {
+      name: "InitNameEntryIx";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "name";
+            type: "string";
+          }
+        ];
+      };
+    },
+    {
       name: "Creator";
       type: {
         kind: "struct";
@@ -1066,34 +1476,6 @@ export type Namespaces = {
           {
             name: "share";
             type: "u8";
-          }
-        ];
-      };
-    },
-    {
-      name: "UpdateEntryMintMetadataIx";
-      type: {
-        kind: "struct";
-        fields: [
-          {
-            name: "sellerFeeBasisPoints";
-            type: "u16";
-          },
-          {
-            name: "creators";
-            type: {
-              option: {
-                vec: {
-                  defined: "Creator";
-                };
-              };
-            };
-          },
-          {
-            name: "primarySaleHappened";
-            type: {
-              option: "bool";
-            };
           }
         ];
       };
@@ -1125,17 +1507,49 @@ export type Namespaces = {
       };
     },
     {
+      name: "UpdateNameEntryMintMetadataIx";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "sellerFeeBasisPoints";
+            type: "u16";
+          },
+          {
+            name: "creators";
+            type: {
+              option: {
+                vec: {
+                  defined: "Creator";
+                };
+              };
+            };
+          },
+          {
+            name: "primarySaleHappened";
+            type: {
+              option: "bool";
+            };
+          }
+        ];
+      };
+    },
+    {
       name: "UpdateNamespaceIx";
       type: {
         kind: "struct";
         fields: [
           {
             name: "updateAuthority";
-            type: "publicKey";
+            type: {
+              option: "publicKey";
+            };
           },
           {
             name: "rentAuthority";
-            type: "publicKey";
+            type: {
+              option: "publicKey";
+            };
           },
           {
             name: "approveAuthority";
@@ -1145,15 +1559,21 @@ export type Namespaces = {
           },
           {
             name: "paymentAmountDaily";
-            type: "u64";
+            type: {
+              option: "u64";
+            };
           },
           {
             name: "paymentMint";
-            type: "publicKey";
+            type: {
+              option: "publicKey";
+            };
           },
           {
             name: "minRentalSeconds";
-            type: "i64";
+            type: {
+              option: "i64";
+            };
           },
           {
             name: "maxRentalSeconds";
@@ -1163,7 +1583,9 @@ export type Namespaces = {
           },
           {
             name: "transferableEntries";
-            type: "bool";
+            type: {
+              option: "bool";
+            };
           }
         ];
       };
@@ -1227,43 +1649,104 @@ export type Namespaces = {
     },
     {
       code: 6011;
-      name: "InvalidCertificate";
-      msg: "Invalid certificate";
-    },
-    {
-      code: 6012;
       name: "InvalidPaymentMint";
       msg: "Invalid payment mint";
     },
     {
-      code: 6013;
+      code: 6012;
       name: "InvalidReverseEntry";
       msg: "Invalid reverse entry";
     },
     {
-      code: 6014;
+      code: 6013;
       name: "ClaimNotAllowed";
       msg: "Claim not allowed";
     },
     {
-      code: 6015;
+      code: 6014;
       name: "InvalidApproveAuthority";
       msg: "Invalid approve authority";
     },
     {
-      code: 6016;
+      code: 6015;
       name: "NamespaceRequiresToken";
       msg: "Namespace requires token";
+    },
+    {
+      code: 6016;
+      name: "MintAlreadyInitialized";
+      msg: "Mint already initialized";
+    },
+    {
+      code: 6017;
+      name: "InvalidEntryMint";
+      msg: "Mint invalid for entry";
+    },
+    {
+      code: 6018;
+      name: "InvalidTimeInvalidatorProgramId";
+      msg: "Time invalidator program ID is invalid";
+    },
+    {
+      code: 6019;
+      name: "InvalidTokenManager";
+      msg: "Invalid token manager";
+    },
+    {
+      code: 6020;
+      name: "NameEntryAlreadyClaimed";
+      msg: "Name Entry already claimed";
+    },
+    {
+      code: 6021;
+      name: "InvalidCertificate";
+      msg: "Invalid certificate";
     }
   ];
 };
 
 export const IDL: Namespaces = {
-  version: "3.2.0",
+  version: "4.1.0",
   name: "namespaces",
   instructions: [
     {
-      name: "init",
+      name: "collectGlobalContextFunds",
+      accounts: [
+        {
+          name: "globalContext",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "globalContextPaymentAccount",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "rentAuthority",
+          isMut: false,
+          isSigner: true,
+        },
+        {
+          name: "authorityTokenAccount",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "tokenProgram",
+          isMut: false,
+          isSigner: false,
+        },
+      ],
+      args: [
+        {
+          name: "amount",
+          type: "u64",
+        },
+      ],
+    },
+    {
+      name: "initGlobalContext",
       accounts: [
         {
           name: "globalContext",
@@ -1315,6 +1798,431 @@ export const IDL: Namespaces = {
           type: {
             defined: "UpdateGlobalContextIx",
           },
+        },
+      ],
+    },
+    {
+      name: "claimNameEntry",
+      accounts: [
+        {
+          name: "namespace",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "nameEntry",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "requestor",
+          isMut: true,
+          isSigner: true,
+        },
+        {
+          name: "recipient",
+          isMut: true,
+          isSigner: true,
+        },
+        {
+          name: "payer",
+          isMut: true,
+          isSigner: true,
+        },
+        {
+          name: "claimRequest",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "mint",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "namespaceTokenAccount",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "tokenManager",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "tokenManagerTokenAccount",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "mintCounter",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "recipientTokenAccount",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "tokenManagerProgram",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "tokenProgram",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "associatedToken",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "rent",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "systemProgram",
+          isMut: false,
+          isSigner: false,
+        },
+      ],
+      args: [
+        {
+          name: "ix",
+          type: {
+            defined: "ClaimNameEntryIx",
+          },
+        },
+      ],
+    },
+    {
+      name: "initNameEntryMint",
+      accounts: [
+        {
+          name: "namespace",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "nameEntry",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "payer",
+          isMut: true,
+          isSigner: true,
+        },
+        {
+          name: "namespaceTokenAccount",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "mint",
+          isMut: true,
+          isSigner: true,
+        },
+        {
+          name: "mintMetadata",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "masterEdition",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "tokenMetadataProgram",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "tokenProgram",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "associatedToken",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "rent",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "systemProgram",
+          isMut: false,
+          isSigner: false,
+        },
+      ],
+      args: [],
+    },
+    {
+      name: "initNameEntry",
+      accounts: [
+        {
+          name: "namespace",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "nameEntry",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "payer",
+          isMut: true,
+          isSigner: true,
+        },
+        {
+          name: "systemProgram",
+          isMut: false,
+          isSigner: false,
+        },
+      ],
+      args: [
+        {
+          name: "ix",
+          type: {
+            defined: "InitNameEntryIx",
+          },
+        },
+      ],
+    },
+    {
+      name: "invalidateExpiredNameEntry",
+      accounts: [
+        {
+          name: "namespace",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "nameEntry",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "namespaceTokenAccount",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "invalidator",
+          isMut: false,
+          isSigner: true,
+        },
+      ],
+      args: [],
+    },
+    {
+      name: "invalidateTransferableNameEntry",
+      accounts: [
+        {
+          name: "namespace",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "nameEntry",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "tokenManager",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "invalidator",
+          isMut: false,
+          isSigner: true,
+        },
+      ],
+      args: [],
+    },
+    {
+      name: "revokeNameEntry",
+      accounts: [
+        {
+          name: "namespace",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "nameEntry",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "claimRequest",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "invalidator",
+          isMut: false,
+          isSigner: true,
+        },
+        {
+          name: "tokenManager",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "mint",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "tokenManagerTokenAccount",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "recipientTokenAccount",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "tokenManagerProgram",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "tokenProgram",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "rent",
+          isMut: false,
+          isSigner: false,
+        },
+      ],
+      args: [],
+    },
+    {
+      name: "setNameEntryData",
+      accounts: [
+        {
+          name: "namespace",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "nameEntry",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "userTokenAccount",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "tokenManager",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "user",
+          isMut: true,
+          isSigner: true,
+        },
+      ],
+      args: [],
+    },
+    {
+      name: "updateNameEntryMintMetadata",
+      accounts: [
+        {
+          name: "namespace",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "nameEntry",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "updateAuthority",
+          isMut: false,
+          isSigner: true,
+        },
+        {
+          name: "mintMetadata",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "tokenMetadataProgram",
+          isMut: false,
+          isSigner: false,
+        },
+      ],
+      args: [
+        {
+          name: "ix",
+          type: {
+            defined: "UpdateNameEntryMintMetadataIx",
+          },
+        },
+      ],
+    },
+    {
+      name: "collectNamespaceFunds",
+      accounts: [
+        {
+          name: "globalContext",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "globalContextPaymentAccount",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "namespace",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "namespacePaymentAccount",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "rentAuthority",
+          isMut: false,
+          isSigner: true,
+        },
+        {
+          name: "rentAuthorityTokenAccount",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "tokenProgram",
+          isMut: false,
+          isSigner: false,
+        },
+      ],
+      args: [
+        {
+          name: "amount",
+          type: "u64",
         },
       ],
     },
@@ -1375,16 +2283,50 @@ export const IDL: Namespaces = {
       ],
     },
     {
-      name: "collectNamespaceFunds",
+      name: "createClaimRequest",
       accounts: [
         {
-          name: "globalContext",
+          name: "namespace",
           isMut: false,
           isSigner: false,
         },
         {
-          name: "globalContextPaymentAccount",
+          name: "payer",
           isMut: true,
+          isSigner: true,
+        },
+        {
+          name: "claimRequest",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "systemProgram",
+          isMut: false,
+          isSigner: false,
+        },
+      ],
+      args: [
+        {
+          name: "entryName",
+          type: "string",
+        },
+        {
+          name: "claimRequestBump",
+          type: "u8",
+        },
+        {
+          name: "user",
+          type: "publicKey",
+        },
+      ],
+    },
+    {
+      name: "updateClaimRequest",
+      accounts: [
+        {
+          name: "nameEntry",
+          isMut: false,
           isSigner: false,
         },
         {
@@ -1393,32 +2335,161 @@ export const IDL: Namespaces = {
           isSigner: false,
         },
         {
-          name: "namespacePaymentAccount",
-          isMut: true,
-          isSigner: false,
-        },
-        {
-          name: "rentAuthority",
+          name: "approveAuthority",
           isMut: false,
           isSigner: true,
         },
         {
-          name: "rentAuthorityTokenAccount",
+          name: "rentRequest",
           isMut: true,
-          isSigner: false,
-        },
-        {
-          name: "tokenProgram",
-          isMut: false,
           isSigner: false,
         },
       ],
       args: [
         {
-          name: "amount",
-          type: "u64",
+          name: "isApproved",
+          type: "bool",
         },
       ],
+    },
+    {
+      name: "invalidateExpiredReverseEntry",
+      accounts: [
+        {
+          name: "namespace",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "nameEntry",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "reverseNameEntry",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "namespaceTokenAccount",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "invalidator",
+          isMut: false,
+          isSigner: true,
+        },
+      ],
+      args: [],
+    },
+    {
+      name: "invalidateTransferableReverseEntry",
+      accounts: [
+        {
+          name: "namespace",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "nameEntry",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "reverseNameEntry",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "tokenManager",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "invalidator",
+          isMut: false,
+          isSigner: true,
+        },
+      ],
+      args: [],
+    },
+    {
+      name: "revokeReverseEntry",
+      accounts: [
+        {
+          name: "namespace",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "nameEntry",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "reverseEntry",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "claimRequest",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "invalidator",
+          isMut: false,
+          isSigner: true,
+        },
+      ],
+      args: [],
+    },
+    {
+      name: "setNamespaceReverseEntry",
+      accounts: [
+        {
+          name: "namespace",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "nameEntry",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "reverseEntry",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "userTokenAccount",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "tokenManager",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "user",
+          isMut: true,
+          isSigner: true,
+        },
+        {
+          name: "payer",
+          isMut: true,
+          isSigner: true,
+        },
+        {
+          name: "systemProgram",
+          isMut: false,
+          isSigner: false,
+        },
+      ],
+      args: [],
     },
     {
       name: "initEntry",
@@ -1784,254 +2855,6 @@ export const IDL: Namespaces = {
       ],
       args: [],
     },
-    {
-      name: "revokeReverseEntry",
-      accounts: [
-        {
-          name: "namespace",
-          isMut: false,
-          isSigner: false,
-        },
-        {
-          name: "entry",
-          isMut: false,
-          isSigner: false,
-        },
-        {
-          name: "reverseEntry",
-          isMut: true,
-          isSigner: false,
-        },
-        {
-          name: "claimRequest",
-          isMut: true,
-          isSigner: false,
-        },
-        {
-          name: "invalidator",
-          isMut: false,
-          isSigner: true,
-        },
-      ],
-      args: [],
-    },
-    {
-      name: "invalidateManagedEntry",
-      accounts: [
-        {
-          name: "namespace",
-          isMut: false,
-          isSigner: false,
-        },
-        {
-          name: "entry",
-          isMut: true,
-          isSigner: false,
-        },
-        {
-          name: "namespaceCertificateTokenAccount",
-          isMut: true,
-          isSigner: false,
-        },
-        {
-          name: "invalidator",
-          isMut: false,
-          isSigner: true,
-        },
-      ],
-      args: [],
-    },
-    {
-      name: "invalidateManagedReverseEntry",
-      accounts: [
-        {
-          name: "namespace",
-          isMut: false,
-          isSigner: false,
-        },
-        {
-          name: "entry",
-          isMut: true,
-          isSigner: false,
-        },
-        {
-          name: "reverseEntry",
-          isMut: true,
-          isSigner: false,
-        },
-        {
-          name: "namespaceCertificateTokenAccount",
-          isMut: true,
-          isSigner: false,
-        },
-        {
-          name: "invalidator",
-          isMut: false,
-          isSigner: true,
-        },
-      ],
-      args: [],
-    },
-    {
-      name: "invalidateUnmanagedEntry",
-      accounts: [
-        {
-          name: "namespace",
-          isMut: false,
-          isSigner: false,
-        },
-        {
-          name: "entry",
-          isMut: true,
-          isSigner: false,
-        },
-        {
-          name: "certificate",
-          isMut: false,
-          isSigner: false,
-        },
-        {
-          name: "invalidator",
-          isMut: false,
-          isSigner: true,
-        },
-      ],
-      args: [],
-    },
-    {
-      name: "invalidateUnmanagedReverseEntry",
-      accounts: [
-        {
-          name: "namespace",
-          isMut: false,
-          isSigner: false,
-        },
-        {
-          name: "entry",
-          isMut: true,
-          isSigner: false,
-        },
-        {
-          name: "reverseEntry",
-          isMut: true,
-          isSigner: false,
-        },
-        {
-          name: "certificate",
-          isMut: false,
-          isSigner: false,
-        },
-        {
-          name: "invalidator",
-          isMut: false,
-          isSigner: true,
-        },
-      ],
-      args: [],
-    },
-    {
-      name: "createClaimRequest",
-      accounts: [
-        {
-          name: "namespace",
-          isMut: false,
-          isSigner: false,
-        },
-        {
-          name: "payer",
-          isMut: true,
-          isSigner: true,
-        },
-        {
-          name: "claimRequest",
-          isMut: true,
-          isSigner: false,
-        },
-        {
-          name: "systemProgram",
-          isMut: false,
-          isSigner: false,
-        },
-      ],
-      args: [
-        {
-          name: "entryName",
-          type: "string",
-        },
-        {
-          name: "claimRequestBump",
-          type: "u8",
-        },
-        {
-          name: "user",
-          type: "publicKey",
-        },
-      ],
-    },
-    {
-      name: "updateClaimRequest",
-      accounts: [
-        {
-          name: "namespace",
-          isMut: false,
-          isSigner: false,
-        },
-        {
-          name: "approveAuthority",
-          isMut: false,
-          isSigner: true,
-        },
-        {
-          name: "rentRequest",
-          isMut: true,
-          isSigner: false,
-        },
-      ],
-      args: [
-        {
-          name: "isApproved",
-          type: "bool",
-        },
-      ],
-    },
-    {
-      name: "updateEntryMintMetadata",
-      accounts: [
-        {
-          name: "namespace",
-          isMut: false,
-          isSigner: false,
-        },
-        {
-          name: "entry",
-          isMut: false,
-          isSigner: false,
-        },
-        {
-          name: "updateAuthority",
-          isMut: false,
-          isSigner: true,
-        },
-        {
-          name: "certificateMintMetadata",
-          isMut: true,
-          isSigner: false,
-        },
-        {
-          name: "tokenMetadataProgram",
-          isMut: false,
-          isSigner: false,
-        },
-      ],
-      args: [
-        {
-          name: "args",
-          type: {
-            defined: "UpdateEntryMintMetadataIx",
-          },
-        },
-      ],
-    },
   ],
   accounts: [
     {
@@ -2139,6 +2962,10 @@ export const IDL: Namespaces = {
             name: "entryName",
             type: "string",
           },
+          {
+            name: "counter",
+            type: "u32",
+          },
         ],
       },
     },
@@ -2179,6 +3006,10 @@ export const IDL: Namespaces = {
             name: "isClaimed",
             type: "bool",
           },
+          {
+            name: "claimRequestCounter",
+            type: "u32",
+          },
         ],
       },
     },
@@ -2218,6 +3049,20 @@ export const IDL: Namespaces = {
           {
             name: "certificateBump",
             type: "u8",
+          },
+        ],
+      },
+    },
+    {
+      name: "ClaimNameEntryIx",
+      type: {
+        kind: "struct",
+        fields: [
+          {
+            name: "duration",
+            type: {
+              option: "i64",
+            },
           },
         ],
       },
@@ -2311,6 +3156,18 @@ export const IDL: Namespaces = {
       },
     },
     {
+      name: "InitNameEntryIx",
+      type: {
+        kind: "struct",
+        fields: [
+          {
+            name: "name",
+            type: "string",
+          },
+        ],
+      },
+    },
+    {
       name: "Creator",
       type: {
         kind: "struct",
@@ -2326,34 +3183,6 @@ export const IDL: Namespaces = {
           {
             name: "share",
             type: "u8",
-          },
-        ],
-      },
-    },
-    {
-      name: "UpdateEntryMintMetadataIx",
-      type: {
-        kind: "struct",
-        fields: [
-          {
-            name: "sellerFeeBasisPoints",
-            type: "u16",
-          },
-          {
-            name: "creators",
-            type: {
-              option: {
-                vec: {
-                  defined: "Creator",
-                },
-              },
-            },
-          },
-          {
-            name: "primarySaleHappened",
-            type: {
-              option: "bool",
-            },
           },
         ],
       },
@@ -2385,17 +3214,49 @@ export const IDL: Namespaces = {
       },
     },
     {
+      name: "UpdateNameEntryMintMetadataIx",
+      type: {
+        kind: "struct",
+        fields: [
+          {
+            name: "sellerFeeBasisPoints",
+            type: "u16",
+          },
+          {
+            name: "creators",
+            type: {
+              option: {
+                vec: {
+                  defined: "Creator",
+                },
+              },
+            },
+          },
+          {
+            name: "primarySaleHappened",
+            type: {
+              option: "bool",
+            },
+          },
+        ],
+      },
+    },
+    {
       name: "UpdateNamespaceIx",
       type: {
         kind: "struct",
         fields: [
           {
             name: "updateAuthority",
-            type: "publicKey",
+            type: {
+              option: "publicKey",
+            },
           },
           {
             name: "rentAuthority",
-            type: "publicKey",
+            type: {
+              option: "publicKey",
+            },
           },
           {
             name: "approveAuthority",
@@ -2405,15 +3266,21 @@ export const IDL: Namespaces = {
           },
           {
             name: "paymentAmountDaily",
-            type: "u64",
+            type: {
+              option: "u64",
+            },
           },
           {
             name: "paymentMint",
-            type: "publicKey",
+            type: {
+              option: "publicKey",
+            },
           },
           {
             name: "minRentalSeconds",
-            type: "i64",
+            type: {
+              option: "i64",
+            },
           },
           {
             name: "maxRentalSeconds",
@@ -2423,7 +3290,9 @@ export const IDL: Namespaces = {
           },
           {
             name: "transferableEntries",
-            type: "bool",
+            type: {
+              option: "bool",
+            },
           },
         ],
       },
@@ -2487,33 +3356,58 @@ export const IDL: Namespaces = {
     },
     {
       code: 6011,
-      name: "InvalidCertificate",
-      msg: "Invalid certificate",
-    },
-    {
-      code: 6012,
       name: "InvalidPaymentMint",
       msg: "Invalid payment mint",
     },
     {
-      code: 6013,
+      code: 6012,
       name: "InvalidReverseEntry",
       msg: "Invalid reverse entry",
     },
     {
-      code: 6014,
+      code: 6013,
       name: "ClaimNotAllowed",
       msg: "Claim not allowed",
     },
     {
-      code: 6015,
+      code: 6014,
       name: "InvalidApproveAuthority",
       msg: "Invalid approve authority",
     },
     {
-      code: 6016,
+      code: 6015,
       name: "NamespaceRequiresToken",
       msg: "Namespace requires token",
+    },
+    {
+      code: 6016,
+      name: "MintAlreadyInitialized",
+      msg: "Mint already initialized",
+    },
+    {
+      code: 6017,
+      name: "InvalidEntryMint",
+      msg: "Mint invalid for entry",
+    },
+    {
+      code: 6018,
+      name: "InvalidTimeInvalidatorProgramId",
+      msg: "Time invalidator program ID is invalid",
+    },
+    {
+      code: 6019,
+      name: "InvalidTokenManager",
+      msg: "Invalid token manager",
+    },
+    {
+      code: 6020,
+      name: "NameEntryAlreadyClaimed",
+      msg: "Name Entry already claimed",
+    },
+    {
+      code: 6021,
+      name: "InvalidCertificate",
+      msg: "Invalid certificate",
     },
   ],
 };

@@ -6,27 +6,20 @@ use {
 
 #[derive(Accounts)]
 pub struct CollectNamespaceFundsCtx<'info> {
-    #[account(
-        seeds = [GLOBAL_CONTEXT_PREFIX.as_bytes()],
-        bump = global_context.bump,
-    )]
+    #[account(seeds = [GLOBAL_CONTEXT_PREFIX.as_bytes()], bump = global_context.bump)]
     pub global_context: Account<'info, GlobalContext>,
+
     #[account(mut, constraint = global_context_payment_account.owner == global_context.key() && global_context_payment_account.mint == namespace.payment_mint @ ErrorCode::InvalidGlobalContextPaymentAccount)]
     pub global_context_payment_account: Account<'info, TokenAccount>,
-    #[account(
-        seeds = [NAMESPACE_PREFIX.as_bytes(), namespace.name.as_ref()],
-        bump = namespace.bump,
-    )]
     pub namespace: Account<'info, Namespace>,
+
     #[account(mut, constraint = namespace_payment_account.owner == namespace.key() && namespace_payment_account.mint == namespace.payment_mint @ ErrorCode::InvalidNamespacePaymentAccount)]
     pub namespace_payment_account: Account<'info, TokenAccount>,
-
     #[account(constraint = namespace.rent_authority == rent_authority.key())]
     pub rent_authority: Signer<'info>,
     #[account(mut, constraint = rent_authority_token_account.owner == rent_authority.key() && rent_authority_token_account.mint == namespace.payment_mint @ ErrorCode::InvalidAuthorityTokenAccount)]
     pub rent_authority_token_account: Account<'info, TokenAccount>,
 
-    // other
     pub token_program: Program<'info, Token>,
 }
 

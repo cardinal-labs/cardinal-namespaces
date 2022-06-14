@@ -5,25 +5,28 @@ import * as web3 from "@solana/web3.js";
 import assert from "assert";
 
 import {
+  findNamespaceId,
   getClaimRequest,
   getNameEntry,
   getNamespaceByName,
   getReverseEntry,
-  withClaimEntry,
   withCreateClaimRequest,
   withCreateNamespace,
+  withUpdateClaimRequest,
+} from "../../src";
+import {
+  withClaimEntry,
   withInitEntry,
   withSetReverseEntry,
-  withUpdateClaimRequest,
-} from "../src";
-import { createMint, withFindOrInitAssociatedTokenAccount } from "./utils";
-import { getProvider } from "./workspace";
+} from "../../src/deprecated";
+import { createMint, withFindOrInitAssociatedTokenAccount } from "../utils";
+import { getProvider } from "../workspace";
 
 describe("namespace-create-rent", () => {
   const provider = getProvider();
 
   // test params
-  const namespaceName = "ns1";
+  const namespaceName = `ns-${Math.random()}`;
   const entryName = "testname";
   const mintAuthority = web3.Keypair.generate();
   const paymentAmountDaily = new anchor.BN(864000);
@@ -145,6 +148,7 @@ describe("namespace-create-rent", () => {
       provider.connection,
       provider.wallet,
       namespaceName,
+      entryName,
       claimRequest.pubkey,
       true,
       transaction
@@ -278,6 +282,9 @@ describe("namespace-create-rent", () => {
 
     const checkReverseEntry = await getReverseEntry(
       provider.connection,
+      (
+        await findNamespaceId(namespaceName)
+      )[0],
       provider.wallet.publicKey
     );
     assert.equal(checkReverseEntry.parsed.entryName, entryName);

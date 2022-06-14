@@ -65,14 +65,33 @@ export const findClaimRequestId = async (
 };
 
 /**
- * Finds the reverse entry ID for a given publickey.
+ * @Deprecated
+ * Finds the deprecated reverse entry ID for a given publickey.
  * @returns
  */
-export const findReverseEntryId = async (
+export const findDeprecatedReverseEntryId = async (
   pubkey: PublicKey
 ): Promise<[PublicKey, number]> => {
   return PublicKey.findProgramAddress(
     [utils.bytes.utf8.encode(REVERSE_ENTRY_SEED), pubkey.toBytes()],
+    NAMESPACES_PROGRAM_ID
+  );
+};
+
+/**
+ * Finds the reverse entry ID for a given publickey.
+ * @returns
+ */
+export const findReverseEntryId = async (
+  namespace: PublicKey,
+  pubkey: PublicKey
+): Promise<[PublicKey, number]> => {
+  return PublicKey.findProgramAddress(
+    [
+      utils.bytes.utf8.encode(REVERSE_ENTRY_SEED),
+      namespace.toBuffer(),
+      pubkey.toBytes(),
+    ],
     NAMESPACES_PROGRAM_ID
   );
 };

@@ -1,6 +1,6 @@
 [package]
 name = "namespaces"
-version = "3.2.0"
+version = "4.1.0"
 description = "Cardinal namespaces service"
 edition = "2021"
 homepage = "https://cardinal.so"
@@ -25,4 +25,6 @@ anchor-spl = "0.24.2"
 spl-associated-token-account = "1.0.2"
 spl-token = { version = "3.1.1", features = ["no-entrypoint"] }
 cardinal-certificate = { version = "0.2.0", features = ["cpi"] }
-metaplex-token-metadata = { version = "0.0.1", features = [ "no-entrypoint" ] }
+cardinal-token-manager = { version = "1.4.6", features = ["cpi"] }
+cardinal-time-invalidator = { version = "1.4.6", features = ["cpi"] }
+mpl-token-metadata = { version = "1.2.5", features = ["no-entrypoint"] }
