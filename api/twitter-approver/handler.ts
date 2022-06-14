@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument */
+
 import * as twitterApprover from "./twitter-approver";
-import { APIGatewayEvent } from "aws-lambda";
-import { Handler } from "aws-lambda";
 
 module.exports.approve = async (event) => {
   try {

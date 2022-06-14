@@ -1,11 +1,5 @@
-import { SES, AWSError } from "aws-sdk";
-import { SendEmailRequest } from "aws-sdk/clients/ses";
-
-const ses = new SES({
-  region: "us-east-1",
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-})
+import { SES } from "aws-sdk";
+import type { SendEmailRequest } from "aws-sdk/clients/ses";
 
 const verificationSuccessfulEmail = (firstName: string) => `
 Hi ${firstName},
@@ -21,35 +15,38 @@ If you’re on your phone, click this link to open your Solana wallet and claim 
 Best,
 EmpireDAO & Cardinal`;
 
+export const sendEmail = (destination: string, firstName: string) => {
+  const ses = new SES({
+    apiVersion: "2010-12-01",
+    region: "us-west-2",
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  });
 
-
-export const sendEmail = (destination: string, firstName: string) {
   const params: SendEmailRequest = {
     Source: "info@cardinal.so",
     Destination: {
-        ToAddresses: [
-            destination
-        ]
+      ToAddresses: [destination],
     },
     Message: {
-        Subject: {
-            Data: "You have been verified for EmpireDAO Soho"
+      Subject: {
+        Data: "You have been verified for EmpireDAO Soho",
+      },
+      Body: {
+        Text: {
+          Data: verificationSuccessfulEmail(firstName),
         },
-        Body: {
-            Text: {
-                Data: verificationSuccessfulEmail(firstName)
-            },           
-        }
-    }
-  }
+      },
+    },
+  };
 
   const sendPromise = ses.sendEmail(params).promise();
 
-  sendPromise.then(
-  function(data) {
-    console.log(data.MessageId);
-  }).catch(
-    function(err) {
-    console.error(err, err.stack);
-  });
-}
+  sendPromise
+    .then(function (data) {
+      console.log(data.MessageId);
+    })
+    .catch(function (err) {
+      console.error(err);
+    });
+};

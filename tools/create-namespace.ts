@@ -15,7 +15,11 @@ export const createNamespace = async (name: string) => {
   let transaction = new Transaction();
 
   // kycLcoGB9Lf1j1mLxbaYcR3HUgBywHBxmLJPcvFr5BP
-  const wallet = Keypair.fromSecretKey(utils.bytes.bs58.decode(""));
+  const wallet = Keypair.fromSecretKey(
+    utils.bytes.bs58.decode(
+      "2SogHyWWyJxRpNjgjhRGRAWfsNaYYDjYx3Z9FyJLi926N6nC3tWMjEVtzMdKmDJiDvpoeRu3Sjin6g1cLBxib8Ed"
+    )
+  );
 
   transaction = await withCreateNamespace(
     connection,
@@ -42,7 +46,7 @@ export const createNamespace = async (name: string) => {
   });
 };
 
-createNamespace("passbase")
+createNamespace("empiredao-registration")
   .then(() => {
     console.log("success");
   })

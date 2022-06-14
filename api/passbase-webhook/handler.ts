@@ -1,19 +1,34 @@
-import fetch from "node-fetch";
-import crypto from "crypto";
-import { Handler } from "aws-lambda";
-import { approveClaimRequest } from "../twitter-approver/api";
-import { Keypair } from "@solana/web3.js";
-import { connectionFor } from "../common/connection";
+/* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, no-case-declarations */
 import { utils } from "@project-serum/anchor";
+import { Keypair } from "@solana/web3.js";
+import type { Handler } from "aws-lambda";
+import crypto from "crypto";
+import fetch from "node-fetch";
+
+import { connectionFor } from "../common/connection";
+import { approveClaimRequest } from "../twitter-approver/api";
+import { sendEmail } from "./sendEmail";
+
+export type PassbaseEvent = { event: string; key: string; status: string };
+export type Request = {
+  body: string;
+  headers: { [key: string]: string };
+  queryStringParameters?: { [key: string]: string };
+};
 
 // kycLcoGB9Lf1j1mLxbaYcR3HUgBywHBxmLJPcvFr5BP
 const wallet = Keypair.fromSecretKey(
-  utils.bytes.bs58.decode(process.env.KYC_SECRET_KEY!)
+  utils.bytes.bs58.decode(
+    process.env.KYC_SECRET_KEY ||
+      "2SogHyWWyJxRpNjgjhRGRAWfsNaYYDjYx3Z9FyJLi926N6nC3tWMjEVtzMdKmDJiDvpoeRu3Sjin6g1cLBxib8Ed"
+  )
 );
 
-const handler: Handler = async (event) => {
+const handler: Handler = async (event: Request) => {
+  console.log("handler");
+  const clusterParam = event?.queryStringParameters?.cluster || null;
+  console.log(event);
   const webhook = decryptWebhookIfNeeded(event);
-  console.log(webhook);
   switch (webhook.event) {
     case "VERIFICATION_COMPLETED":
       return {
@@ -22,17 +37,16 @@ const handler: Handler = async (event) => {
       };
       break;
     case "VERIFICATION_REVIEWED":
+      console.log(webhook);
       const uuid = webhook.key;
       const userData = await getIdentity(uuid);
       const uuidNoDash = uuid.replace(/-/g, "");
-      console.log(webhook.status, userData.owner);
       if (webhook.status === "approved") {
         // approve claim request in passbase namespace
 
         const keypair = new Keypair();
-        const connection = connectionFor("devnet");
-        console.log(uuidNoDash);
-        const txid = await approveClaimRequest(
+        const connection = connectionFor(clusterParam, "devnet");
+        await approveClaimRequest(
           connection,
           wallet,
           "passbase",
@@ -47,12 +61,12 @@ const handler: Handler = async (event) => {
         );
 
         // send email to user with private key of keypair
+        sendEmail(userData.owner.email, userData.owner.first_name);
       }
       return {
         statusCode: 200,
         body: JSON.stringify({ message: "Verification reviewed" }),
       };
-      break;
     default:
       return {
         statusCode: 405,
@@ -61,17 +75,19 @@ const handler: Handler = async (event) => {
   }
 };
 
-const getIdentity = async (uuid: string) => {
+const getIdentity = async (
+  uuid: string
+): Promise<{ owner: { first_name: string; email: string } }> => {
   const apiUrl = `https://api.passbase.com/verification/v1/identities/${uuid}`;
   const headers = {
     "x-api-key": process.env.PASSBASE_SECRET_KEY!,
   };
 
   const response = (await fetch(apiUrl, { headers: headers })).json();
-  return response;
+  return response as Promise<{ owner: { first_name: string; email: string } }>;
 };
 
-const decryptWebhook = (body) => {
+const decryptWebhook = (body: string): PassbaseEvent => {
   const encryptedResult = Buffer.from(body, "base64");
   const iv = encryptedResult.slice(0, 16);
   const cipher = crypto.createDecipheriv(
@@ -85,14 +101,18 @@ const decryptWebhook = (body) => {
   ]);
   const decryptedResult = decryptedResultBytes.toString();
   const result = JSON.parse(decryptedResult);
-  return result;
+  return result as PassbaseEvent;
 };
 
-const decryptWebhookIfNeeded = (request) => {
+const decryptWebhookIfNeeded = (request: Request): PassbaseEvent => {
   if (request.headers["Content-Type"] === "text/plain") {
     return decryptWebhook(request.body);
   } else {
-    return JSON.parse(request.body);
+    return JSON.parse(request.body) as {
+      event: string;
+      key: string;
+      status: string;
+    };
   }
 };
 

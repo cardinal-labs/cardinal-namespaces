@@ -55,6 +55,27 @@ functions:
       - http:
           path: /passbase/webhook
           method: post
+    environment:
+      PASSBASE_WEBHOOK_SECRET: pbQQnWXaTyPEK2FeXR5dMYQX9cd3SsHz
+      PASSBASE_SECRET_KEY: 6KGtQueEyEhzsFChC45U3UNc2Z3xiA1IxpeewKaUk7orzw9DYpysekVjm8cow7o3XvgaMMGpCaROgLf24aqJOkAZ5BW9oUDwW9ZKryrqxLWSaI6yy7HmFpbsHPkijFVW
+      KYC_SECRET_KEY: 2SogHyWWyJxRpNjgjhRGRAWfsNaYYDjYx3Z9FyJLi926N6nC3tWMjEVtzMdKmDJiDvpoeRu3Sjin6g1cLBxib8Ed
+      AWS_ACCESS_KEY_ID: AKIAVZF53PXUQ2G6QAMB
+      AWS_SECRET_ACCESS_KEY: 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
+  typeform-webhook:
+    handler: typeform-webhook/handler.webhook
+    events:
+      - http:
+          path: /typeform/webhook
+          method: post
+    environment:
+      AWS_ACCESS_KEY_ID: AKIAVZF53PXUQ2G6QAMB
+      AWS_SECRET_ACCESS_KEY: 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
+  passbase-data:
+    handler: passbase-webhook/handler.data
+    events:
+      - http:
+          path: /passbase/data
+          method: get
 
 custom:
   domains:
