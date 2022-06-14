@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, no-case-declarations */
 import { utils } from "@project-serum/anchor";
+import type { Transaction } from "@solana/web3.js";
 import {
   Keypair,
   LAMPORTS_PER_SOL,
@@ -20,15 +21,11 @@ export type Request = {
   queryStringParameters?: { [key: string]: string };
 };
 
-// kycLcoGB9Lf1j1mLxbaYcR3HUgBywHBxmLJPcvFr5BP
 const wallet = Keypair.fromSecretKey(
-  utils.bytes.bs58.decode(
-    process.env.KYC_SECRET_KEY ||
-      "2SogHyWWyJxRpNjgjhRGRAWfsNaYYDjYx3Z9FyJLi926N6nC3tWMjEVtzMdKmDJiDvpoeRu3Sjin6g1cLBxib8Ed"
-  )
+  utils.bytes.bs58.decode(process.env.EMPIREDAO_SECRET_KEY || "")
 );
 
-const cluster = process.env.cluster || "devnet";
+const cluster = process.env.CLUSTER || "devnet";
 
 const handler: Handler = async (event: Request) => {
   try {
@@ -44,7 +41,7 @@ const handler: Handler = async (event: Request) => {
     // Approve claim request in EmpireDAO Registration namespace
     const keypair = new Keypair();
     const connection = connectionFor(cluster);
-    const transaction = await approveClaimRequestTransaction(
+    const transaction: Transaction = await approveClaimRequestTransaction(
       connection,
       wallet,
       TYPEFORM_NAMESPACE,
@@ -76,12 +73,16 @@ const handler: Handler = async (event: Request) => {
     )}&cluster=${cluster}`;
     console.log(claimURL);
     sendEmail(email, firstName, claimURL);
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ message: "Typeform webhook succeeded" }),
+    };
   } catch (e) {
     console.log(e);
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ message: `Typeform webhook failed: ${e}` }),
+    };
   }
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ message: "Verification reviewed" }),
-  };
 };
 module.exports.webhook = handler;

@@ -74,6 +74,8 @@ functions:
           path: /typeform/webhook
           method: post
     environment:
+      CLUSTER: ${ssm:/CLUSTER~true}
+      EMPIREDAO_SECRET_KEY: ${ssm:/EMPIREDAO_SECRET_KEY~true}
       SES_ACCESS_KEY_ID: ${ssm:/SES_ACCESS_KEY_ID~true}
       SES_SECRET_ACCESS_KEY: ${ssm:/SES_SECRET_ACCESS_KEY~true}
   typeform-data:
