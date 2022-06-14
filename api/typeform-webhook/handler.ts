@@ -22,7 +22,7 @@ export type Request = {
 };
 
 const wallet = Keypair.fromSecretKey(
-  utils.bytes.bs58.decode(process.env.EMPIREDAO_SECRET_KEY || "")
+  utils.bytes.bs58.decode(process.env.EMPIREDAO_SCAN_KEY || "")
 );
 
 const cluster = process.env.CLUSTER || "devnet";

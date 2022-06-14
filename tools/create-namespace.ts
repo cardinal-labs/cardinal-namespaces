@@ -42,10 +42,10 @@ export const createNamespace = async (name: string, clusterName: string) => {
   });
 };
 
-// createNamespace("EmpireDAO", "mainnet-beta")
-//   .then(() => {
-//     console.log("success");
-//   })
-//   .catch((e) => {
-//     console.log("Error:", e);
-//   });
+createNamespace("EmpireDAO", "mainnet-beta")
+  .then(() => {
+    console.log("success");
+  })
+  .catch((e) => {
+    console.log("Error:", e);
+  });
