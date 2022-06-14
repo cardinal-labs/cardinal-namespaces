@@ -18,9 +18,9 @@ EmpireDAO & Cardinal`;
 export const sendEmail = (destination: string, firstName: string) => {
   const ses = new SES({
     apiVersion: "2010-12-01",
-    region: "us-west-2",
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    // region: "us-west-2",
+    accessKeyId: "",
+    secretAccessKey: ""
   });
 
   const params: SendEmailRequest = {

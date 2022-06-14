@@ -10,16 +10,12 @@ import {
 import { withCreateNamespace } from "../src";
 import { connectionFor } from "./connection";
 
-export const createNamespace = async (name: string) => {
-  const connection = connectionFor("devnet");
+export const createNamespace = async (name: string, clusterName: string) => {
+  const connection = connectionFor(clusterName);
   let transaction = new Transaction();
 
-  // kycLcoGB9Lf1j1mLxbaYcR3HUgBywHBxmLJPcvFr5BP
-  const wallet = Keypair.fromSecretKey(
-    utils.bytes.bs58.decode(
-      "2SogHyWWyJxRpNjgjhRGRAWfsNaYYDjYx3Z9FyJLi926N6nC3tWMjEVtzMdKmDJiDvpoeRu3Sjin6g1cLBxib8Ed"
-    )
-  );
+  // escnhPr3QjTijhRPh7EMfcrnX1R5Ek5ceyMXjg8ZsZb
+  const wallet = Keypair.fromSecretKey(utils.bytes.bs58.decode(""));
 
   transaction = await withCreateNamespace(
     connection,
@@ -46,7 +42,7 @@ export const createNamespace = async (name: string) => {
   });
 };
 
-createNamespace("empiredao-registration")
+createNamespace("EmpireDAO", "mainnet-beta")
   .then(() => {
     console.log("success");
   })
