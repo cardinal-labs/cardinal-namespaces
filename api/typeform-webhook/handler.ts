@@ -1,11 +1,16 @@
-import { LAMPORTS_PER_SOL, SystemProgram } from "@solana/web3.js";
 /* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, no-case-declarations */
 import { utils } from "@project-serum/anchor";
-import { Keypair } from "@solana/web3.js";
+import {
+  Keypair,
+  LAMPORTS_PER_SOL,
+  sendAndConfirmTransaction,
+  SystemProgram,
+} from "@solana/web3.js";
 import type { Handler } from "aws-lambda";
 
 import { connectionFor } from "../common/connection";
-import { approveClaimRequest } from "../twitter-approver/api";
+import { approveClaimRequestTransaction } from "../twitter-approver/api";
+import { TYPEFORM_NAMESPACE } from "../typeform-data/handler";
 import { sendEmail } from "./sendEmail";
 
 export type PassbaseEvent = { event: string; key: string; status: string };
@@ -28,7 +33,6 @@ const cluster = process.env.cluster || "devnet";
 const handler: Handler = async (event: Request) => {
   try {
     const data = JSON.parse(event.body);
-    console.log(data);
 
     // Get data from POST request
     const responseId = data.form_response.token as string;
@@ -37,27 +41,37 @@ const handler: Handler = async (event: Request) => {
       (answer) => answer.field.type === "email"
     )[0].email as string;
 
-    console.log(responseId, firstName, email);
-
     // Approve claim request in EmpireDAO Registration namespace
     const keypair = new Keypair();
     const connection = connectionFor(cluster);
-    await approveClaimRequest(
+    const transaction = await approveClaimRequestTransaction(
       connection,
       wallet,
-      "empiredao-registration",
+      TYPEFORM_NAMESPACE,
       responseId,
       keypair.publicKey
     );
-
-    await SystemProgram.transfer({
-      fromPubkey: wallet.publicKey,
-      toPubkey: keypair.publicKey,
-      lamports: 0.001 * LAMPORTS_PER_SOL,
-    });
+    if (transaction.instructions.length > 0) {
+      console.log(
+        `Executing transaction of length ${transaction.instructions.length}`
+      );
+      transaction.instructions = [
+        ...transaction.instructions,
+        SystemProgram.transfer({
+          fromPubkey: wallet.publicKey,
+          toPubkey: keypair.publicKey,
+          lamports: 0.001 * LAMPORTS_PER_SOL,
+        }),
+      ];
+      transaction.feePayer = wallet.publicKey;
+      transaction.recentBlockhash = (
+        await connection.getRecentBlockhash("max")
+      ).blockhash;
+      await sendAndConfirmTransaction(connection, transaction, [wallet]);
+    }
 
     // Send Email to user to claim NFT
-    const claimURL = `https://cardinal-identity-kyc.vercel.app/empiredao-registration/${responseId}?otp=${utils.bytes.bs58.encode(
+    const claimURL = `https://identity.cardinal.so/${TYPEFORM_NAMESPACE}/${responseId}?otp=${utils.bytes.bs58.encode(
       keypair.secretKey
     )}&cluster=${cluster}`;
     console.log(claimURL);

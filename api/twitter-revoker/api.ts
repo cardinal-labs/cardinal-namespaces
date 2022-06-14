@@ -82,7 +82,7 @@ export async function revoke(
   const transaction = new web3.Transaction();
 
   if (entry?.parsed.reverseEntry) {
-    const reverseEntryId = entry?.parsed.reverseEntry as web3.PublicKey;
+    const reverseEntryId = entry?.parsed.reverseEntry;
     console.log(
       `Revoking reverse entry ${reverseEntryId.toString()} using claimId ${claimRequestId.toString()} from owner ${owner.toString()}`
     );

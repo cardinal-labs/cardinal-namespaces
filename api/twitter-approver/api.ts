@@ -21,7 +21,7 @@ export async function tryGetClaimRequest(
   }
 }
 
-export async function approveClaimRequest(
+export async function approveClaimRequestTransaction(
   connection: web3.Connection,
   wallet: web3.Keypair,
   namespaceName: string,
@@ -65,7 +65,23 @@ export async function approveClaimRequest(
       transaction
     );
   }
+  return transaction;
+}
 
+export async function approveClaimRequest(
+  connection: web3.Connection,
+  wallet: web3.Keypair,
+  namespaceName: string,
+  entryName: string,
+  user: web3.PublicKey
+) {
+  const transaction = await approveClaimRequestTransaction(
+    connection,
+    wallet,
+    namespaceName,
+    entryName,
+    user
+  );
   if (transaction.instructions.length > 0) {
     console.log(
       `Executing transaction of length ${transaction.instructions.length}`

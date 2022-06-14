@@ -61,6 +61,12 @@ functions:
       KYC_SECRET_KEY: ${ssm:/KYC_SECRET_KEY~true}
       SES_ACCESS_KEY_ID: ${ssm:/SES_ACCESS_KEY_ID~true}
       SES_SECRET_ACCESS_KEY: ${ssm:/SES_SECRET_ACCESS_KEY~true}
+  passbase-data:
+    handler: passbase-data/handler.data
+    events:
+      - http:
+          path: /passbase/data
+          method: get
   typeform-webhook:
     handler: typeform-webhook/handler.webhook
     events:
@@ -70,11 +76,13 @@ functions:
     environment:
       SES_ACCESS_KEY_ID: ${ssm:/SES_ACCESS_KEY_ID~true}
       SES_SECRET_ACCESS_KEY: ${ssm:/SES_SECRET_ACCESS_KEY~true}
-  passbase-data:
-    handler: passbase-data/handler.data
+  typeform-data:
+    handler: typeform-data/handler.data
+    environment:
+      TYPEFORM_API_KEY: ${ssm:/TYPEFORM_API_KEY~true}
     events:
       - http:
-          path: /passbase/data
+          path: /typeform/data
           method: get
 
 custom:
