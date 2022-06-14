@@ -25,7 +25,7 @@ const wallet = Keypair.fromSecretKey(
   utils.bytes.bs58.decode(process.env.EMPIREDAO_SCAN_KEY || "")
 );
 
-const cluster = process.env.CLUSTER || "mainnet-beta";
+const cluster = "mainnet-beta";
 
 async function retryFn<T>(fn: () => {}, retries: number) {
   let counter = 0;
