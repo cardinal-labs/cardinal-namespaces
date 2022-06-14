@@ -20,7 +20,7 @@ EmpireDAO & Cardinal
 </p>
 </div>`;
 
-export const sendEmail = (
+export const sendEmail = async (
   destination: string,
   firstName: string,
   claimURL: string
@@ -49,13 +49,5 @@ export const sendEmail = (
     },
   };
 
-  const sendPromise = ses.sendEmail(params).promise();
-
-  sendPromise
-    .then(function (data) {
-      console.log(data.MessageId);
-    })
-    .catch(function (err) {
-      console.error(err);
-    });
+  await ses.sendEmail(params).promise();
 };

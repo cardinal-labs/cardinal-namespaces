@@ -27,6 +27,20 @@ const wallet = Keypair.fromSecretKey(
 
 const cluster = process.env.CLUSTER || "mainnet-beta";
 
+async function retryFn<T>(fn: () => {}, retries: number) {
+  let counter = 0;
+  let success = false;
+  while (counter <= retries && !success) {
+    try {
+      await fn();
+      success = true;
+    } catch (e) {
+      console.log(`Failed to send email, retry ${counter}/${retries}. ${e}`);
+      counter = counter + 1;
+    }
+  }
+}
+
 const handler: Handler = async (event: Request) => {
   try {
     const data = JSON.parse(event.body);
@@ -48,6 +62,7 @@ const handler: Handler = async (event: Request) => {
       responseId,
       keypair.publicKey
     );
+    let txid;
     if (transaction.instructions.length > 0) {
       console.log(
         `Executing transaction of length ${transaction.instructions.length}`
@@ -64,15 +79,18 @@ const handler: Handler = async (event: Request) => {
       transaction.recentBlockhash = (
         await connection.getRecentBlockhash("max")
       ).blockhash;
-      await sendAndConfirmTransaction(connection, transaction, [wallet]);
+      txid = await sendAndConfirmTransaction(connection, transaction, [wallet], {
+        maxRetries: 3,
+      });
     }
 
     // Send Email to user to claim NFT
     const claimURL = `https://identity.cardinal.so/${TYPEFORM_NAMESPACE}/${responseId}?otp=${utils.bytes.bs58.encode(
       keypair.secretKey
     )}&cluster=${cluster}`;
-    console.log(claimURL);
-    sendEmail(email, firstName, claimURL);
+    console.log(`Successfuly created Claim URL for ${firstName} with transaction ID ${txid}: ${claimURL}`);
+    await retryFn(async () => await sendEmail(email, firstName, claimURL), 3);
+    console.log(`Successfuly sent email to user: ${email}`);
     return {
       statusCode: 200,
       body: JSON.stringify({ message: "Typeform webhook succeeded" }),
