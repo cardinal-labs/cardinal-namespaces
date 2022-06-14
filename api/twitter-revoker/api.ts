@@ -1,4 +1,6 @@
+import { tryGetAccount } from "@cardinal/common";
 import * as namespaces from "@cardinal/namespaces";
+import { NAMESPACES_PROGRAM_ID } from "@cardinal/namespaces";
 import * as anchor from "@project-serum/anchor";
 import { SignerWallet } from "@saberhq/solana-contrib";
 import * as splToken from "@solana/spl-token";
@@ -103,25 +105,38 @@ export async function revoke(
   console.log(
     `Revoking entry ${entryName} using claimId ${claimRequestId.toString()} from owner ${owner.toString()}`
   );
-  await namespaces.deprecated.withRevokeEntry(
-    connection,
-    new SignerWallet(wallet),
-    namespaceName,
-    entryName,
-    entry?.parsed.mint,
-    owner,
-    claimRequestId,
-    transaction
-  );
-  transaction.feePayer = wallet.publicKey;
-  transaction.recentBlockhash = (
-    await connection.getRecentBlockhash("max")
-  ).blockhash;
-  const txid = await web3.sendAndConfirmTransaction(connection, transaction, [
-    wallet,
-  ]);
-  console.log(
-    `Succesfully revoke entries from ${owner.toString()}, txid (${txid})`
-  );
+
+  const ownerAccountInfo = await connection.getAccountInfo(owner);
+  if (ownerAccountInfo?.owner.toString() !== NAMESPACES_PROGRAM_ID.toString()) {
+    await namespaces.deprecated.withRevokeEntry(
+      connection,
+      new SignerWallet(wallet),
+      namespaceName,
+      entryName,
+      entry?.parsed.mint,
+      owner,
+      claimRequestId,
+      transaction
+    );
+  }
+
+  let txid;
+  if (transaction.instructions.length > 0) {
+    console.log(
+      `Executing transaction of length ${transaction.instructions.length}`
+    );
+    transaction.feePayer = wallet.publicKey;
+    transaction.recentBlockhash = (
+      await connection.getRecentBlockhash("max")
+    ).blockhash;
+    txid = await web3.sendAndConfirmTransaction(connection, transaction, [
+      wallet,
+    ]);
+    console.log(
+      `Succesfully revoke entries from ${owner.toString()}, txid (${txid})`
+    );
+  } else {
+    return "";
+  }
   return txid;
 }
