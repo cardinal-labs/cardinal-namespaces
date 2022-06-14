@@ -19,8 +19,8 @@ export const sendEmail = (destination: string, firstName: string) => {
   const ses = new SES({
     apiVersion: "2010-12-01",
     // region: "us-west-2",
-    accessKeyId: "AKIAVZF53PXU75WN3HVQ", // process.env.AWS_ACCESS_KEY_ID ||
-    secretAccessKey: "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", //process.env.AWS_SECRET_ACCESS_KEY ||
+    accessKeyId: "",
+    secretAccessKey: ""
   });
 
   const params: SendEmailRequest = {
