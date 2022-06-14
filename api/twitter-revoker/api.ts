@@ -89,13 +89,13 @@ export async function revoke(
     const reverseEntry = await connection.getAccountInfo(reverseEntryId);
     if (reverseEntry) {
       await namespaces.withRevokeReverseEntry(
+        transaction,
         connection,
         new SignerWallet(wallet),
         namespaceName,
         entryName,
         reverseEntryId,
-        claimRequestId,
-        transaction
+        claimRequestId
       );
     }
   }
@@ -103,7 +103,7 @@ export async function revoke(
   console.log(
     `Revoking entry ${entryName} using claimId ${claimRequestId.toString()} from owner ${owner.toString()}`
   );
-  await namespaces.withRevokeEntry(
+  await namespaces.deprecated.withRevokeEntry(
     connection,
     new SignerWallet(wallet),
     namespaceName,
