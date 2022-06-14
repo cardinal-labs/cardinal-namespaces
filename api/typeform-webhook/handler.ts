@@ -25,7 +25,7 @@ const wallet = Keypair.fromSecretKey(
   utils.bytes.bs58.decode(process.env.EMPIREDAO_SCAN_KEY || "")
 );
 
-const cluster = process.env.CLUSTER || "devnet";
+const cluster = process.env.CLUSTER || "mainnet-beta";
 
 const handler: Handler = async (event: Request) => {
   try {
