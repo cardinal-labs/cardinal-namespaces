@@ -89,7 +89,7 @@ pub fn handler(ctx: Context<InitNameEntryMintCtx>) -> Result<()> {
             ctx.accounts.namespace.name.clone(),
             "NAME".to_string(),
             // generative URL which will inclde image of the name with expiration data
-            "https://nft.cardinal.so/metadata/".to_string() + &ctx.accounts.mint.key().to_string() + &"?name=".to_string() + &ctx.accounts.namespace.name.to_string(),
+            "https://nft.cardinal.so/metadata/".to_string() + &ctx.accounts.mint.key().to_string() + &"?name=".to_string() + &ctx.accounts.name_entry.name.to_string(),
             Some(vec![MCreator {
                 address: ctx.accounts.namespace.key(),
                 verified: true,

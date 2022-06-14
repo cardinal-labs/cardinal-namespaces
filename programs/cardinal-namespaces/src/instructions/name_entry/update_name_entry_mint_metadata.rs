@@ -52,7 +52,7 @@ pub fn handler(ctx: Context<UpdateNameEntryMintMetadataCtx>, ix: UpdateNameEntry
             Some(DataV2 {
                 name: ctx.accounts.name_entry.name.clone() + "." + &ctx.accounts.namespace.name.to_string(),
                 symbol: "NAME".to_string(),
-                uri: "https://nft.cardinal.so/metadata/".to_string() + &ctx.accounts.name_entry.mint.to_string(),
+                uri: "https://nft.cardinal.so/metadata/".to_string() + &ctx.accounts.name_entry.mint.to_string() + &"?name=".to_string() + &ctx.accounts.name_entry.name.to_string(),
                 creators: Some(
                     [
                         vec![Creator {
@@ -76,7 +76,7 @@ pub fn handler(ctx: Context<UpdateNameEntryMintMetadataCtx>, ix: UpdateNameEntry
                 uses: None,
             }),
             ix.primary_sale_happened,
-            None,
+            Some(true),
         ),
         &[ctx.accounts.mint_metadata.to_account_info(), ctx.accounts.namespace.to_account_info()],
         namespace_signer,
