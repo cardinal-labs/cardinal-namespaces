@@ -16,6 +16,7 @@ pub struct RevokeEntryCtx<'info> {
         claim_request.is_approved
         && claim_request.namespace == namespace.key()
         && claim_request.entry_name == entry.name
+        && claim_request.counter == entry.claim_request_counter
         @ ErrorCode::ClaimNotAllowed
     )]
     claim_request: Box<Account<'info, ClaimRequest>>,

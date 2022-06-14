@@ -618,6 +618,11 @@ export type Namespaces = {
       name: "updateClaimRequest";
       accounts: [
         {
+          name: "nameEntry";
+          isMut: false;
+          isSigner: false;
+        },
+        {
           name: "namespace";
           isMut: false;
           isSigner: false;
@@ -2319,6 +2324,11 @@ export const IDL: Namespaces = {
     {
       name: "updateClaimRequest",
       accounts: [
+        {
+          name: "nameEntry",
+          isMut: false,
+          isSigner: false,
+        },
         {
           name: "namespace",
           isMut: false,

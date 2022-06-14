@@ -171,6 +171,7 @@ describe("create-claim-revoke-transferable-name-entry", () => {
       provider.connection,
       provider.wallet,
       namespaceName,
+      entryName,
       claimRequest.pubkey,
       true,
       transaction
@@ -305,6 +306,7 @@ describe("create-claim-revoke-transferable-name-entry", () => {
       provider.connection,
       provider.wallet,
       namespaceName,
+      entryName,
       claimRequestId,
       true,
       transaction

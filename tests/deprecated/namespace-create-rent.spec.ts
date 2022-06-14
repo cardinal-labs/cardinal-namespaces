@@ -148,6 +148,7 @@ describe("namespace-create-rent", () => {
       provider.connection,
       provider.wallet,
       namespaceName,
+      entryName,
       claimRequest.pubkey,
       true,
       transaction

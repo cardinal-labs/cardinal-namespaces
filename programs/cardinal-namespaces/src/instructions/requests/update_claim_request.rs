@@ -5,6 +5,7 @@ use {
 
 #[derive(Accounts)]
 pub struct UpdateClaimRequestCtx<'info> {
+    name_entry: Account<'info, Entry>,
     namespace: Account<'info, Namespace>,
     #[account(constraint = approve_authority.key() == namespace.approve_authority.unwrap() @ ErrorCode::InvalidApproveAuthority)]
     approve_authority: Signer<'info>,
@@ -15,5 +16,6 @@ pub struct UpdateClaimRequestCtx<'info> {
 pub fn handler(ctx: Context<UpdateClaimRequestCtx>, is_approved: bool) -> Result<()> {
     let rent_request = &mut ctx.accounts.rent_request;
     rent_request.is_approved = is_approved;
+    rent_request.counter = ctx.accounts.name_entry.claim_request_counter;
     Ok(())
 }

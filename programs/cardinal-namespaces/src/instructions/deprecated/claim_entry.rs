@@ -36,12 +36,14 @@ pub struct ClaimEntry<'info> {
     #[account(mut)]
     payer: Signer<'info>,
     // TODO move this check into the handler so it can be unchecked account
-    #[account(
-        mut,
+    #[account(mut,
         close = namespace,
-        seeds = [CLAIM_REQUEST_SEED.as_bytes(), namespace.key().as_ref(), entry.name.as_bytes(), user.key().as_ref()],
-        bump = claim_request.bump,
-        constraint = claim_request.is_approved @ ErrorCode::ClaimNotAllowed
+        constraint = claim_request.is_approved
+        && claim_request.namespace == namespace.key()
+        && claim_request.entry_name == entry.name
+        && claim_request.requestor == user.key()
+        && claim_request.counter == entry.claim_request_counter
+        @ ErrorCode::ClaimNotAllowed
     )]
     claim_request: Box<Account<'info, ClaimRequest>>,
 

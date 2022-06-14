@@ -172,6 +172,7 @@ describe("create-claim-revoke-name-entry", () => {
       provider.connection,
       provider.wallet,
       namespaceName,
+      entryName,
       claimRequest.pubkey,
       true,
       transaction
@@ -316,6 +317,7 @@ describe("create-claim-revoke-name-entry", () => {
       provider.connection,
       provider.wallet,
       namespaceName,
+      entryName,
       claimRequestId,
       true,
       transaction
