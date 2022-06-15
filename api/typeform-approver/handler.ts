@@ -88,6 +88,11 @@ const handler: Handler = async (event: Request) => {
       return {
         statusCode: 200,
         body: JSON.stringify({ message: "Applicant Approval succeeded" }),
+        headers: {
+          "Access-Control-Allow-Methods": "*",
+          "Access-Control-Allow-Origin": "*", // Required for CORS support to work
+          "Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS
+        },
       };
     }
   } catch (e) {
@@ -95,6 +100,11 @@ const handler: Handler = async (event: Request) => {
     return {
       statusCode: 400,
       body: JSON.stringify({ message: `Applicant Approval failed: ${e}` }),
+      headers: {
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Origin": "*", // Required for CORS support to work
+        "Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS
+      },
     };
   }
 };
