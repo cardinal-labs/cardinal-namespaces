@@ -10,9 +10,9 @@ import {
 import type { Handler } from "aws-lambda";
 
 import { connectionFor } from "../common/connection";
+import { sendEmail } from "../common/sendEmail";
 import { approveClaimRequestTransaction } from "../twitter-approver/api";
 import { TYPEFORM_NAMESPACE } from "../typeform-data/handler";
-import { sendEmail } from "./sendEmail";
 
 export type PassbaseEvent = { event: string; key: string; status: string };
 export type Request = {
@@ -44,7 +44,6 @@ async function retryFn<T>(fn: () => {}, retries: number) {
 const handler: Handler = async (event: Request) => {
   try {
     const data = JSON.parse(event.body);
-
     // Get data from POST request
     const responseId = data.form_response.token as string;
     const firstName = data.form_response.answers[0].text as string;

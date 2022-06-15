@@ -79,6 +79,19 @@ functions:
       EMPIREDAO_SCAN_KEY: ${ssm:/EMPIREDAO_SCAN_KEY~true}
       SES_ACCESS_KEY_ID: ${ssm:/SES_ACCESS_KEY_ID~true}
       SES_SECRET_ACCESS_KEY: ${ssm:/SES_SECRET_ACCESS_KEY~true}
+  typeform-approver:
+    handler: typeform-approver/handler.approve
+    timeout: 60
+    events:
+      - http:
+          path: /typeform/approve
+          method: post
+    environment:
+      CLUSTER: ${ssm:/CLUSTER~true}
+      EMPIREDAO_SCAN_KEY: ${ssm:/EMPIREDAO_SCAN_KEY~true}
+      SES_ACCESS_KEY_ID: ${ssm:/SES_ACCESS_KEY_ID~true}
+      SES_SECRET_ACCESS_KEY: ${ssm:/SES_SECRET_ACCESS_KEY~true}
+      SLACK_SECRET_KEY: ${ssm:/SLACK_SECRET_KEY~true}
   typeform-data:
     handler: typeform-data/handler.data
     timeout: 30
