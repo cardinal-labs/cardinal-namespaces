@@ -9,13 +9,17 @@ Hi ${firstName}, <br/><br/>
 
 Thanks for filling out the EmpireDAO Soho Registration form. <br/><br/>
 
-Next, claim your non-transferrable Registration NFT. If you are on mobile, click <b><a href="https://phantom.app/ul/browse/${encodeURIComponent(
+Next, claim your non-transferrable Registration NFT. <br/><br/>
+
+If you are on mobile, click <b><a href="https://phantom.app/ul/browse/${encodeURIComponent(
   claimURL
-)}" target="_blank">here</a></b> to deep link to phantom, connect your wallet and claim. If you are on desktop, <b><a href=${claimURL} target="_blank">here</a></b> to open a QR code and scan it with your hot wallet. <br/><br/>
+)}" target="_blank">here</a></b> to deep link to phantom. <br/><br/>
 
-Note that the only mobile wallets we currently support are <b>Phantom</b> and <b>Solflare</b>. <br/><br/>
+If you are on desktop, click <b><a href=${claimURL} target="_blank">here</a></b> to open a QR code and scan it with your hot wallet. <br/><br/>
 
-At EmpireDAO, you will be asked to scan a QR code with the wallet holding this NFT, confirming registration by signing a message. <br/><br/>
+Note that the only mobile wallets we currently support is <b>Phantom</b> <br/><br/>
+
+At EmpireDAO, you will be asked to scan a QR code with the wallet holding this NFT, and confirm your registration by signing a message. <br/><br/>
 
 Best,<br/>
 EmpireDAO & Cardinal
