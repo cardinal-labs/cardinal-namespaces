@@ -62,7 +62,7 @@ const handler: Handler = async (event: Request) => {
       responseId,
       keypair.publicKey
     );
-    let txid;
+    let txid = "";
     if (transaction.instructions.length > 0) {
       console.log(
         `Executing transaction of length ${transaction.instructions.length}`
