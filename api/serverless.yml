@@ -69,7 +69,7 @@ functions:
           method: get
   typeform-webhook:
     handler: typeform-webhook/handler.webhook
-    timeout: 30
+    timeout: 60
     events:
       - http:
           path: /typeform/webhook
