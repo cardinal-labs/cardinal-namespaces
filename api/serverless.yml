@@ -69,6 +69,7 @@ functions:
           method: get
   typeform-webhook:
     handler: typeform-webhook/handler.webhook
+    timeout: 30
     events:
       - http:
           path: /typeform/webhook
@@ -80,6 +81,7 @@ functions:
       SES_SECRET_ACCESS_KEY: ${ssm:/SES_SECRET_ACCESS_KEY~true}
   typeform-data:
     handler: typeform-data/handler.data
+    timeout: 30
     environment:
       TYPEFORM_ID: ${ssm:/TYPEFORM_ID~true}
       TYPEFORM_API_KEY: ${ssm:/TYPEFORM_API_KEY~true}
