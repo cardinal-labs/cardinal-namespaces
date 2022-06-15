@@ -64,7 +64,11 @@ const handler: Handler = async (event: Request) => {
     };
   }
   const keypair = Keypair.fromSecretKey(utils.bytes.bs58.decode(keypairParam));
-  const connection = connectionFor(clusterParam || null, "devnet", "confirmed");
+  const connection = connectionFor(
+    clusterParam || null,
+    "mainnet-beta",
+    "confirmed"
+  );
   const transaction = await connection.getTransaction(txid);
 
   // check keypair
