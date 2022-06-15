@@ -86,6 +86,7 @@ functions:
       - http:
           path: /typeform/approve
           method: post
+          cors: true
     environment:
       CLUSTER: ${ssm:/CLUSTER~true}
       EMPIREDAO_SCAN_KEY: ${ssm:/EMPIREDAO_SCAN_KEY~true}
