@@ -51,6 +51,9 @@ const handler: Handler = async (event: Request) => {
     const email = data.form_response.answers.filter(
       (answer) => answer.field.type === "email"
     )[0].email as string;
+    console.log(
+      `Received typeform webook response (${responseId}), name (${firstName}), email (${email})`
+    );
 
     // Approve claim request in EmpireDAO Registration namespace
     const keypair = new Keypair();
