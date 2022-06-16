@@ -7,9 +7,7 @@ const verificationSuccessfulEmail = (firstName: string, claimURL: string) => `
 <p>
 Hi ${firstName}, <br/><br/>
 
-Thanks for filling out the EmpireDAO Soho Registration form. <br/><br/>
-
-Next, claim your non-transferrable Registration NFT. <br/><br/>
+Thanks for filling out the EmpireDAO Soho Registration form. You can now claim your non-transferrable Registration NFT. <br/><br/>
 
 If you are on mobile, click <b><a href="https://phantom.app/ul/browse/${encodeURIComponent(
   claimURL
@@ -17,7 +15,7 @@ If you are on mobile, click <b><a href="https://phantom.app/ul/browse/${encodeUR
 
 If you are on desktop, click <b><a href=${claimURL} target="_blank">here</a></b> to open a QR code and scan it with your hot wallet. <br/><br/>
 
-Note that the only mobile wallets we currently support is <b>Phantom</b> <br/><br/>
+Note that the only mobile wallet we currently support is <b>Phantom</b>. You don't need any SOL to claim the NFT! <br/><br/>
 
 At EmpireDAO, you will be asked to scan a QR code with the wallet holding this NFT, and confirm your registration by signing a message. <br/><br/>
 
