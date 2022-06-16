@@ -3,7 +3,7 @@ import type { SendEmailRequest } from "aws-sdk/clients/ses";
 
 const verificationSuccessfulEmail = (firstName: string, claimURL: string) => `
 <div>
-<img src="https://identity.cardinal.so/logos/empiredao-banner.png" alt="EmpireDAO" style="width: 100%;">
+<img src="https://identity.cardinal.so/logos/empiredao-registration-banner.png" alt="EmpireDAO" style="width: 100%; max-width: 1000px;">
 <p>
 Hi ${firstName}, <br/><br/>
 
