@@ -12,7 +12,7 @@ import type { Handler } from "aws-lambda";
 import { connectionFor } from "../common/connection";
 import { sendEmail } from "../common/sendEmail";
 import { approveClaimRequestTransaction } from "../twitter-approver/api";
-import { TYPEFORM_NAMESPACE } from "../typeform-data/handler";
+import { TYPEFORM_NAMESPACE } from "../typeform-data/typeform";
 
 export type PassbaseEvent = { event: string; key: string; status: string };
 export type Request = {
