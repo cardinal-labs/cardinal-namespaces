@@ -27,7 +27,7 @@ export type SignedData = {
   config: string;
   event: string;
   pubkey: string;
-  timestampSeconds: number;
+  timestampSeconds: string;
 };
 
 const BLOCKTIME_THRESHOLD = 60 * 5;
@@ -105,7 +105,7 @@ const handler: Handler = async (event: Request) => {
 
   const keypair = Keypair.fromSecretKey(utils.bytes.bs58.decode(keypairParam));
   const signResult = nacl.sign.detached.verify(
-    Buffer.from(JSON.stringify(data)),
+    Buffer.from(JSON.stringify(data, Object.keys(data).sort())),
     Buffer.from(signedData, "base64"),
     accountId.toBuffer()
   );
@@ -117,7 +117,7 @@ const handler: Handler = async (event: Request) => {
         "Access-Control-Allow-Origin": "*", // Required for CORS support to work
         "Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS
       },
-      body: JSON.stringify({ message: "Transaction has expired" }),
+      body: JSON.stringify({ message: "Sign message is invalid" }),
     };
   }
 
@@ -130,7 +130,10 @@ const handler: Handler = async (event: Request) => {
   }
 
   //check blocktime
-  if (Date.now() / 1000 - (data.timestampSeconds ?? 0) > BLOCKTIME_THRESHOLD) {
+  if (
+    Date.now() / 1000 - (parseInt(data.timestampSeconds) ?? 0) >
+    BLOCKTIME_THRESHOLD
+  ) {
     return {
       statusCode: 403,
       headers: {
