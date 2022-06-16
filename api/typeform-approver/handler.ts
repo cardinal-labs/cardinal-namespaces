@@ -1,12 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, no-case-declarations */
 import { utils } from "@project-serum/anchor";
 import type { Transaction } from "@solana/web3.js";
-import {
-  Keypair,
-  LAMPORTS_PER_SOL,
-  sendAndConfirmTransaction,
-  SystemProgram,
-} from "@solana/web3.js";
+import { Keypair, sendAndConfirmTransaction } from "@solana/web3.js";
 import type { Handler } from "aws-lambda";
 
 import { connectionFor } from "../common/connection";
@@ -59,14 +54,6 @@ const handler: Handler = async (event: Request) => {
         console.log(
           `Executing transaction of length ${transaction.instructions.length}`
         );
-        transaction.instructions = [
-          ...transaction.instructions,
-          SystemProgram.transfer({
-            fromPubkey: wallet.publicKey,
-            toPubkey: keypair.publicKey,
-            lamports: 0.001 * LAMPORTS_PER_SOL,
-          }),
-        ];
         transaction.feePayer = wallet.publicKey;
         transaction.recentBlockhash = (
           await connection.getRecentBlockhash("max")
