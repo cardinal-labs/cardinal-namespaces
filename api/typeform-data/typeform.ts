@@ -20,7 +20,7 @@ export const getTypeformResponse = async (
   formId = TYPEFORM_FORM_ID
 ): Promise<TypeformResponse | undefined> => {
   const response = await fetch(
-    `https://api.typeform.com/forms/${formId}/responses`,
+    `https://api.typeform.com/forms/${formId}/responses?included_response_ids=${entryName}`,
     {
       headers: {
         Authorization: `bearer ${TYPEFORM_API_KEY}`,
@@ -30,6 +30,11 @@ export const getTypeformResponse = async (
   const typeformResponse = (await response.json()) as {
     items: TypeformResponse[];
   };
+  console.log(
+    `Found ${
+      typeformResponse.items && typeformResponse.items.length
+    } responses for id ${entryName}`
+  );
   return typeformResponse.items.find((r) => r.token === entryName);
 };
 
