@@ -67,18 +67,6 @@ functions:
       - http:
           path: /passbase/data
           method: get
-  typeform-webhook:
-    handler: typeform-webhook/handler.webhook
-    timeout: 60
-    events:
-      - http:
-          path: /typeform/webhook
-          method: post
-    environment:
-      CLUSTER: ${ssm:/CLUSTER~true}
-      EMPIREDAO_SCAN_KEY: ${ssm:/EMPIREDAO_SCAN_KEY~true}
-      SES_ACCESS_KEY_ID: ${ssm:/SES_ACCESS_KEY_ID~true}
-      SES_SECRET_ACCESS_KEY: ${ssm:/SES_SECRET_ACCESS_KEY~true}
   typeform-approver:
     handler: typeform-approver/handler.approve
     timeout: 60
