@@ -20,7 +20,7 @@ export const sendEmail = (destination: string, firstName: string) => {
     apiVersion: "2010-12-01",
     // region: "us-west-2",
     accessKeyId: "",
-    secretAccessKey: ""
+    secretAccessKey: "",
   });
 
   const params: SendEmailRequest = {

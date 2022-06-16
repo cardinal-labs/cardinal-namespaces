@@ -2,8 +2,8 @@ import { withFindOrInitAssociatedTokenAccount } from "@cardinal/certificates";
 import { findAta } from "@cardinal/common";
 import {
   getRemainingAccountsForKind,
-  TokenManagerKind,
   TOKEN_MANAGER_ADDRESS,
+  TokenManagerKind,
   withRemainingAccountsForReturn,
 } from "@cardinal/token-manager/dist/cjs/programs/tokenManager";
 import { getTokenManager } from "@cardinal/token-manager/dist/cjs/programs/tokenManager/accounts";
@@ -22,18 +22,19 @@ import * as splToken from "@solana/spl-token";
 import type { Connection, Keypair, Transaction } from "@solana/web3.js";
 import { PublicKey, SystemProgram, SYSVAR_RENT_PUBKEY } from "@solana/web3.js";
 
-import { getNameEntry, NAMESPACES_PROGRAM } from ".";
+import type { NAMESPACES_PROGRAM } from ".";
 import {
   ENTRY_SEED,
+  findClaimRequestId,
+  findNameEntryId,
+  findNamespaceId,
+  findReverseEntryId,
+  getNameEntry,
   GLOBAL_CONTEXT_SEED,
   NAMESPACE_SEED,
   NAMESPACES_IDL,
   NAMESPACES_PROGRAM_ID,
   withRemainingAccountsForClaim,
-  findNamespaceId,
-  findNameEntryId,
-  findReverseEntryId,
-  findClaimRequestId,
 } from ".";
 
 export async function withInit(
@@ -552,7 +553,8 @@ export async function withSetNamespaceReverseEntry(
   wallet: Wallet,
   namespaceName: string,
   entryName: string,
-  mintId: PublicKey
+  mintId: PublicKey,
+  payer = wallet.publicKey
 ): Promise<Transaction> {
   const provider = new anchor.AnchorProvider(connection, wallet, {});
   const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
@@ -583,7 +585,7 @@ export async function withSetNamespaceReverseEntry(
         userTokenAccount: userTokenAccountId,
         tokenManager: tokenManagerId,
         user: provider.wallet.publicKey,
-        payer: provider.wallet.publicKey,
+        payer: payer,
         systemProgram: anchor.web3.SystemProgram.programId,
       },
     })

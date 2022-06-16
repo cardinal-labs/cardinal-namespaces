@@ -67,28 +67,42 @@ functions:
       - http:
           path: /passbase/data
           method: get
-  typeform-webhook:
-    handler: typeform-webhook/handler.webhook
-    timeout: 30
+  typeform-approver:
+    handler: typeform-approver/handler.approve
+    timeout: 60
     events:
       - http:
-          path: /typeform/webhook
+          path: /typeform/approve
           method: post
+          cors: true
     environment:
       CLUSTER: ${ssm:/CLUSTER~true}
       EMPIREDAO_SCAN_KEY: ${ssm:/EMPIREDAO_SCAN_KEY~true}
       SES_ACCESS_KEY_ID: ${ssm:/SES_ACCESS_KEY_ID~true}
       SES_SECRET_ACCESS_KEY: ${ssm:/SES_SECRET_ACCESS_KEY~true}
-  typeform-data:
-    handler: typeform-data/handler.data
+      SLACK_SECRET_KEY: ${ssm:/SLACK_SECRET_KEY~true}
+  typeform-data-offline:
+    handler: typeform-data/offline.data
     timeout: 30
     environment:
       TYPEFORM_ID: ${ssm:/TYPEFORM_ID~true}
       TYPEFORM_API_KEY: ${ssm:/TYPEFORM_API_KEY~true}
     events:
       - http:
-          path: /typeform/data
+          path: /typeform/data/offline
+          method: post
+          cors: true
+  typeform-data-online:
+    handler: typeform-data/online.data
+    timeout: 30
+    environment:
+      TYPEFORM_ID: ${ssm:/TYPEFORM_ID~true}
+      TYPEFORM_API_KEY: ${ssm:/TYPEFORM_API_KEY~true}
+    events:
+      - http:
+          path: /typeform/data/online
           method: get
+          cors: true
 
 custom:
   domains:
