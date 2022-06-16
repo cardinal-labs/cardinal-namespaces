@@ -2,20 +2,29 @@ import { findNamespaceId, getReverseEntry } from "@cardinal/namespaces";
 import { utils } from "@project-serum/anchor";
 import { Keypair, PublicKey } from "@solana/web3.js";
 import type { Handler } from "aws-lambda";
-import fetch from "node-fetch";
+import nacl from "tweetnacl";
 
 import { connectionFor } from "../common/connection";
+import {
+  getTypeformResponse,
+  getTypeformResponseBase64EncodedFile,
+  TYPEFORM_NAMESPACE,
+} from "./typeform";
 
 export type Request = {
-  body: string;
+  body: { [key: string]: SignedData | string };
   headers: { [key: string]: string };
   queryStringParameters?: { [key: string]: string };
 };
 
-export const TYPEFORM_NAMESPACE = "EmpireDAO";
+export type SignedData = {
+  config: string;
+  event: string;
+  pubkey: string;
+  timestampSeconds: number;
+};
+
 const BLOCKTIME_THRESHOLD = 60 * 5;
-const TYPEFORM_FORM_ID = process.env.TYPEFORM_ID || "";
-const TYPEFORM_API_KEY = process.env.TYPEFORM_API_KEY || "";
 
 export type TypeformResponse = {
   answers: {
@@ -28,27 +37,13 @@ export type TypeformResponse = {
 };
 
 const handler: Handler = async (event: Request) => {
-  // const test = event?.queryStringParameters?.test;
-  // if (test) {
-  //   const typeformData = await getTypeformResponse(
-  //     "t009laq8qewah1t009ned5nrq5icl5o0"
-  //   );
-  //   const imageAnswer = typeformData!.answers[typeformData!.answers.length - 1];
-  //   const base64EncodedImage = await getTypeformResponseBase64EncodedFile(
-  //     imageAnswer.file_url || ""
-  //   );
-  //   return {
-  //     statusCode: 200,
-  //     body: JSON.stringify({
-  //       name: `${typeformData!.answers[0].text || ""} ${
-  //         typeformData!.answers[1]?.text || ""
-  //       }`,
-  //       image: base64EncodedImage,
-  //     }),
-  //   };
-  // }
-
   const clusterParam = event?.queryStringParameters?.cluster;
+  const connection = connectionFor(
+    clusterParam || null,
+    "mainnet-beta",
+    "confirmed"
+  );
+
   const keypairParam = event?.queryStringParameters?.keypair;
   if (!keypairParam) {
     return {
@@ -56,51 +51,59 @@ const handler: Handler = async (event: Request) => {
       body: JSON.stringify({ message: "Missing keypair parameter" }),
     };
   }
-  const txid = event?.queryStringParameters?.txid;
-  if (!txid) {
+
+  const data = event?.body?.data as SignedData;
+  if (!data) {
     return {
       statusCode: 403,
-      body: JSON.stringify({ message: "Missing transaction parameter" }),
+      body: JSON.stringify({ message: "Missing data parameter" }),
     };
   }
+
+  const signedData = event?.body?.signedDatan as string;
+  if (!signedData) {
+    return {
+      statusCode: 403,
+      body: JSON.stringify({ message: "Missing signedData parameter" }),
+    };
+  }
+
+  const accountId = new PublicKey(event?.body?.account);
+  if (!accountId) {
+    return {
+      statusCode: 403,
+      body: JSON.stringify({ message: "Missing signedData parameter" }),
+    };
+  }
+
   const keypair = Keypair.fromSecretKey(utils.bytes.bs58.decode(keypairParam));
-  const connection = connectionFor(
-    clusterParam || null,
-    "mainnet-beta",
-    "confirmed"
+  const signResult = nacl.sign.detached.verify(
+    Buffer.from(JSON.stringify(data)),
+    Buffer.from(signedData, "base64"),
+    accountId.toBuffer()
   );
-  const transaction = await connection.getTransaction(txid);
+  if (!signResult) {
+    return {
+      statusCode: 403,
+      headers: {
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Origin": "*", // Required for CORS support to work
+        "Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS
+      },
+      body: JSON.stringify({ message: "Transaction has expired" }),
+    };
+  }
 
   // check keypair
-  if (
-    !transaction?.transaction.message.accountKeys
-      .map((acc) => acc.toString())
-      .includes(keypair.publicKey.toString())
-  ) {
+  if (data.pubkey !== keypair.publicKey.toString()) {
     return {
       statusCode: 404,
       body: JSON.stringify({ message: "Keypair key not found in transaction" }),
     };
   }
 
-  // check address
-  const address = transaction?.transaction.message.accountKeys
-    .map((acc) => acc.toString())
-    .filter((_, i) => transaction.transaction.message.isAccountSigner(i))[0];
-  // if (
-  //   !transaction?.transaction.message.accountKeys
-  //     .map((acc) => acc.toString())
-  //     .filter((_, i) => transaction.transaction.message.isAccountSigner(i))
-  //     .includes(address)
-  // ) {
-  //   return {
-  //     statusCode: 404,
-  //     body: JSON.stringify({ message: "Address key not found in transaction" }),
-  //   };
-  // }
-
   //check blocktime
-  if (Date.now() / 1000 - (transaction.blockTime ?? 0) > BLOCKTIME_THRESHOLD) {
+  if (Date.now() / 1000 - (data.timestampSeconds ?? 0) > BLOCKTIME_THRESHOLD) {
     return {
       statusCode: 403,
       headers: {
@@ -116,7 +119,7 @@ const handler: Handler = async (event: Request) => {
   const nameEntryData = await getReverseEntry(
     connection,
     namespaceId,
-    new PublicKey(address)
+    accountId
   );
   const typeformData = await getTypeformResponse(
     nameEntryData.parsed.entryName
@@ -153,36 +156,6 @@ const handler: Handler = async (event: Request) => {
       image: base64EncodedImage,
     }),
   };
-};
-
-const getTypeformResponse = async (
-  entryName: string,
-  formId = TYPEFORM_FORM_ID
-): Promise<TypeformResponse | undefined> => {
-  const response = await fetch(
-    `https://api.typeform.com/forms/${formId}/responses`,
-    {
-      headers: {
-        Authorization: `bearer ${TYPEFORM_API_KEY}`,
-      },
-    }
-  );
-  const typeformResponse = (await response.json()) as {
-    items: TypeformResponse[];
-  };
-  return typeformResponse.items.find((r) => r.token === entryName);
-};
-
-const getTypeformResponseBase64EncodedFile = async (
-  fileUrl: string
-): Promise<string> => {
-  const response = await fetch(fileUrl, {
-    headers: {
-      Authorization: `bearer ${TYPEFORM_API_KEY}`,
-    },
-  });
-  const buffer = await response.buffer();
-  return buffer.toString("base64");
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access

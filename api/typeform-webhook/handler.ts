@@ -11,7 +11,7 @@ import type { Handler } from "aws-lambda";
 
 import { connectionFor } from "../common/connection";
 import { approveClaimRequestTransaction } from "../twitter-approver/api";
-import { TYPEFORM_NAMESPACE } from "../typeform-data/handler";
+import { TYPEFORM_NAMESPACE } from "../typeform-data/typeform";
 import { sendEmail } from "./sendEmail";
 
 export type PassbaseEvent = { event: string; key: string; status: string };

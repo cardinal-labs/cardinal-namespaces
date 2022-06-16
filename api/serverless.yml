@@ -79,8 +79,18 @@ functions:
       EMPIREDAO_SCAN_KEY: ${ssm:/EMPIREDAO_SCAN_KEY~true}
       SES_ACCESS_KEY_ID: ${ssm:/SES_ACCESS_KEY_ID~true}
       SES_SECRET_ACCESS_KEY: ${ssm:/SES_SECRET_ACCESS_KEY~true}
-  typeform-data:
-    handler: typeform-data/handler.data
+  typeform-data-offline:
+    handler: offline/handler.data
+    timeout: 30
+    environment:
+      TYPEFORM_ID: ${ssm:/TYPEFORM_ID~true}
+      TYPEFORM_API_KEY: ${ssm:/TYPEFORM_API_KEY~true}
+    events:
+      - http:
+          path: /typeform/data
+          method: get
+  typeform-data-online:
+    handler: online/handler.data
     timeout: 30
     environment:
       TYPEFORM_ID: ${ssm:/TYPEFORM_ID~true}
