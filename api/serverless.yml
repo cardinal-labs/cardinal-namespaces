@@ -81,8 +81,18 @@ functions:
       SES_ACCESS_KEY_ID: ${ssm:/SES_ACCESS_KEY_ID~true}
       SES_SECRET_ACCESS_KEY: ${ssm:/SES_SECRET_ACCESS_KEY~true}
       SLACK_SECRET_KEY: ${ssm:/SLACK_SECRET_KEY~true}
-  typeform-data:
-    handler: typeform-data/handler.data
+  typeform-data-offline:
+    handler: typeform-data/offline.data
+    timeout: 30
+    environment:
+      TYPEFORM_ID: ${ssm:/TYPEFORM_ID~true}
+      TYPEFORM_API_KEY: ${ssm:/TYPEFORM_API_KEY~true}
+    events:
+      - http:
+          path: /typeform/data
+          method: get
+  typeform-data-online:
+    handler: typeform-data/online.data
     timeout: 30
     environment:
       TYPEFORM_ID: ${ssm:/TYPEFORM_ID~true}
