@@ -60,7 +60,7 @@ const handler: Handler = async (event: Request) => {
     };
   }
 
-  const signedData = event?.body?.signedDatan as string;
+  const signedData = event?.body?.signedData as string;
   if (!signedData) {
     return {
       statusCode: 403,
