@@ -12,9 +12,15 @@ import {
 } from "./typeform";
 
 export type Request = {
-  body: { [key: string]: SignedData | string };
+  body: string;
   headers: { [key: string]: string };
   queryStringParameters?: { [key: string]: string };
+};
+
+export type RequestBody = {
+  account: string;
+  data: SignedData;
+  signedData: string;
 };
 
 export type SignedData = {
@@ -48,30 +54,51 @@ const handler: Handler = async (event: Request) => {
   if (!keypairParam) {
     return {
       statusCode: 403,
+      headers: {
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Origin": "*", // Required for CORS support to work
+        "Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS
+      },
       body: JSON.stringify({ message: "Missing keypair parameter" }),
     };
   }
 
-  const data = event?.body?.data as SignedData;
+  const body = JSON.parse(event.body) as RequestBody;
+  const data = body.data;
   if (!data) {
     return {
       statusCode: 403,
+      headers: {
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Origin": "*", // Required for CORS support to work
+        "Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS
+      },
       body: JSON.stringify({ message: "Missing data parameter" }),
     };
   }
 
-  const signedData = event?.body?.signedData as string;
+  const signedData = body.signedData;
   if (!signedData) {
     return {
       statusCode: 403,
+      headers: {
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Origin": "*", // Required for CORS support to work
+        "Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS
+      },
       body: JSON.stringify({ message: "Missing signedData parameter" }),
     };
   }
 
-  const accountId = new PublicKey(event?.body?.account);
+  const accountId = new PublicKey(body.account);
   if (!accountId) {
     return {
       statusCode: 403,
+      headers: {
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Origin": "*", // Required for CORS support to work
+        "Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS
+      },
       body: JSON.stringify({ message: "Missing signedData parameter" }),
     };
   }

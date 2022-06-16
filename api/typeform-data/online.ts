@@ -4,10 +4,10 @@ import { Keypair, PublicKey } from "@solana/web3.js";
 import type { Handler } from "aws-lambda";
 
 import { connectionFor } from "../common/connection";
-import { TYPEFORM_NAMESPACE } from "./offline";
 import {
   getTypeformResponse,
   getTypeformResponseBase64EncodedFile,
+  TYPEFORM_NAMESPACE,
 } from "./typeform";
 
 export type Request = {
