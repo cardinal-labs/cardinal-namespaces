@@ -271,11 +271,11 @@ export async function getReverseEntry(
 
 export async function tryGetReverseEntry(
   connection: Connection,
-  pubkey: PublicKey,
-  namespace: PublicKey
+  namespace: PublicKey,
+  pubkey: PublicKey
 ): Promise<AccountData<ReverseEntryData> | null> {
   try {
-    return await getReverseEntry(connection, pubkey, namespace);
+    return await getReverseEntry(connection, namespace, pubkey);
   } catch (e) {
     console.log(`Failed to get reverse entry`);
     return null;
