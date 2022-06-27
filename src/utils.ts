@@ -9,20 +9,12 @@ import { findPaymentManagerAddress } from "@cardinal/token-manager/dist/cjs/prog
 import { TIME_INVALIDATOR_ADDRESS } from "@cardinal/token-manager/dist/cjs/programs/timeInvalidator";
 import { findTimeInvalidatorAddress } from "@cardinal/token-manager/dist/cjs/programs/timeInvalidator/pda";
 import { withRemainingAccountsForPayment } from "@cardinal/token-manager/dist/cjs/programs/tokenManager";
-import { utils } from "@project-serum/anchor";
 import type { Wallet } from "@saberhq/solana-contrib";
 import type { AccountMeta, Connection, Transaction } from "@solana/web3.js";
 import { PublicKey } from "@solana/web3.js";
 
 import { getNamespace, getReverseEntry } from "./accounts";
-import {
-  CLAIM_REQUEST_SEED,
-  DEFAULT_PAYMENT_MANAGER,
-  ENTRY_SEED,
-  NAMESPACE_SEED,
-  NAMESPACES_PROGRAM_ID,
-  REVERSE_ENTRY_SEED,
-} from "./constants";
+import { DEFAULT_PAYMENT_MANAGER } from "./constants";
 
 export function formatName(namespace: string, name: string): string {
   return namespace === "twitter" ? `@${name}` : `${name}.${namespace}`;
@@ -77,54 +69,6 @@ export async function nameForDisplay(
   const name = await tryGetName(connection, pubkey, namespace);
   return name || displayAddress(pubkey.toString());
 }
-
-export async function claimRequestId(
-  namespaceName: string,
-  entryName: string,
-  user: PublicKey
-) {
-  const [namespaceId] = await PublicKey.findProgramAddress(
-    [
-      utils.bytes.utf8.encode(NAMESPACE_SEED),
-      utils.bytes.utf8.encode(namespaceName),
-    ],
-    NAMESPACES_PROGRAM_ID
-  );
-  return PublicKey.findProgramAddress(
-    [
-      utils.bytes.utf8.encode(CLAIM_REQUEST_SEED),
-      namespaceId.toBytes(),
-      utils.bytes.utf8.encode(entryName),
-      user.toBytes(),
-    ],
-    NAMESPACES_PROGRAM_ID
-  );
-}
-
-export async function nameEntryId(namespaceName: string, entryName: string) {
-  const [namespaceId] = await PublicKey.findProgramAddress(
-    [
-      utils.bytes.utf8.encode(NAMESPACE_SEED),
-      utils.bytes.utf8.encode(namespaceName),
-    ],
-    NAMESPACES_PROGRAM_ID
-  );
-  return PublicKey.findProgramAddress(
-    [
-      utils.bytes.utf8.encode(ENTRY_SEED),
-      namespaceId.toBytes(),
-      utils.bytes.utf8.encode(entryName),
-    ],
-    NAMESPACES_PROGRAM_ID
-  );
-}
-
-export const reverseEntryId = (address: PublicKey) => {
-  return PublicKey.findProgramAddress(
-    [utils.bytes.utf8.encode(REVERSE_ENTRY_SEED), address.toBytes()],
-    NAMESPACES_PROGRAM_ID
-  );
-};
 
 export const withRemainingAccountsForClaim = async (
   connection: Connection,
