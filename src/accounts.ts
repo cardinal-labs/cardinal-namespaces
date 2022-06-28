@@ -250,7 +250,7 @@ export async function getReverseEntry(
     const parsed = await namespacesProgram.account.reverseEntry.fetch(
       reverseEntryId
     );
-    if (!parsed.data) {
+    if (!parsed) {
       throw new Error("Failed trying deprecated global reverse entry");
     }
     return {
