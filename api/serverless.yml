@@ -26,6 +26,15 @@ functions:
       - http:
           path: /approve
           method: get
+  twitter-verifier:
+    handler: twitter-verifier/handler.verify
+    timeout: 30
+    environment:
+      TWITTER_SOLANA_KEY: ${ssm:/TWITTER_SOLANA_KEY~true}
+    events:
+      - http:
+          path: /verify
+          method: get
   twitter-claimer:
     handler: twitter-claimer/handler.claim
     timeout: 30
