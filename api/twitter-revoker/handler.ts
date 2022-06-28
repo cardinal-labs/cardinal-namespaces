@@ -27,8 +27,7 @@ module.exports.revoke = async (event) => {
         "Access-Control-Allow-Origin": "*", // Required for CORS support to work
         "Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS
       },
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      body: JSON.stringify({ error: e.toString() }),
+      body: JSON.stringify({ error: (e as string).toString() }),
     };
   }
 };

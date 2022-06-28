@@ -1,4 +1,5 @@
 import * as namespaces from "@cardinal/namespaces";
+import { findNamespaceId } from "@cardinal/namespaces";
 import { SignerWallet } from "@saberhq/solana-contrib";
 import * as web3 from "@solana/web3.js";
 
@@ -49,8 +50,9 @@ export async function approveClaimRequestTransaction(
 
   if (!tryClaimRequest || !tryClaimRequest?.parsed?.isApproved) {
     console.log("Approving claim request");
-    const [claimRequestId] = await namespaces.claimRequestId(
-      namespaceName,
+    const [namespaceId] = await findNamespaceId(namespaceName);
+    const [claimRequestId] = await namespaces.findClaimRequestId(
+      namespaceId,
       entryName,
       user
     );

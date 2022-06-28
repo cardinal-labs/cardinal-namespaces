@@ -1,14 +1,17 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument */
+import { tryPublicKey } from "@cardinal/common";
 
-import * as twitterApprover from "./twitter-approver";
+import * as twitterClaimer from "./twitter-claimer";
 
-module.exports.approve = async (event) => {
+module.exports.claim = async (event) => {
+  const data = JSON.parse(event.body);
+  const account = data.account as string;
   try {
     if (
       !event?.queryStringParameters?.tweetId ||
       event?.queryStringParameters?.tweetId === "undefined" ||
-      !event?.queryStringParameters?.publicKey ||
-      event?.queryStringParameters?.publicKey === "undefined" ||
+      !account ||
+      !tryPublicKey(account) ||
       !event?.queryStringParameters?.handle ||
       event?.queryStringParameters?.handle === "undefined"
     ) {
@@ -18,12 +21,13 @@ module.exports.approve = async (event) => {
       };
     }
 
-    const { status, txid, message } = await twitterApprover.approveTweet(
-      event?.queryStringParameters?.tweetId,
-      event?.queryStringParameters?.publicKey,
-      event?.queryStringParameters?.handle,
-      event?.queryStringParameters?.cluster
-    );
+    const { status, transaction, message } =
+      await twitterClaimer.claimTransaction(
+        event?.queryStringParameters?.tweetId,
+        account,
+        event?.queryStringParameters?.handle,
+        event?.queryStringParameters?.cluster
+      );
     return {
       statusCode: status,
       headers: {
@@ -31,7 +35,7 @@ module.exports.approve = async (event) => {
         "Access-Control-Allow-Origin": "*", // Required for CORS support to work
         "Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS
       },
-      body: JSON.stringify({ result: "done", txid, message }),
+      body: JSON.stringify({ result: "done", transaction, message }),
     };
   } catch (e) {
     console.log("Error approving claim request: ", e);

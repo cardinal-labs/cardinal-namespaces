@@ -71,10 +71,26 @@
     tiny-invariant "^1.2.0"
     tslib "^2.3.1"
 
-"@cardinal/namespaces@^4.1.5":
-  version "4.1.5"
-  resolved "https://registry.yarnpkg.com/@cardinal/namespaces/-/namespaces-4.1.5.tgz#6cd159bbdc65ec434bbd30aa5b9152c3b4541878"
-  integrity sha512-RiMZfpXyIF0mqfmGI5MBO1tx8Iefa5oM8VXiP/HmYv0qkCpcsTM2/Pu988anhWKxE0fw4p8ejVOMf4YO4lyNyw==
+"@cardinal/common@^2.0.4":
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/@cardinal/common/-/common-2.0.4.tgz#46cfa4f60aa66ed0b625ed2cb38ac5f37c2be7fb"
+  integrity sha512-6Fzx8JAnfwqxANGFdTY4ztcudZ8+aiem/2IZrraPWcXzM3mfJ8EozGUYjDMdxKruTrVxbmIOL3sqfhuoDyz7XQ==
+  dependencies:
+    "@metaplex-foundation/mpl-token-metadata" "^1.2.5"
+    "@project-serum/anchor" "^0.24.2"
+    "@saberhq/anchor-contrib" "^1.12.48"
+    "@saberhq/solana-contrib" "^1.12.48"
+    "@saberhq/token-utils" "^1.12.48"
+    "@solana/buffer-layout" "^4.0.0"
+    "@solana/spl-token" "^0.1.8"
+    "@ubeswap/token-math" "^4.4.4"
+    tiny-invariant "^1.2.0"
+    tslib "^2.3.1"
+
+"@cardinal/namespaces@^4.1.12":
+  version "4.1.12"
+  resolved "https://registry.yarnpkg.com/@cardinal/namespaces/-/namespaces-4.1.12.tgz#53c0c11f6199a4c78e77ebc85f29e82a9f8bb28c"
+  integrity sha512-rseqBNVvGgh+nU6vGWh0Ltg/g81GsLm1U1nRmndRFDdkjVGk8ycO2iURfg5LrU0ehE0gIPAxUBJO0thPeDFJBg==
   dependencies:
     "@cardinal/certificates" "^2.0.0"
     "@cardinal/common" "^2.0.1"
