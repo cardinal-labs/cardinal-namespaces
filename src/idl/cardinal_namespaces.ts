@@ -312,7 +312,7 @@ export type Namespaces = {
         {
           name: "invalidator";
           isMut: false;
-          isSigner: true;
+          isSigner: false;
         }
       ];
       args: [];
@@ -338,7 +338,7 @@ export type Namespaces = {
         {
           name: "invalidator";
           isMut: false;
-          isSigner: true;
+          isSigner: false;
         }
       ];
       args: [];
@@ -2019,7 +2019,7 @@ export const IDL: Namespaces = {
         {
           name: "invalidator",
           isMut: false,
-          isSigner: true,
+          isSigner: false,
         },
       ],
       args: [],
@@ -2045,7 +2045,7 @@ export const IDL: Namespaces = {
         {
           name: "invalidator",
           isMut: false,
-          isSigner: true,
+          isSigner: false,
         },
       ],
       args: [],
