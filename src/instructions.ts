@@ -489,6 +489,36 @@ export async function withRevokeNameEntry(
   return transaction;
 }
 
+export async function withInvalidateExpiredNameEntry(
+  transaction: Transaction,
+  connection: Connection,
+  wallet: Wallet,
+  namespaceName: string,
+  mintId: PublicKey,
+  entryName: string
+): Promise<Transaction> {
+  const provider = new anchor.AnchorProvider(connection, wallet, {});
+  const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
+    NAMESPACES_IDL,
+    NAMESPACES_PROGRAM_ID,
+    provider
+  );
+  const [namespaceId] = await findNamespaceId(namespaceName);
+  const [nameEntryId] = await findNameEntryId(namespaceId, entryName);
+  const namespaceTokenAccountId = await findAta(mintId, namespaceId, true);
+  transaction.add(
+    namespacesProgram.instruction.invalidateExpiredNameEntry({
+      accounts: {
+        namespace: namespaceId,
+        nameEntry: nameEntryId,
+        namespaceTokenAccount: namespaceTokenAccountId,
+        invalidator: namespaceId,
+      },
+    })
+  );
+  return transaction;
+}
+
 export async function withSetEntryData(
   connection: Connection,
   wallet: Wallet,
@@ -687,6 +717,38 @@ export async function withRevokeReverseEntry(
         reverseEntry: reverseEntryId,
         claimRequest: claimRequestId,
         invalidator: wallet.publicKey,
+      },
+    })
+  );
+  return transaction;
+}
+
+export async function withInvalidateExpiredReverseEntry(
+  transaction: Transaction,
+  connection: Connection,
+  wallet: Wallet,
+  namespaceName: string,
+  mintId: PublicKey,
+  entryName: string,
+  reverseEntryId: PublicKey
+): Promise<Transaction> {
+  const provider = new anchor.AnchorProvider(connection, wallet, {});
+  const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
+    NAMESPACES_IDL,
+    NAMESPACES_PROGRAM_ID,
+    provider
+  );
+  const [namespaceId] = await findNamespaceId(namespaceName);
+  const [nameEntryId] = await findNameEntryId(namespaceId, entryName);
+  const namespaceTokenAccountId = await findAta(mintId, namespaceId, true);
+  transaction.add(
+    namespacesProgram.instruction.invalidateExpiredReverseEntry({
+      accounts: {
+        namespace: namespaceId,
+        nameEntry: nameEntryId,
+        namespaceTokenAccount: namespaceTokenAccountId,
+        reverseNameEntry: reverseEntryId,
+        invalidator: namespaceId,
       },
     })
   );
