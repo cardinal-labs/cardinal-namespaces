@@ -495,7 +495,8 @@ export async function withInvalidateExpiredNameEntry(
   wallet: Wallet,
   namespaceName: string,
   mintId: PublicKey,
-  entryName: string
+  entryName: string,
+  invalidator?: PublicKey
 ): Promise<Transaction> {
   const provider = new anchor.AnchorProvider(connection, wallet, {});
   const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
@@ -512,7 +513,7 @@ export async function withInvalidateExpiredNameEntry(
         namespace: namespaceId,
         nameEntry: nameEntryId,
         namespaceTokenAccount: namespaceTokenAccountId,
-        invalidator: namespaceId,
+        invalidator: invalidator || namespaceId,
       },
     })
   );
