@@ -10,6 +10,7 @@ import {
   withUpdateClaimRequest,
 } from "@cardinal/namespaces";
 import * as anchor from "@project-serum/anchor";
+import type { Wallet } from "@saberhq/solana-contrib";
 import { SignerWallet } from "@saberhq/solana-contrib";
 import { Keypair, PublicKey, Transaction } from "@solana/web3.js";
 
@@ -200,7 +201,7 @@ export async function claimTransaction(
         await withRevokeReverseEntry(
           transaction,
           connection,
-          wallet,
+          wallet as Wallet,
           NAMESPACE_NAME,
           entryName,
           checkNameEntry.parsed.reverseEntry,

@@ -92,9 +92,12 @@ export async function approveClaimRequest(
     transaction.recentBlockhash = (
       await connection.getRecentBlockhash("max")
     ).blockhash;
-    return await web3.sendAndConfirmTransaction(connection, transaction, [
-      wallet,
-    ]);
+    return await web3.sendAndConfirmTransaction(
+      connection,
+      transaction,
+      [wallet],
+      { skipPreflight: true }
+    );
   } else {
     return "";
   }

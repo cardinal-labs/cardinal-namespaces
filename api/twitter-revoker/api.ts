@@ -128,9 +128,12 @@ export async function revoke(
     transaction.recentBlockhash = (
       await connection.getRecentBlockhash("max")
     ).blockhash;
-    txid = await web3.sendAndConfirmTransaction(connection, transaction, [
-      wallet,
-    ]);
+    txid = await web3.sendAndConfirmTransaction(
+      connection,
+      transaction,
+      [wallet],
+      { skipPreflight: true }
+    );
     console.log(
       `Succesfully revoke entries from ${owner.toString()}, txid (${txid})`
     );
