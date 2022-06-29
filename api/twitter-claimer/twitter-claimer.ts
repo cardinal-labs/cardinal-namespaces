@@ -76,7 +76,7 @@ export async function claimTransaction(
     connection,
     NAMESPACE_NAME,
     entryName,
-    WALLET.publicKey
+    new PublicKey(publicKey)
   );
   let transaction = new Transaction();
   if (!tryClaimRequest) {
