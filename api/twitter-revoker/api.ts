@@ -1,4 +1,3 @@
-import { tryGetAccount } from "@cardinal/common";
 import * as namespaces from "@cardinal/namespaces";
 import { NAMESPACES_PROGRAM_ID } from "@cardinal/namespaces";
 import * as anchor from "@project-serum/anchor";
@@ -120,7 +119,7 @@ export async function revoke(
     );
   }
 
-  let txid;
+  let txid: string;
   if (transaction.instructions.length > 0) {
     console.log(
       `Executing transaction of length ${transaction.instructions.length}`

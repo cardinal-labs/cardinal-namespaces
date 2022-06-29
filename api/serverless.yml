@@ -26,6 +26,25 @@ functions:
       - http:
           path: /approve
           method: get
+          cors: true
+  twitter-verifier:
+    handler: twitter-verifier/handler.verify
+    environment:
+      TWITTER_SOLANA_KEY: ${ssm:/TWITTER_SOLANA_KEY~true}
+    events:
+      - http:
+          path: /verify
+          method: get
+          cors: true
+  twitter-claimer:
+    handler: twitter-claimer/handler.claim
+    environment:
+      TWITTER_SOLANA_KEY: ${ssm:/TWITTER_SOLANA_KEY~true}
+    events:
+      - http:
+          path: /claim
+          method: post
+          cors: true
   twitter-revoker:
     handler: twitter-revoker/handler.revoke
     timeout: 30
@@ -35,12 +54,14 @@ functions:
       - http:
           path: /revoke
           method: get
+          cors: true
   twitter-proxy:
     handler: twitter-proxy/handler.proxy
     events:
       - http:
           path: /proxy
           method: get
+          cors: true
           caching:
             enabled: true
             ttlInSeconds: 3600 # overrides the global setting for ttlInSeconds
@@ -120,6 +141,7 @@ custom:
     enabled: true
 
 plugins:
+  - serverless-plugin-common-excludes
   - serverless-api-gateway-caching
   - serverless-domain-manager
   - serverless-plugin-typescript

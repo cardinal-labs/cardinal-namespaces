@@ -1,12 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument */
 import fetch from "node-fetch";
 
-const TWITTER_API_KEYS = [
-  "AAAAAAAAAAAAAAAAAAAAAC7iXgEAAAAAH%2BlE4oemN1y5aLOsCimsV32G9Cs%3DKgaXQRuggNA5UzuJmN1X9twXNARy7qxSiBxNf4oCc6CxKwIhxa",
-  "AAAAAAAAAAAAAAAAAAAAAIeiYAEAAAAA0xfvS2Oonb3ijLTis8MmrSsRWm0%3DotAZj0h9Aq6qEa7VKLckzfeRH3eDxj2Gp69rxD4B7pJlf7kdQy",
-  "AAAAAAAAAAAAAAAAAAAAAOz4ZgEAAAAAYQ%2F6yZsduzzRyIDsGuUlvbSM4nE%3DFzVAxwlczyaSn8tD2VqJN7AcgR97zcDXBLYZDrAwV8VLdrSKJM",
-  "AAAAAAAAAAAAAAAAAAAAANcAbQEAAAAA6jd7gLquooPwcvc%2B%2F%2FNz62cp3Og%3DFNeW1ZQd6vunLwPZBS8mN65Sa7nn0mVc6sXTs7PhxXWt0VBOXA",
-];
+import { TWITTER_API_KEYS } from "../twitter-claimer/utils";
 
 module.exports.proxy = async (event) => {
   const params = event.queryStringParameters;
