@@ -166,29 +166,30 @@ functions:
           cors: true
 
 custom:
-  domains:
-    main:
-      domainName: api.cardinal.so
-    dev:
-      domainName: dev-api.cardinal.so
-  customDomains:
-    - rest:
-        domainName: ${self:custom.domains.${opt:stage}.domainName}
-        basePath: twitter
-        certificateName: "*.cardinal.com"
-        createRoute53Record: true
-    - rest:
-        domainName: ${self:custom.domains.${opt:stage}.domainName}
-        basePath: namespaces
-        certificateName: "*.cardinal.com"
-        createRoute53Record: true
+  # domains:
+  #   main:
+  #     domainName: api.cardinal.so
+  #   dev:
+  #     domainName: dev-api.cardinal.so
+  # customDomains:
+  # NOTE: For some fucked up reason serverless doesn't allow for multiple by AWS UI does so it's set like this directly in AWS UI
+  #   - rest:
+  #       domainName: ${self:custom.domains.${opt:stage}.domainName}
+  #       basePath: twitter
+  #       certificateName: "*.cardinal.so"
+  #       createRoute53Record: true
+  #   - rest:
+  #       domainName: ${self:custom.domains.${opt:stage}.domainName}
+  #       basePath: namespaces
+  #       certificateName: "*.cardinal.so"
+  #       createRoute53Record: true
   apiGatewayCaching:
     enabled: true
 
 plugins:
+  # - serverless-domain-manager
   - serverless-plugin-common-excludes
   - serverless-api-gateway-caching
-  - serverless-domain-manager
   - serverless-plugin-typescript
   - serverless-offline
   - serverless-plugin-include-dependencies
