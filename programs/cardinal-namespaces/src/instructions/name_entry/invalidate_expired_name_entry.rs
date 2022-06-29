@@ -22,7 +22,8 @@ pub struct InvalidateExpiredNameEntryCtx<'info> {
         @ ErrorCode::NamespaceRequiresToken
     )]
     pub namespace_token_account: Account<'info, TokenAccount>,
-    pub invalidator: Signer<'info>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    invalidator: UncheckedAccount<'info>,
 }
 
 pub fn handler(ctx: Context<InvalidateExpiredNameEntryCtx>) -> Result<()> {
