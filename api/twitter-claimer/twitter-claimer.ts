@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
+import { emptyWallet } from "@cardinal/common";
 import {
   deprecated,
   findClaimRequestId,
@@ -113,9 +114,10 @@ export async function claimTransaction(
     console.log("---> Initializing and claiming entry:", entryName);
     const certificateMint = Keypair.generate();
     const transaction = new Transaction();
+    const wallet = emptyWallet(new PublicKey(publicKey));
     await deprecated.withInitEntry(
       connection,
-      new SignerWallet(WALLET),
+      wallet,
       certificateMint.publicKey,
       NAMESPACE_NAME,
       entryName,
@@ -123,7 +125,7 @@ export async function claimTransaction(
     );
     await deprecated.withClaimEntry(
       connection,
-      new SignerWallet(WALLET),
+      wallet,
       NAMESPACE_NAME,
       entryName,
       certificateMint.publicKey,
@@ -132,7 +134,7 @@ export async function claimTransaction(
     );
     await deprecated.withSetReverseEntry(
       connection,
-      new SignerWallet(WALLET),
+      wallet,
       NAMESPACE_NAME,
       entryName,
       certificateMint.publicKey,
@@ -141,9 +143,10 @@ export async function claimTransaction(
   } else if (checkNameEntry && !checkNameEntry.parsed.isClaimed) {
     ////////////////////// Invalidated claim //////////////////////
     console.log("---> Claiming invalidated entry:", entryName);
+    const wallet = emptyWallet(new PublicKey(publicKey));
     await deprecated.withClaimEntry(
       connection,
-      new SignerWallet(WALLET),
+      wallet,
       NAMESPACE_NAME,
       entryName,
       checkNameEntry.parsed.mint,
@@ -152,7 +155,7 @@ export async function claimTransaction(
     );
     await deprecated.withSetReverseEntry(
       connection,
-      new SignerWallet(WALLET),
+      wallet,
       NAMESPACE_NAME,
       entryName,
       checkNameEntry.parsed.mint,
@@ -171,9 +174,10 @@ export async function claimTransaction(
     ) {
       ////////////////////// Expired claim //////////////////////
       console.log("---> Claiming expired entry:", entryName);
+      const wallet = emptyWallet(new PublicKey(publicKey));
       await deprecated.withClaimEntry(
         connection,
-        new SignerWallet(WALLET),
+        wallet,
         NAMESPACE_NAME,
         entryName,
         checkNameEntry.parsed.mint,
@@ -182,7 +186,7 @@ export async function claimTransaction(
       );
       await deprecated.withSetReverseEntry(
         connection,
-        new SignerWallet(WALLET),
+        wallet,
         NAMESPACE_NAME,
         entryName,
         checkNameEntry.parsed.mint,
@@ -191,11 +195,12 @@ export async function claimTransaction(
     } else {
       ////////////////////// Revoke and claim //////////////////////
       console.log("---> and claiming entry:", entryName);
+      const wallet = emptyWallet(new PublicKey(publicKey));
       if (checkNameEntry.parsed.reverseEntry) {
         await withRevokeReverseEntry(
           transaction,
           connection,
-          new SignerWallet(WALLET),
+          wallet,
           NAMESPACE_NAME,
           entryName,
           checkNameEntry.parsed.reverseEntry,
@@ -204,7 +209,7 @@ export async function claimTransaction(
       }
       await deprecated.withRevokeEntry(
         connection,
-        new SignerWallet(WALLET),
+        wallet,
         NAMESPACE_NAME,
         entryName,
         checkNameEntry.parsed.mint,
@@ -214,7 +219,7 @@ export async function claimTransaction(
       );
       await deprecated.withClaimEntry(
         connection,
-        new SignerWallet(WALLET),
+        wallet,
         NAMESPACE_NAME,
         entryName,
         checkNameEntry.parsed.mint,
@@ -223,7 +228,7 @@ export async function claimTransaction(
       );
       await deprecated.withSetReverseEntry(
         connection,
-        new SignerWallet(WALLET),
+        wallet,
         NAMESPACE_NAME,
         entryName,
         checkNameEntry.parsed.mint,
