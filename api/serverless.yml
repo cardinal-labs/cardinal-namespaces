@@ -11,7 +11,7 @@ provider:
     cors: true
 
 package:
-  individually: true
+  individually: false
   exclude:
     - "./node_modules"
     - "./yarn.lock"
