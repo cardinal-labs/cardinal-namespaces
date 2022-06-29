@@ -5,6 +5,7 @@ import {
   findClaimRequestId,
   findNamespaceId,
   shortenAddress,
+  tryGetReverseEntry,
   withCreateClaimRequest,
   withRevokeReverseEntry,
   withUpdateClaimRequest,
@@ -39,6 +40,7 @@ export async function claimTransaction(
     `Attempting to approve tweet for tweet (${tweetId}) publicKey ${publicKey} entryName ${entryName} cluster ${cluster} `
   );
   const connection = connectionFor(cluster);
+  const wallet = emptyWallet(new PublicKey(publicKey));
 
   // check tweet
   let tweetApproved = true;
@@ -105,6 +107,7 @@ export async function claimTransaction(
     );
   }
 
+  const certificateMint = Keypair.generate();
   const checkNameEntry = await tryGetNameEntry(
     connection,
     NAMESPACE_NAME,
@@ -113,9 +116,7 @@ export async function claimTransaction(
   if (!checkNameEntry) {
     ////////////////////// Init and claim //////////////////////
     console.log("---> Initializing and claiming entry:", entryName);
-    const certificateMint = Keypair.generate();
     const transaction = new Transaction();
-    const wallet = emptyWallet(new PublicKey(publicKey));
     await deprecated.withInitEntry(
       connection,
       wallet,
@@ -133,18 +134,17 @@ export async function claimTransaction(
       0,
       transaction
     );
-    await deprecated.withSetReverseEntry(
-      connection,
-      wallet,
-      NAMESPACE_NAME,
-      entryName,
-      certificateMint.publicKey,
-      transaction
-    );
+    // await deprecated.withSetReverseEntry(
+    //   connection,
+    //   wallet,
+    //   NAMESPACE_NAME,
+    //   entryName,
+    //   certificateMint.publicKey,
+    //   transaction
+    // );
   } else if (checkNameEntry && !checkNameEntry.parsed.isClaimed) {
     ////////////////////// Invalidated claim //////////////////////
     console.log("---> Claiming invalidated entry:", entryName);
-    const wallet = emptyWallet(new PublicKey(publicKey));
     await deprecated.withClaimEntry(
       connection,
       wallet,
@@ -154,14 +154,14 @@ export async function claimTransaction(
       0,
       transaction
     );
-    await deprecated.withSetReverseEntry(
-      connection,
-      wallet,
-      NAMESPACE_NAME,
-      entryName,
-      checkNameEntry.parsed.mint,
-      transaction
-    );
+    // await deprecated.withSetReverseEntry(
+    //   connection,
+    //   wallet,
+    //   NAMESPACE_NAME,
+    //   entryName,
+    //   checkNameEntry.parsed.mint,
+    //   transaction
+    // );
   } else {
     const namespaceTokenAccount = await tryGetAta(
       connection,
@@ -175,7 +175,6 @@ export async function claimTransaction(
     ) {
       ////////////////////// Expired claim //////////////////////
       console.log("---> Claiming expired entry:", entryName);
-      const wallet = emptyWallet(new PublicKey(publicKey));
       await deprecated.withClaimEntry(
         connection,
         wallet,
@@ -185,18 +184,17 @@ export async function claimTransaction(
         0,
         transaction
       );
-      await deprecated.withSetReverseEntry(
-        connection,
-        wallet,
-        NAMESPACE_NAME,
-        entryName,
-        checkNameEntry.parsed.mint,
-        transaction
-      );
+      // await deprecated.withSetReverseEntry(
+      //   connection,
+      //   wallet,
+      //   NAMESPACE_NAME,
+      //   entryName,
+      //   checkNameEntry.parsed.mint,
+      //   transaction
+      // );
     } else {
       ////////////////////// Revoke and claim //////////////////////
       console.log("---> and claiming entry:", entryName);
-      const wallet = emptyWallet(new PublicKey(publicKey));
       if (checkNameEntry.parsed.reverseEntry) {
         await withRevokeReverseEntry(
           transaction,
@@ -227,15 +225,32 @@ export async function claimTransaction(
         0,
         transaction
       );
-      await deprecated.withSetReverseEntry(
-        connection,
-        wallet,
-        NAMESPACE_NAME,
-        entryName,
-        checkNameEntry.parsed.mint,
-        transaction
-      );
+      // await deprecated.withSetReverseEntry(
+      //   connection,
+      //   wallet,
+      //   NAMESPACE_NAME,
+      //   entryName,
+      //   checkNameEntry.parsed.mint,
+      //   transaction
+      // );
     }
+  }
+
+  console.log("---> Setting reverse entry if none for:", publicKey.toString());
+  const reverseEntryData = await tryGetReverseEntry(
+    connection,
+    namespaceId,
+    new PublicKey(publicKey)
+  );
+  if (!reverseEntryData) {
+    await deprecated.withSetReverseEntry(
+      connection,
+      wallet,
+      NAMESPACE_NAME,
+      entryName,
+      checkNameEntry ? checkNameEntry.parsed.mint : certificateMint.publicKey,
+      transaction
+    );
   }
 
   transaction.feePayer = WALLET.publicKey;
