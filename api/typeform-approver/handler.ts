@@ -58,9 +58,12 @@ const handler: Handler = async (event: Request) => {
         transaction.recentBlockhash = (
           await connection.getRecentBlockhash("max")
         ).blockhash;
-        txid = await sendAndConfirmTransaction(connection, transaction, [
-          wallet,
-        ]);
+        txid = await sendAndConfirmTransaction(
+          connection,
+          transaction,
+          [wallet],
+          { skipPreflight: true }
+        );
       }
 
       // Send Email to user to claim NFT

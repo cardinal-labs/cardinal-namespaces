@@ -4,18 +4,20 @@ import {
   findClaimRequestId,
   findNamespaceId,
   shortenAddress,
+  withCreateClaimRequest,
   withRevokeReverseEntry,
+  withUpdateClaimRequest,
 } from "@cardinal/namespaces";
 import * as anchor from "@project-serum/anchor";
 import { SignerWallet } from "@saberhq/solana-contrib";
 import * as web3 from "@solana/web3.js";
 
 import { connectionFor, secondaryConnectionFor } from "../common/connection";
-import { approveClaimRequestTransaction } from "../twitter-approver/api";
 import {
   tryGetNameEntry,
   tweetContainsPublicKey,
 } from "../twitter-claimer/utils";
+import { tryGetClaimRequest } from "./api";
 
 // twtQEtj1wnNmSZZ475prwBFPbPit6w88YSfjia83g4k
 const WALLET = web3.Keypair.fromSecretKey(
@@ -61,24 +63,16 @@ export async function revokeHolder(
   const connection = connectionFor(cluster);
   console.log(`Approving claim request for ${publicKey} for ${entryName}`);
 
-  const transaction = await approveClaimRequestTransaction(
-    connection,
-    WALLET,
-    NAMESPACE_NAME,
-    entryName,
-    new web3.PublicKey(publicKey)
-  );
-
-  console.log(`Revoking for ${publicKey} for ${entryName}`);
-
-  const entry = await tryGetNameEntry(connection, NAMESPACE_NAME, entryName);
-  if (!entry) throw new Error(`No entry for ${entryName} to be revoked`);
-
-  const owner = await getOwner(
-    secondaryConnectionFor(cluster),
-    entry.parsed.mint.toString()
-  );
-  if (!owner) throw new Error(`No owner for ${entryName} to be revoked`);
+  const [nameEntry, claimRequest] = await Promise.all([
+    tryGetNameEntry(connection, NAMESPACE_NAME, entryName),
+    tryGetClaimRequest(
+      connection,
+      NAMESPACE_NAME,
+      entryName,
+      new web3.PublicKey(publicKey)
+    ),
+  ]);
+  if (!nameEntry) throw new Error(`No entry for ${entryName} to be revoked`);
 
   const [namespaceId] = await findNamespaceId(NAMESPACE_NAME);
   const [claimRequestId] = await findClaimRequestId(
@@ -87,8 +81,52 @@ export async function revokeHolder(
     new web3.PublicKey(publicKey)
   );
 
-  if (entry?.parsed.reverseEntry) {
-    const reverseEntryId = entry?.parsed.reverseEntry;
+  const transaction = new web3.Transaction();
+  if (!claimRequest) {
+    console.log("Creating claim request");
+    await withCreateClaimRequest(
+      connection,
+      new SignerWallet(WALLET),
+      NAMESPACE_NAME,
+      entryName,
+      new web3.PublicKey(publicKey),
+      transaction
+    );
+  }
+
+  if (
+    !claimRequest ||
+    !claimRequest?.parsed?.isApproved ||
+    claimRequest.parsed.counter !== nameEntry.parsed.claimRequestCounter
+  ) {
+    console.log("Approving claim request");
+    const [claimRequestId] = await findClaimRequestId(
+      namespaceId,
+      entryName,
+      new web3.PublicKey(publicKey)
+    );
+
+    await withUpdateClaimRequest(
+      connection,
+      new SignerWallet(WALLET),
+      NAMESPACE_NAME,
+      entryName,
+      claimRequestId,
+      true,
+      transaction
+    );
+  }
+
+  console.log(`Revoking for ${publicKey} for ${entryName}`);
+
+  const owner = await getOwner(
+    secondaryConnectionFor(cluster),
+    nameEntry.parsed.mint.toString()
+  );
+  if (!owner) throw new Error(`No owner for ${entryName} to be revoked`);
+
+  if (nameEntry.parsed.reverseEntry) {
+    const reverseEntryId = nameEntry.parsed.reverseEntry;
     console.log(
       `Revoking reverse entry ${reverseEntryId.toString()} using claimId ${claimRequestId.toString()} from owner ${owner.toString()}`
     );
@@ -116,7 +154,7 @@ export async function revokeHolder(
       new SignerWallet(WALLET),
       NAMESPACE_NAME,
       entryName,
-      entry?.parsed.mint,
+      nameEntry.parsed.mint,
       owner,
       claimRequestId,
       transaction
@@ -132,9 +170,12 @@ export async function revokeHolder(
     transaction.recentBlockhash = (
       await connection.getRecentBlockhash("max")
     ).blockhash;
-    txid = await web3.sendAndConfirmTransaction(connection, transaction, [
-      WALLET,
-    ]);
+    txid = await web3.sendAndConfirmTransaction(
+      connection,
+      transaction,
+      [WALLET],
+      { skipPreflight: true }
+    );
     console.log(
       `Succesfully revoke entries from ${owner.toString()}, txid (${txid})`
     );
