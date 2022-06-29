@@ -7,8 +7,6 @@ provider:
   name: aws
   runtime: nodejs14.x
   lambdaHashingVersion: "20201221"
-  http:
-    cors: true
 
 package:
   individually: false
@@ -173,12 +171,17 @@ custom:
       domainName: api.cardinal.so
     dev:
       domainName: dev-api.cardinal.so
-  customDomain:
-    rest:
-      domainName: ${self:custom.domains.${opt:stage}.domainName}
-      basePath: twitter
-      certificateName: "*.cardinal.com"
-      createRoute53Record: true
+  customDomains:
+    - rest:
+        domainName: ${self:custom.domains.${opt:stage}.domainName}
+        basePath: twitter
+        certificateName: "*.cardinal.com"
+        createRoute53Record: true
+    - rest:
+        domainName: ${self:custom.domains.${opt:stage}.domainName}
+        basePath: namespaces
+        certificateName: "*.cardinal.com"
+        createRoute53Record: true
   apiGatewayCaching:
     enabled: true
 
