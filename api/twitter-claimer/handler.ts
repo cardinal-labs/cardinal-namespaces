@@ -46,7 +46,7 @@ module.exports.claim = async (event) => {
         "Access-Control-Allow-Origin": "*", // Required for CORS support to work
         "Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS
       },
-      body: JSON.stringify({ error: (e as string).toString() }),
+      body: JSON.stringify({ error: String(e) }),
     };
   }
 };

@@ -46,9 +46,7 @@ export async function approveTweet(
     return {
       status: 404,
       txid: "",
-      message: `Public key ${shortenAddress(
-        publicKey
-      )} not found in tweet ${tweetId}`,
+      message: `Public key ${shortenAddress(publicKey)} not found in tweet`,
     };
   }
 

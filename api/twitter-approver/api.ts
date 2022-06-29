@@ -61,7 +61,6 @@ export async function approveClaimRequestTransaction(
       connection,
       new SignerWallet(wallet),
       namespaceName,
-      entryName,
       claimRequestId,
       true,
       transaction
