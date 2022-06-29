@@ -731,7 +731,8 @@ export async function withInvalidateExpiredReverseEntry(
   namespaceName: string,
   mintId: PublicKey,
   entryName: string,
-  reverseEntryId: PublicKey
+  reverseEntryId: PublicKey,
+  invalidator?: PublicKey
 ): Promise<Transaction> {
   const provider = new anchor.AnchorProvider(connection, wallet, {});
   const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
@@ -749,7 +750,7 @@ export async function withInvalidateExpiredReverseEntry(
         nameEntry: nameEntryId,
         namespaceTokenAccount: namespaceTokenAccountId,
         reverseNameEntry: reverseEntryId,
-        invalidator: namespaceId,
+        invalidator: invalidator || namespaceId,
       },
     })
   );

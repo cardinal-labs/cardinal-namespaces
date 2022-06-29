@@ -26,7 +26,8 @@ pub struct InvalidateTransferableReverseNameEntryCtx<'info> {
         @ ErrorCode::InvalidTokenManager
     )]
     token_manager: Account<'info, TokenManager>,
-    invalidator: Signer<'info>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    invalidator: UncheckedAccount<'info>,
 }
 
 pub fn handler(ctx: Context<InvalidateTransferableReverseNameEntryCtx>) -> Result<()> {

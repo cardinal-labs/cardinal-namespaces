@@ -1,5 +1,5 @@
 export type Namespaces = {
-  version: "4.1.13";
+  version: "4.1.14";
   name: "namespaces";
   instructions: [
     {
@@ -671,7 +671,7 @@ export type Namespaces = {
         {
           name: "invalidator";
           isMut: false;
-          isSigner: true;
+          isSigner: false;
         }
       ];
       args: [];
@@ -702,7 +702,7 @@ export type Namespaces = {
         {
           name: "invalidator";
           isMut: false;
-          isSigner: true;
+          isSigner: false;
         }
       ];
       args: [];
@@ -1706,7 +1706,7 @@ export type Namespaces = {
 };
 
 export const IDL: Namespaces = {
-  version: "4.1.13",
+  version: "4.1.14",
   name: "namespaces",
   instructions: [
     {
@@ -2378,7 +2378,7 @@ export const IDL: Namespaces = {
         {
           name: "invalidator",
           isMut: false,
-          isSigner: true,
+          isSigner: false,
         },
       ],
       args: [],
@@ -2409,7 +2409,7 @@ export const IDL: Namespaces = {
         {
           name: "invalidator",
           isMut: false,
-          isSigner: true,
+          isSigner: false,
         },
       ],
       args: [],
