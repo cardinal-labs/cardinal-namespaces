@@ -17,6 +17,7 @@ package:
     - "./yarn.lock"
 
 functions:
+  ################################ Twitter ################################
   twitter-approver:
     handler: twitter-approver/handler.approve
     timeout: 30
@@ -24,7 +25,7 @@ functions:
       TWITTER_SOLANA_KEY: ${ssm:/TWITTER_SOLANA_KEY~true}
     events:
       - http:
-          path: /approve
+          path: /twitter/approve
           method: get
           cors: true
   twitter-verifier:
@@ -42,7 +43,7 @@ functions:
       TWITTER_SOLANA_KEY: ${ssm:/TWITTER_SOLANA_KEY~true}
     events:
       - http:
-          path: /claim
+          path: /twitter/claim
           method: post
           cors: true
   twitter-revoker:
@@ -52,14 +53,14 @@ functions:
       TWITTER_SOLANA_KEY: ${ssm:/TWITTER_SOLANA_KEY~true}
     events:
       - http:
-          path: /revoke
+          path: /twitter/revoke
           method: get
           cors: true
   twitter-proxy:
     handler: twitter-proxy/handler.proxy
     events:
       - http:
-          path: /proxy
+          path: /twitter/proxy
           method: get
           cors: true
           caching:
@@ -70,6 +71,8 @@ functions:
             cacheKeyParameters:
               - name: request.path.url
               - name: request.path.usernames
+
+  ################################ Passbase ################################
   passbase-webhook:
     handler: passbase-webhook/handler.webhook
     events:
@@ -88,6 +91,8 @@ functions:
       - http:
           path: /passbase/data
           method: get
+
+  ################################ Typeform ################################
   typeform-approver:
     handler: typeform-approver/handler.approve
     timeout: 60
