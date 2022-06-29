@@ -1,8 +1,21 @@
+import { getOwner } from "@cardinal/common";
+import {
+  deprecated,
+  findClaimRequestId,
+  findNamespaceId,
+  shortenAddress,
+  withRevokeReverseEntry,
+} from "@cardinal/namespaces";
 import * as anchor from "@project-serum/anchor";
+import { SignerWallet } from "@saberhq/solana-contrib";
 import * as web3 from "@solana/web3.js";
 
-import { connectionFor } from "../common/connection";
-import * as api from "./api";
+import { connectionFor, secondaryConnectionFor } from "../common/connection";
+import { approveClaimRequestTransaction } from "../twitter-approver/api";
+import {
+  tryGetNameEntry,
+  tweetContainsPublicKey,
+} from "../twitter-claimer/utils";
 
 // twtQEtj1wnNmSZZ475prwBFPbPit6w88YSfjia83g4k
 const WALLET = web3.Keypair.fromSecretKey(
@@ -16,35 +29,123 @@ export async function revokeHolder(
   publicKey: string,
   entryName: string,
   cluster: web3.Cluster = "mainnet-beta"
-): Promise<string> {
+): Promise<{ status: number; txid?: string; message?: string }> {
   console.log(
     `Attempting to revoke holder for tweet (${tweetId}) publicKey ${publicKey} entryName ${entryName} cluster ${cluster} `
   );
-  const connection = connectionFor(cluster);
 
-  let txid: string;
-  const checkClaimRequest = await api.tryGetClaimRequest(
+  let tweetApproved = true;
+  if (cluster !== "devnet") {
+    try {
+      tweetApproved = await tweetContainsPublicKey(
+        tweetId,
+        entryName,
+        publicKey
+      );
+    } catch (e) {
+      console.log("Failed twitter check: ", e);
+      return {
+        status: 401,
+        message: String(e),
+      };
+    }
+  }
+  if (!tweetApproved) {
+    return {
+      status: 404,
+      txid: "",
+      message: `Public key ${shortenAddress(publicKey)} not found in tweet`,
+    };
+  }
+
+  const connection = connectionFor(cluster);
+  console.log(`Approving claim request for ${publicKey} for ${entryName}`);
+
+  const transaction = await approveClaimRequestTransaction(
     connection,
+    WALLET,
     NAMESPACE_NAME,
     entryName,
     new web3.PublicKey(publicKey)
   );
 
-  if (checkClaimRequest && checkClaimRequest.parsed.isApproved) {
-    console.log(`Revoking for ${publicKey} for ${entryName}`);
-    txid = await api.revoke(
-      cluster,
+  console.log(`Revoking for ${publicKey} for ${entryName}`);
+
+  const entry = await tryGetNameEntry(connection, NAMESPACE_NAME, entryName);
+  if (!entry) throw new Error(`No entry for ${entryName} to be revoked`);
+
+  const owner = await getOwner(
+    secondaryConnectionFor(cluster),
+    entry.parsed.mint.toString()
+  );
+  if (!owner) throw new Error(`No owner for ${entryName} to be revoked`);
+
+  const [namespaceId] = await findNamespaceId(NAMESPACE_NAME);
+  const [claimRequestId] = await findClaimRequestId(
+    namespaceId,
+    entryName,
+    new web3.PublicKey(publicKey)
+  );
+
+  if (entry?.parsed.reverseEntry) {
+    const reverseEntryId = entry?.parsed.reverseEntry;
+    console.log(
+      `Revoking reverse entry ${reverseEntryId.toString()} using claimId ${claimRequestId.toString()} from owner ${owner.toString()}`
+    );
+    const reverseEntry = await connection.getAccountInfo(reverseEntryId);
+    if (reverseEntry) {
+      await withRevokeReverseEntry(
+        transaction,
+        connection,
+        new SignerWallet(WALLET),
+        NAMESPACE_NAME,
+        entryName,
+        reverseEntryId,
+        claimRequestId
+      );
+    }
+  }
+
+  console.log(
+    `Revoking entry ${entryName} using claimId ${claimRequestId.toString()} from owner ${owner.toString()}`
+  );
+
+  if (owner.toString() !== namespaceId.toString()) {
+    await deprecated.withRevokeEntry(
       connection,
-      WALLET,
+      new SignerWallet(WALLET),
       NAMESPACE_NAME,
       entryName,
-      checkClaimRequest.pubkey
+      entry?.parsed.mint,
+      owner,
+      claimRequestId,
+      transaction
     );
-  } else {
-    throw new Error("User cannot revoke since they have not been approved");
   }
+
+  let txid = "";
+  if (transaction.instructions.length > 0) {
+    console.log(
+      `Executing transaction of length ${transaction.instructions.length}`
+    );
+    transaction.feePayer = WALLET.publicKey;
+    transaction.recentBlockhash = (
+      await connection.getRecentBlockhash("max")
+    ).blockhash;
+    txid = await web3.sendAndConfirmTransaction(connection, transaction, [
+      WALLET,
+    ]);
+    console.log(
+      `Succesfully revoke entries from ${owner.toString()}, txid (${txid})`
+    );
+  }
+
   console.log(
     `Succesfully revoked for publicKey (${publicKey}) for handle (${entryName}) txid (${txid})`
   );
-  return txid;
+  return {
+    status: 200,
+    txid,
+    message: `Succesfully approved claim publicKey (${publicKey}) for handle (${entryName}) txid (${txid})`,
+  };
 }

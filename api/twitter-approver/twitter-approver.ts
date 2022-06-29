@@ -37,11 +37,10 @@ export async function approveTweet(
       console.log("Failed twitter check: ", e);
       return {
         status: 401,
-        message: e,
+        message: String(e),
       };
     }
   }
-
   if (!tweetApproved) {
     return {
       status: 404,
