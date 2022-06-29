@@ -22,6 +22,7 @@
     "aws-lambda": "^1.0.7",
     "crypto-js": "^4.1.1",
     "jsbi": "^4.1.0",
-    "node-fetch": "^2.6.6"
+    "node-fetch": "^2.6.6",
+    "serverless-plugin-common-excludes": "^4.0.0"
   }
 }

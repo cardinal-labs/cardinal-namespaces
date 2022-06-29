@@ -141,6 +141,7 @@ custom:
     enabled: true
 
 plugins:
+  - serverless-plugin-common-excludes
   - serverless-api-gateway-caching
   - serverless-domain-manager
   - serverless-plugin-typescript

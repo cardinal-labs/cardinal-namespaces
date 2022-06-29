@@ -5384,6 +5384,13 @@ serverless-offline@^8.5.0:
     velocityjs "^2.0.6"
     ws "^7.5.7"
 
+serverless-plugin-common-excludes@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/serverless-plugin-common-excludes/-/serverless-plugin-common-excludes-4.0.0.tgz#caa1de88d7be8c916b8db35292b0cce0dfd47707"
+  integrity sha512-jOJJ81LKGpEFdXWOCFr58JxtdPL0fWnUpmQsQXV4BHCE4Xs4Gg0F7liLXIBDQXmJlwCzg7oMJq4bm5ZyRONQsA==
+  dependencies:
+    semver "^7.3.5"
+
 serverless-plugin-include-dependencies@^5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/serverless-plugin-include-dependencies/-/serverless-plugin-include-dependencies-5.0.0.tgz#cdd0b74492899c9e8494e06a1f95b80e3c1000c4"
