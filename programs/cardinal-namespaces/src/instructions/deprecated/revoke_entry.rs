@@ -69,6 +69,9 @@ pub fn handler(ctx: Context<RevokeEntryCtx>) -> Result<()> {
     entry.data = None;
     entry.is_claimed = false;
 
+    let namespace = &mut ctx.accounts.namespace;
+    namespace.count = namespace.count.checked_sub(1).expect("Sub error");
+
     let namespace_seeds = &[NAMESPACE_PREFIX.as_bytes(), ctx.accounts.namespace.name.as_bytes(), &[ctx.accounts.namespace.bump]];
     let namespace_signer = &[&namespace_seeds[..]];
 

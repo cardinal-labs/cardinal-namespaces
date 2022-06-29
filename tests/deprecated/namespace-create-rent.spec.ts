@@ -3,6 +3,7 @@ import * as anchor from "@project-serum/anchor";
 import * as splToken from "@solana/spl-token";
 import * as web3 from "@solana/web3.js";
 import assert from "assert";
+import { BN } from "bn.js";
 
 import {
   findNamespaceId,
@@ -45,20 +46,21 @@ describe("namespace-create-rent", () => {
     );
 
     const transaction = new web3.Transaction();
+
     await withCreateNamespace(
+      transaction,
       provider.connection,
       provider.wallet,
-      namespaceName,
-      provider.wallet.publicKey,
-      provider.wallet.publicKey,
-      provider.wallet.publicKey,
-      0,
-      paymentAmountDaily,
-      paymentMint.publicKey,
-      new anchor.BN(0),
-      new anchor.BN(86400),
-      true,
-      transaction
+      {
+        namespaceName,
+        updateAuthority: provider.wallet.publicKey,
+        rentAuthority: provider.wallet.publicKey,
+        approveAuthority: provider.wallet.publicKey,
+        paymentAmountDaily,
+        paymentMint: paymentMint.publicKey,
+        maxRentalSeconds: new BN(86400),
+        transferableEntries: true,
+      }
     );
     transaction.feePayer = provider.wallet.publicKey;
     transaction.recentBlockhash = (

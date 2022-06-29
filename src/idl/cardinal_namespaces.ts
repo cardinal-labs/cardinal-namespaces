@@ -296,7 +296,7 @@ export type Namespaces = {
       accounts: [
         {
           name: "namespace";
-          isMut: false;
+          isMut: true;
           isSigner: false;
         },
         {
@@ -322,7 +322,7 @@ export type Namespaces = {
       accounts: [
         {
           name: "namespace";
-          isMut: false;
+          isMut: true;
           isSigner: false;
         },
         {
@@ -1226,6 +1226,16 @@ export type Namespaces = {
           {
             name: "transferableEntries";
             type: "bool";
+          },
+          {
+            name: "count";
+            type: "u32";
+          },
+          {
+            name: "limit";
+            type: {
+              option: "u32";
+            };
           }
         ];
       };
@@ -1366,10 +1376,6 @@ export type Namespaces = {
         kind: "struct";
         fields: [
           {
-            name: "bump";
-            type: "u8";
-          },
-          {
             name: "name";
             type: "string";
           },
@@ -1412,6 +1418,12 @@ export type Namespaces = {
           {
             name: "transferableEntries";
             type: "bool";
+          },
+          {
+            name: "limit";
+            type: {
+              option: "u32";
+            };
           }
         ];
       };
@@ -1586,6 +1598,12 @@ export type Namespaces = {
             type: {
               option: "bool";
             };
+          },
+          {
+            name: "limit";
+            type: {
+              option: "u32";
+            };
           }
         ];
       };
@@ -1701,6 +1719,11 @@ export type Namespaces = {
       code: 6021;
       name: "InvalidCertificate";
       msg: "Invalid certificate";
+    },
+    {
+      code: 6022;
+      name: "NamespaceReachedLimit";
+      msg: "Namespace has reached the limit";
     }
   ];
 };
@@ -2003,7 +2026,7 @@ export const IDL: Namespaces = {
       accounts: [
         {
           name: "namespace",
-          isMut: false,
+          isMut: true,
           isSigner: false,
         },
         {
@@ -2029,7 +2052,7 @@ export const IDL: Namespaces = {
       accounts: [
         {
           name: "namespace",
-          isMut: false,
+          isMut: true,
           isSigner: false,
         },
         {
@@ -2934,6 +2957,16 @@ export const IDL: Namespaces = {
             name: "transferableEntries",
             type: "bool",
           },
+          {
+            name: "count",
+            type: "u32",
+          },
+          {
+            name: "limit",
+            type: {
+              option: "u32",
+            },
+          },
         ],
       },
     },
@@ -3073,10 +3106,6 @@ export const IDL: Namespaces = {
         kind: "struct",
         fields: [
           {
-            name: "bump",
-            type: "u8",
-          },
-          {
             name: "name",
             type: "string",
           },
@@ -3119,6 +3148,12 @@ export const IDL: Namespaces = {
           {
             name: "transferableEntries",
             type: "bool",
+          },
+          {
+            name: "limit",
+            type: {
+              option: "u32",
+            },
           },
         ],
       },
@@ -3294,6 +3329,12 @@ export const IDL: Namespaces = {
               option: "bool",
             },
           },
+          {
+            name: "limit",
+            type: {
+              option: "u32",
+            },
+          },
         ],
       },
     },
@@ -3408,6 +3449,11 @@ export const IDL: Namespaces = {
       code: 6021,
       name: "InvalidCertificate",
       msg: "Invalid certificate",
+    },
+    {
+      code: 6022,
+      name: "NamespaceReachedLimit",
+      msg: "Namespace has reached the limit",
     },
   ],
 };

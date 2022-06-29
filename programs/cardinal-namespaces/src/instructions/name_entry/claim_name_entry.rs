@@ -73,8 +73,14 @@ pub struct ClaimNameEntryCtx<'info> {
 pub fn handler<'key, 'accounts, 'remaining, 'info>(ctx: Context<'key, 'accounts, 'remaining, 'info, ClaimNameEntryCtx<'info>>, ix: ClaimNameEntryIx) -> Result<()> {
     let remaining_accs = &mut ctx.remaining_accounts.iter();
     let name_entry = &mut ctx.accounts.name_entry;
+    let namespace = &mut ctx.accounts.namespace;
     name_entry.data = Some(ctx.accounts.recipient.key());
     name_entry.claim_request_counter = name_entry.claim_request_counter.checked_add(1).expect("Add error");
+    namespace.count = namespace.count.checked_add(1).expect("Add error");
+
+    if ctx.accounts.namespace.limit.is_some() && ctx.accounts.namespace.count > ctx.accounts.namespace.limit.unwrap() {
+        return Err(error!(ErrorCode::NamespaceReachedLimit));
+    }
 
     if name_entry.is_claimed {
         return Err(error!(ErrorCode::NameEntryAlreadyClaimed));

@@ -91,6 +91,13 @@ pub fn handler(ctx: Context<ClaimEntry>, ix: ClaimEntryIx) -> Result<()> {
     entry.is_claimed = true;
     entry.claim_request_counter = entry.claim_request_counter.checked_add(1).expect("Add error");
 
+    let namespace = &mut ctx.accounts.namespace;
+    namespace.count = namespace.count.checked_add(1).expect("Add error");
+
+    if ctx.accounts.namespace.limit.is_some() && ctx.accounts.namespace.count > ctx.accounts.namespace.limit.unwrap() {
+        return Err(error!(ErrorCode::NamespaceReachedLimit));
+    }
+
     // duration checks
     if ix.duration != None {
         if ix.duration.unwrap() <= ctx.accounts.namespace.min_rental_seconds {

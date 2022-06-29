@@ -6,6 +6,7 @@ use {
 
 #[derive(Accounts)]
 pub struct InvalidateTransferableNameEntryCtx<'info> {
+    #[account(mut)]
     namespace: Account<'info, Namespace>,
     #[account(
         mut,
@@ -32,5 +33,7 @@ pub fn handler(ctx: Context<InvalidateTransferableNameEntryCtx>) -> Result<()> {
     name_entry.is_claimed = false;
     name_entry.mint = Pubkey::default();
 
+    let namespace = &mut ctx.accounts.namespace;
+    namespace.count = namespace.count.checked_sub(1).expect("Sub error");
     Ok(())
 }
