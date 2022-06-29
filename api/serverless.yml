@@ -17,6 +17,43 @@ package:
     - "./yarn.lock"
 
 functions:
+  ################################ V1 Twitter ################################
+  v1-twitter-approver:
+    handler: twitter-approver/handler.approve
+    timeout: 30
+    environment:
+      TWITTER_SOLANA_KEY: ${ssm:/TWITTER_SOLANA_KEY~true}
+    events:
+      - http:
+          path: /approve
+          method: get
+          cors: true
+  v1-twitter-revoker:
+    handler: twitter-revoker/handler.revoke
+    timeout: 30
+    environment:
+      TWITTER_SOLANA_KEY: ${ssm:/TWITTER_SOLANA_KEY~true}
+    events:
+      - http:
+          path: /revoke
+          method: get
+          cors: true
+  v1-twitter-proxy:
+    handler: twitter-proxy/handler.proxy
+    events:
+      - http:
+          path: /proxy
+          method: get
+          cors: true
+          caching:
+            enabled: true
+            ttlInSeconds: 3600 # overrides the global setting for ttlInSeconds
+            perKeyInvalidation:
+              requireAuthorization: false # default is true
+            cacheKeyParameters:
+              - name: request.path.url
+              - name: request.path.usernames
+
   ################################ Twitter ################################
   twitter-approver:
     handler: twitter-approver/handler.approve
