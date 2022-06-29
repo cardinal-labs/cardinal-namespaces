@@ -69,7 +69,7 @@ functions:
       TWITTER_SOLANA_KEY: ${ssm:/TWITTER_SOLANA_KEY~true}
     events:
       - http:
-          path: /verify
+          path: /twitter/verify
           method: get
           cors: true
   twitter-claimer:
