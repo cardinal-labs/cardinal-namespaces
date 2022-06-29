@@ -1,5 +1,3 @@
-use anchor_lang::AccountsClose;
-
 use {
     crate::{errors::ErrorCode, state::*},
     anchor_lang::prelude::*,
