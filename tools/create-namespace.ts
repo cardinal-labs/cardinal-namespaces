@@ -1,4 +1,4 @@
-import { BN, utils } from "@project-serum/anchor";
+import { utils } from "@project-serum/anchor";
 import { SignerWallet } from "@saberhq/solana-contrib";
 import {
   Keypair,
@@ -18,19 +18,17 @@ export const createNamespace = async (name: string, clusterName: string) => {
   const wallet = Keypair.fromSecretKey(utils.bytes.bs58.decode(""));
 
   transaction = await withCreateNamespace(
+    transaction,
     connection,
     new SignerWallet(wallet),
-    name,
-    wallet.publicKey,
-    wallet.publicKey,
-    wallet.publicKey,
-    0,
-    new BN(0),
-    new PublicKey("So11111111111111111111111111111111111111112"),
-    new BN(0),
-    null,
-    false,
-    transaction
+    {
+      namespaceName: name,
+      updateAuthority: wallet.publicKey,
+      rentAuthority: wallet.publicKey,
+      approveAuthority: wallet.publicKey,
+      paymentMint: new PublicKey("So11111111111111111111111111111111111111112"),
+      transferableEntries: false,
+    }
   );
   transaction.feePayer = wallet.publicKey;
   transaction.recentBlockhash = (
