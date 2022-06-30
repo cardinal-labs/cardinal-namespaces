@@ -24,14 +24,13 @@ import { PublicKey, SystemProgram, SYSVAR_RENT_PUBKEY } from "@solana/web3.js";
 
 import type { NAMESPACES_PROGRAM } from ".";
 import {
-  ENTRY_SEED,
   findClaimRequestId,
+  findGlobalContextId,
   findNameEntryId,
   findNamespaceId,
   findReverseEntryId,
   getNameEntry,
-  GLOBAL_CONTEXT_SEED,
-  NAMESPACE_SEED,
+  getNamespace,
   NAMESPACES_IDL,
   NAMESPACES_PROGRAM_ID,
   withRemainingAccountsForClaim,
@@ -50,10 +49,7 @@ export async function withInit(
     provider
   );
 
-  const [globalContextId] = await PublicKey.findProgramAddress(
-    [anchor.utils.bytes.utf8.encode(GLOBAL_CONTEXT_SEED)],
-    namespacesProgram.programId
-  );
+  const [globalContextId] = await findGlobalContextId();
 
   transaction.add(
     namespacesProgram.instruction.initGlobalContext(
@@ -99,13 +95,7 @@ export async function withCreateNamespace(
     provider
   );
 
-  const [namespaceId] = await PublicKey.findProgramAddress(
-    [
-      anchor.utils.bytes.utf8.encode(NAMESPACE_SEED),
-      anchor.utils.bytes.utf8.encode(params.namespaceName),
-    ],
-    namespacesProgram.programId
-  );
+  const [namespaceId] = await findNamespaceId(params.namespaceName);
 
   transaction.add(
     namespacesProgram.instruction.createNamespace(
@@ -213,6 +203,8 @@ export async function withClaimNameEntry(
   );
   const [tokenManagerId] = await findTokenManagerAddress(mintId);
 
+  const namespace = await getNamespace(connection, namespaceId);
+
   const namespaceTokenAccountId =
     await splToken.Token.getAssociatedTokenAddress(
       splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -253,7 +245,9 @@ export async function withClaimNameEntry(
 
   const remainingAccountsForKind = await getRemainingAccountsForKind(
     mintId,
-    TokenManagerKind.Edition
+    namespace.parsed.transferableEntries
+      ? TokenManagerKind.Unmanaged
+      : TokenManagerKind.Edition
   );
 
   transaction.add(
@@ -305,22 +299,8 @@ export async function withInitNameEntry(
     provider
   );
 
-  const [namespaceId] = await PublicKey.findProgramAddress(
-    [
-      anchor.utils.bytes.utf8.encode(NAMESPACE_SEED),
-      anchor.utils.bytes.utf8.encode(namespaceName),
-    ],
-    namespacesProgram.programId
-  );
-
-  const [entryId] = await PublicKey.findProgramAddress(
-    [
-      anchor.utils.bytes.utf8.encode(ENTRY_SEED),
-      namespaceId.toBytes(),
-      anchor.utils.bytes.utf8.encode(entryName),
-    ],
-    namespacesProgram.programId
-  );
+  const [namespaceId] = await findNamespaceId(namespaceName);
+  const [entryId] = await findNameEntryId(namespaceId, entryName);
 
   transaction.add(
     namespacesProgram.instruction.initNameEntry(
@@ -355,22 +335,8 @@ export async function withInitNameEntryMint(
     provider
   );
 
-  const [namespaceId] = await PublicKey.findProgramAddress(
-    [
-      anchor.utils.bytes.utf8.encode(NAMESPACE_SEED),
-      anchor.utils.bytes.utf8.encode(namespaceName),
-    ],
-    namespacesProgram.programId
-  );
-
-  const [entryId] = await PublicKey.findProgramAddress(
-    [
-      anchor.utils.bytes.utf8.encode(ENTRY_SEED),
-      namespaceId.toBytes(),
-      anchor.utils.bytes.utf8.encode(entryName),
-    ],
-    namespacesProgram.programId
-  );
+  const [namespaceId] = await findNamespaceId(namespaceName);
+  const [entryId] = await findNameEntryId(namespaceId, entryName);
 
   const namespaceTokenAccountId =
     await splToken.Token.getAssociatedTokenAddress(
@@ -420,22 +386,8 @@ export async function withRevokeNameEntry(
     NAMESPACES_PROGRAM_ID,
     provider
   );
-  const [namespaceId] = await PublicKey.findProgramAddress(
-    [
-      anchor.utils.bytes.utf8.encode(NAMESPACE_SEED),
-      anchor.utils.bytes.utf8.encode(namespaceName),
-    ],
-    namespacesProgram.programId
-  );
-
-  const [entryId] = await PublicKey.findProgramAddress(
-    [
-      anchor.utils.bytes.utf8.encode(ENTRY_SEED),
-      namespaceId.toBytes(),
-      anchor.utils.bytes.utf8.encode(entryName),
-    ],
-    namespacesProgram.programId
-  );
+  const [namespaceId] = await findNamespaceId(namespaceName);
+  const [entryId] = await findNameEntryId(namespaceId, entryName);
 
   const nameEntry = await getNameEntry(connection, namespaceName, entryName);
   const [tokenManagerId] = await findTokenManagerAddress(mintId);
@@ -538,22 +490,8 @@ export async function withSetEntryData(
     NAMESPACES_PROGRAM_ID,
     provider
   );
-  const [namespaceId] = await PublicKey.findProgramAddress(
-    [
-      anchor.utils.bytes.utf8.encode(NAMESPACE_SEED),
-      anchor.utils.bytes.utf8.encode(namespaceName),
-    ],
-    namespacesProgram.programId
-  );
-
-  const [entryId] = await PublicKey.findProgramAddress(
-    [
-      anchor.utils.bytes.utf8.encode(ENTRY_SEED),
-      namespaceId.toBytes(),
-      anchor.utils.bytes.utf8.encode(entryName),
-    ],
-    namespacesProgram.programId
-  );
+  const [namespaceId] = await findNamespaceId(namespaceName);
+  const [entryId] = await findNameEntryId(namespaceId, entryName);
 
   const entry = await namespacesProgram.account.entry.fetch(entryId);
   const [tokenManagerId] = await findTokenManagerAddress(mintId);

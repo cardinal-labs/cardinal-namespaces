@@ -20,6 +20,7 @@ start:
 	solana-test-validator --url https://api.devnet.solana.com \
 		--clone metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s --clone PwDiXFxQsGra4sFFTT8r1QWRMd4vfumiWC1jfWNfdYT \
 		--clone mgr99QFMYByTqGPWmNqunV7vBLmWWXdSrHUfV8Jf3JM --clone ojLGErfqghuAqpJXE1dguXF7kKfvketCEeah8ig6GU3 \
+		--clone tmeEDp1RgoDtZFtx6qod3HkbQmv9LMe36uqKVvsLTDE --clone DwoZ1RMgLEgSAsHNC2fecJqhvWvwhEkb9u29hVs2hNvg \
 		--clone crt4Ymiqtk3M5w6JuKDT7GuZfUDiPLnhwRVqymSSBBn --clone 94mjR7rAf12K6u8WrLzUaZZnxtX1ZNBo3SPeQKZwXLx9 \
 		--bpf-program ./target/deploy/namespaces-keypair.json ./target/deploy/namespaces.so \
 		--reset --quiet & echo $$! > validator.PID

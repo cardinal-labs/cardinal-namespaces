@@ -24,6 +24,7 @@ pub struct InvalidateExpiredNameEntryCtx<'info> {
     )]
     pub namespace_token_account: Account<'info, TokenAccount>,
     /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
     invalidator: UncheckedAccount<'info>,
 }
 

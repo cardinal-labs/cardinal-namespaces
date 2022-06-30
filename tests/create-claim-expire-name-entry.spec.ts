@@ -1,5 +1,8 @@
 import { findAta, tryGetAccount } from "@cardinal/common";
 import { withInvalidate } from "@cardinal/token-manager";
+import { getTimeInvalidator } from "@cardinal/token-manager/dist/cjs/programs/timeInvalidator/accounts";
+import { findTimeInvalidatorAddress } from "@cardinal/token-manager/dist/cjs/programs/timeInvalidator/pda";
+import { findTokenManagerAddress } from "@cardinal/token-manager/dist/cjs/programs/tokenManager/pda";
 import * as anchor from "@project-serum/anchor";
 import { TOKEN_PROGRAM_ID } from "@project-serum/anchor/dist/cjs/utils/token";
 import { expectTXTable } from "@saberhq/chai-solana";
@@ -297,7 +300,7 @@ describe("create-claim-expire-name-entry", () => {
     });
   });
 
-  it("Wait and invalidate entry", async () => {
+  it("Wait and invalidate token", async () => {
     await new Promise((r) => setTimeout(r, 1000));
     const nameEntry = await getNameEntry(
       provider.connection,
@@ -305,6 +308,13 @@ describe("create-claim-expire-name-entry", () => {
       entryName
     );
     const mintId = nameEntry.parsed.mint;
+
+    const [tokenManagerId] = await findTokenManagerAddress(mintId);
+    const [timeInvalidatorId] = await findTimeInvalidatorAddress(
+      tokenManagerId
+    );
+    const ti = await getTimeInvalidator(provider.connection, timeInvalidatorId);
+    console.log(ti, ti.parsed.maxExpiration?.toString());
 
     const transaction = new web3.Transaction();
     await withInvalidate(
@@ -322,7 +332,7 @@ describe("create-claim-expire-name-entry", () => {
         }),
         transaction.instructions
       ),
-      "before",
+      "Wait and invalidate",
       {
         verbosity: "always",
         formatLogs: true,
@@ -338,7 +348,7 @@ describe("create-claim-expire-name-entry", () => {
     expect(checkRecipientTokenAccount.amount.toNumber()).to.eq(0);
   });
 
-  it("Wait and invalidate entry", async () => {
+  it("Invalidate entry", async () => {
     const nameEntry = await getNameEntry(
       provider.connection,
       namespaceName,
@@ -373,7 +383,7 @@ describe("create-claim-expire-name-entry", () => {
         }),
         transaction.instructions
       ),
-      "before",
+      "Wait and invalidate",
       {
         verbosity: "always",
         formatLogs: true,
@@ -400,12 +410,9 @@ describe("create-claim-expire-name-entry", () => {
     );
     expect(checkReverseEntry).to.eq(null);
 
-    const entryAfter = await getNameEntry(
-      provider.connection,
-      namespaceName,
-      entryName
+    const entryAfter = await tryGetAccount(() =>
+      getNameEntry(provider.connection, namespaceName, entryName)
     );
-    expect(entryAfter.parsed.data).to.eq(null);
-    expect(entryAfter.parsed.isClaimed).to.eq(false);
+    expect(entryAfter).to.eq(null);
   });
 });

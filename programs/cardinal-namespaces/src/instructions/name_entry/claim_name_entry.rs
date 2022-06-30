@@ -131,7 +131,11 @@ pub fn handler<'key, 'accounts, 'remaining, 'info>(ctx: Context<'key, 'accounts,
         } else {
             InvalidationType::Return as u8
         },
-        num_invalidators: if ctx.accounts.namespace.payment_amount_daily > 0 { 2 } else { 1 },
+        num_invalidators: if ctx.accounts.namespace.payment_amount_daily > 0 || ctx.accounts.namespace.max_expiration.is_some() {
+            2
+        } else {
+            1
+        },
     };
     let cpi_accounts = cardinal_token_manager::cpi::accounts::InitCtx {
         token_manager: ctx.accounts.token_manager.to_account_info(),
@@ -180,7 +184,7 @@ pub fn handler<'key, 'accounts, 'remaining, 'info>(ctx: Context<'key, 'accounts,
             } else {
                 None
             },
-            extension_duration_seconds: Some(86400),
+            extension_duration_seconds: if ctx.accounts.namespace.payment_amount_daily > 0 { Some(86400) } else { None },
             extension_payment_mint: if ctx.accounts.namespace.payment_amount_daily > 0 { Some(payment_mint.key()) } else { None },
             max_expiration: ctx.accounts.namespace.max_expiration,
             disable_partial_extension: None,
@@ -201,7 +205,7 @@ pub fn handler<'key, 'accounts, 'remaining, 'info>(ctx: Context<'key, 'accounts,
             issuer: ctx.accounts.namespace.to_account_info(),
         };
         let cpi_ctx = CpiContext::new(ctx.accounts.token_manager_program.to_account_info(), cpi_accounts).with_signer(namespace_signer);
-        cardinal_token_manager::cpi::add_invalidator(cpi_ctx, ctx.accounts.namespace.key())?;
+        cardinal_token_manager::cpi::add_invalidator(cpi_ctx, time_invalidator_account_info.expect("Expected time_invalidator_account_info").to_account_info().key())?;
     }
 
     // token manager issue
@@ -227,8 +231,7 @@ pub fn handler<'key, 'accounts, 'remaining, 'info>(ctx: Context<'key, 'accounts,
         token_program: ctx.accounts.token_program.to_account_info(),
         system_program: ctx.accounts.system_program.to_account_info(),
     };
-    let remaining_accounts = ctx.remaining_accounts.to_vec();
-    let cpi_ctx = CpiContext::new(ctx.accounts.token_manager_program.to_account_info(), cpi_accounts).with_remaining_accounts(remaining_accounts);
+    let cpi_ctx = CpiContext::new(ctx.accounts.token_manager_program.to_account_info(), cpi_accounts).with_remaining_accounts(remaining_accs.cloned().collect::<Vec<AccountInfo<'info>>>());
     cardinal_token_manager::cpi::claim(cpi_ctx)?;
 
     if ctx.accounts.namespace.payment_amount_daily > 0 && ix.duration.expect("Duration required") > 0 {
