@@ -1242,6 +1242,10 @@ export type Namespaces = {
             type: {
               option: "i64";
             };
+          },
+          {
+            name: "invalidationType";
+            type: "u8";
           }
         ];
       };
@@ -1436,6 +1440,10 @@ export type Namespaces = {
             type: {
               option: "i64";
             };
+          },
+          {
+            name: "invalidationType";
+            type: "u8";
           }
         ];
       };
@@ -1742,6 +1750,11 @@ export type Namespaces = {
       code: 6022;
       name: "NamespaceReachedLimit";
       msg: "Namespace has reached the limit";
+    },
+    {
+      code: 6023;
+      name: "InvalidInvalidationType";
+      msg: "Namespace has invalid invalidation type";
     }
   ];
 };
@@ -2991,6 +3004,10 @@ export const IDL: Namespaces = {
               option: "i64",
             },
           },
+          {
+            name: "invalidationType",
+            type: "u8",
+          },
         ],
       },
     },
@@ -3184,6 +3201,10 @@ export const IDL: Namespaces = {
             type: {
               option: "i64",
             },
+          },
+          {
+            name: "invalidationType",
+            type: "u8",
           },
         ],
       },
@@ -3490,6 +3511,11 @@ export const IDL: Namespaces = {
       code: 6022,
       name: "NamespaceReachedLimit",
       msg: "Namespace has reached the limit",
+    },
+    {
+      code: 6023,
+      name: "InvalidInvalidationType",
+      msg: "Namespace has invalid invalidation type",
     },
   ],
 };

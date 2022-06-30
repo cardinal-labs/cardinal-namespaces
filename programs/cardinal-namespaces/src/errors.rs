@@ -48,4 +48,6 @@ pub enum ErrorCode {
     InvalidCertificate,
     #[msg("Namespace has reached the limit")]
     NamespaceReachedLimit,
+    #[msg("Namespace has invalid invalidation type")]
+    InvalidInvalidationType,
 }

@@ -360,19 +360,23 @@ describe("create-claim-expire-name-entry", () => {
       transaction,
       provider.connection,
       new SignerWallet(invalidator),
-      namespaceName,
-      nameEntry.parsed.mint,
-      entryName,
-      nameEntry.parsed.reverseEntry!
+      {
+        namespaceName,
+        entryName,
+        mintId: nameEntry.parsed.mint,
+        reverseEntryId: nameEntry.parsed.reverseEntry!,
+      }
     );
 
     await withInvalidateExpiredNameEntry(
       transaction,
       provider.connection,
       new SignerWallet(invalidator),
-      namespaceName,
-      nameEntry.parsed.mint,
-      entryName
+      {
+        namespaceName,
+        entryName,
+        mintId: nameEntry.parsed.mint,
+      }
     );
     await expectTXTable(
       new TransactionEnvelope(
@@ -414,5 +418,20 @@ describe("create-claim-expire-name-entry", () => {
       getNameEntry(provider.connection, namespaceName, entryName)
     );
     expect(entryAfter).to.eq(null);
+
+    const checkNamespaceTokenAccount = await new splToken.Token(
+      provider.connection,
+      nameEntry.parsed.mint,
+      TOKEN_PROGRAM_ID,
+      web3.Keypair.generate()
+    ).getAccountInfo(
+      await findAta(
+        nameEntry.parsed.mint,
+        (
+          await findNamespaceId(namespaceName)
+        )[0]
+      )
+    );
+    expect(checkNamespaceTokenAccount.amount.toNumber()).to.eq(1);
   });
 });
