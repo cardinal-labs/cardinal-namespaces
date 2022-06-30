@@ -89,6 +89,7 @@ export async function withCreateNamespace(
     maxRentalSeconds?: anchor.BN;
     transferableEntries: boolean;
     limit?: number;
+    maxExpiration?: anchor.BN;
   }
 ): Promise<Transaction> {
   const provider = new anchor.AnchorProvider(connection, wallet, {});
@@ -120,6 +121,7 @@ export async function withCreateNamespace(
         maxRentalSeconds: params.maxRentalSeconds ?? null,
         transferableEntries: params.transferableEntries,
         limit: params.limit ?? null,
+        maxExpiration: params.maxExpiration ?? null,
       },
       {
         accounts: {
@@ -140,15 +142,16 @@ export async function withUpdateNamespace(
   wallet: Wallet,
   namespaceName: string,
   params: {
-    updateAuthority: PublicKey;
-    rentAuthority: PublicKey;
+    updateAuthority?: PublicKey;
+    rentAuthority?: PublicKey;
     approveAuthority?: PublicKey;
     paymentAmountDaily?: anchor.BN;
     paymentMint?: PublicKey;
     minRentalSeconds?: anchor.BN;
     maxRentalSeconds?: anchor.BN;
-    transferableEntries: boolean;
+    transferableEntries?: boolean;
     limit?: number;
+    maxExpiration?: anchor.BN;
   }
 ): Promise<Transaction> {
   const provider = new anchor.AnchorProvider(connection, wallet, {});
@@ -162,15 +165,16 @@ export async function withUpdateNamespace(
   transaction.add(
     namespacesProgram.instruction.updateNamespace(
       {
-        updateAuthority: params.updateAuthority,
-        rentAuthority: params.rentAuthority,
+        updateAuthority: params.updateAuthority ?? null,
+        rentAuthority: params.rentAuthority ?? null,
         approveAuthority: params.approveAuthority ?? null,
         paymentAmountDaily: params.paymentAmountDaily ?? null,
         paymentMint: params.paymentMint ?? null,
         minRentalSeconds: params.minRentalSeconds ?? null,
         maxRentalSeconds: params.maxRentalSeconds ?? null,
-        transferableEntries: params.transferableEntries,
+        transferableEntries: params.transferableEntries ?? null,
         limit: params.limit ?? null,
+        maxExpiration: params.maxExpiration ?? null,
       },
       {
         accounts: {

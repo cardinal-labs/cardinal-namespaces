@@ -79,7 +79,10 @@ export const withRemainingAccountsForClaim = async (
   duration?: number
 ): Promise<AccountMeta[]> => {
   const namespace = await getNamespace(connection, namespaceId);
-  if (namespace.parsed.paymentAmountDaily.toNumber() > 0) {
+  if (
+    namespace.parsed.paymentAmountDaily.toNumber() > 0 ||
+    namespace.parsed.maxExpiration
+  ) {
     const [paymentManagerId] = await findPaymentManagerAddress(
       DEFAULT_PAYMENT_MANAGER
     );

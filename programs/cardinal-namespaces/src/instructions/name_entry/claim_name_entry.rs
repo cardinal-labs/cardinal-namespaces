@@ -156,7 +156,7 @@ pub fn handler<'key, 'accounts, 'remaining, 'info>(ctx: Context<'key, 'accounts,
     let mut payment_manager_account_info: Option<&AccountInfo> = None;
     let mut time_invalidator_account_info: Option<&AccountInfo> = None;
     let mut time_invalidator_program: Option<&AccountInfo> = None;
-    if ctx.accounts.namespace.payment_amount_daily > 0 {
+    if ctx.accounts.namespace.payment_amount_daily > 0 || ctx.accounts.namespace.max_expiration.is_some() {
         // payment_mint
         let payment_mint_account_info = next_account_info(remaining_accs)?;
         let payment_mint = Account::<Mint>::try_from(payment_mint_account_info)?;
@@ -175,10 +175,14 @@ pub fn handler<'key, 'accounts, 'remaining, 'info>(ctx: Context<'key, 'accounts,
             collector: ctx.accounts.namespace.key(),
             payment_manager: payment_manager_account_info.expect("Expected payment_manager").key(),
             duration_seconds: Some(0),
-            extension_payment_amount: Some(ctx.accounts.namespace.payment_amount_daily),
+            extension_payment_amount: if ctx.accounts.namespace.payment_amount_daily > 0 {
+                Some(ctx.accounts.namespace.payment_amount_daily)
+            } else {
+                None
+            },
             extension_duration_seconds: Some(86400),
-            extension_payment_mint: Some(payment_mint.key()),
-            max_expiration: None,
+            extension_payment_mint: if ctx.accounts.namespace.payment_amount_daily > 0 { Some(payment_mint.key()) } else { None },
+            max_expiration: ctx.accounts.namespace.max_expiration,
             disable_partial_extension: None,
         };
         let cpi_accounts = cardinal_time_invalidator::cpi::accounts::InitCtx {

@@ -16,7 +16,7 @@ pub struct GlobalContext {
     pub fee_basis_points: u64,
 }
 
-pub const NAMESPACE_SIZE: usize = 8 + std::mem::size_of::<Namespace>() + 80;
+pub const NAMESPACE_SIZE: usize = 8 + std::mem::size_of::<Namespace>() + 52;
 #[account]
 pub struct Namespace {
     pub bump: u8,
@@ -34,6 +34,7 @@ pub struct Namespace {
     pub transferable_entries: bool,
     pub count: u32,
     pub limit: Option<u32>,
+    pub max_expiration: Option<i64>,
 }
 
 pub const CLAIM_REQUEST_SIZE: usize = 8 + std::mem::size_of::<ClaimRequest>() + 24;

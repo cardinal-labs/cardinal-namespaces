@@ -70,6 +70,7 @@ describe("create-update-namespace", () => {
         approveAuthority: provider.wallet.publicKey,
         transferableEntries: false,
         limit: 1,
+        maxExpiration: new anchor.BN(10000),
       }
     );
     await expectTXTable(
@@ -94,5 +95,6 @@ describe("create-update-namespace", () => {
       checkNamespace.parsed.paymentAmountDaily.toNumber(),
       paymentAmountDaily.toNumber()
     );
+    assert.equal(checkNamespace.parsed.maxExpiration?.toNumber(), 10000);
   });
 });
