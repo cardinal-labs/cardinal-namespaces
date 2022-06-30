@@ -79,7 +79,10 @@ export const withRemainingAccountsForClaim = async (
   duration?: number
 ): Promise<AccountMeta[]> => {
   const namespace = await getNamespace(connection, namespaceId);
-  if (namespace.parsed.paymentAmountDaily.toNumber() > 0) {
+  if (
+    namespace.parsed.paymentAmountDaily.toNumber() > 0 ||
+    namespace.parsed.maxExpiration
+  ) {
     const [paymentManagerId] = await findPaymentManagerAddress(
       DEFAULT_PAYMENT_MANAGER
     );
@@ -95,12 +98,12 @@ export const withRemainingAccountsForClaim = async (
       {
         pubkey: paymentManagerId,
         isSigner: false,
-        isWritable: false,
+        isWritable: true,
       },
       {
         pubkey: timeInvalidatorId,
         isSigner: false,
-        isWritable: false,
+        isWritable: true,
       },
       {
         pubkey: TIME_INVALIDATOR_ADDRESS,
@@ -124,31 +127,32 @@ export const withRemainingAccountsForClaim = async (
       const paymentManagerData = await tryGetAccount(() =>
         getPaymentManager(connection, paymentManagerId)
       );
-      const feeCollectorId = await withFindOrInitAssociatedTokenAccount(
-        transaction,
-        connection,
-        namespace.parsed.paymentMint,
-        paymentManagerData
-          ? paymentManagerData.parsed.feeCollector
-          : PublicKey.default,
-        wallet.publicKey,
-        true
-      );
+      const feeCollectorTokenAccountId =
+        await withFindOrInitAssociatedTokenAccount(
+          transaction,
+          connection,
+          namespace.parsed.paymentMint,
+          paymentManagerData
+            ? paymentManagerData.parsed.feeCollector
+            : PublicKey.default,
+          wallet.publicKey,
+          true
+        );
       accounts.concat([
         {
           pubkey: payerTokenAccountId,
           isSigner: false,
-          isWritable: false,
+          isWritable: true,
         },
         {
           pubkey: paymentTokenAccountId,
           isSigner: false,
-          isWritable: false,
+          isWritable: true,
         },
         {
-          pubkey: feeCollectorId,
+          pubkey: feeCollectorTokenAccountId,
           isSigner: false,
-          isWritable: false,
+          isWritable: true,
         },
         {
           pubkey: PAYMENT_MANAGER_ADDRESS,

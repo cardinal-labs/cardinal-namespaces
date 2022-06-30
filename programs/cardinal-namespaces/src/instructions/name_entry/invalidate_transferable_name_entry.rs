@@ -24,6 +24,7 @@ pub struct InvalidateTransferableNameEntryCtx<'info> {
     )]
     token_manager: Account<'info, TokenManager>,
     /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
     invalidator: UncheckedAccount<'info>,
 }
 

@@ -23,7 +23,6 @@ pub struct InitEntry<'info> {
     #[account(
         init,
         payer = payer,
-        // todo choose size once data is finalized
         space = ENTRY_SIZE,
         seeds = [ENTRY_SEED.as_bytes(), namespace.key().as_ref(), ix.name.as_bytes()],
         bump,

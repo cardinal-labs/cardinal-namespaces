@@ -311,7 +311,7 @@ export type Namespaces = {
         },
         {
           name: "invalidator";
-          isMut: false;
+          isMut: true;
           isSigner: false;
         }
       ];
@@ -337,7 +337,7 @@ export type Namespaces = {
         },
         {
           name: "invalidator";
-          isMut: false;
+          isMut: true;
           isSigner: false;
         }
       ];
@@ -1236,6 +1236,12 @@ export type Namespaces = {
             type: {
               option: "u32";
             };
+          },
+          {
+            name: "maxExpiration";
+            type: {
+              option: "i64";
+            };
           }
         ];
       };
@@ -1424,6 +1430,12 @@ export type Namespaces = {
             type: {
               option: "u32";
             };
+          },
+          {
+            name: "maxExpiration";
+            type: {
+              option: "i64";
+            };
           }
         ];
       };
@@ -1603,6 +1615,12 @@ export type Namespaces = {
             name: "limit";
             type: {
               option: "u32";
+            };
+          },
+          {
+            name: "maxExpiration";
+            type: {
+              option: "i64";
             };
           }
         ];
@@ -2041,7 +2059,7 @@ export const IDL: Namespaces = {
         },
         {
           name: "invalidator",
-          isMut: false,
+          isMut: true,
           isSigner: false,
         },
       ],
@@ -2067,7 +2085,7 @@ export const IDL: Namespaces = {
         },
         {
           name: "invalidator",
-          isMut: false,
+          isMut: true,
           isSigner: false,
         },
       ],
@@ -2967,6 +2985,12 @@ export const IDL: Namespaces = {
               option: "u32",
             },
           },
+          {
+            name: "maxExpiration",
+            type: {
+              option: "i64",
+            },
+          },
         ],
       },
     },
@@ -3155,6 +3179,12 @@ export const IDL: Namespaces = {
               option: "u32",
             },
           },
+          {
+            name: "maxExpiration",
+            type: {
+              option: "i64",
+            },
+          },
         ],
       },
     },
@@ -3333,6 +3363,12 @@ export const IDL: Namespaces = {
             name: "limit",
             type: {
               option: "u32",
+            },
+          },
+          {
+            name: "maxExpiration",
+            type: {
+              option: "i64",
             },
           },
         ],

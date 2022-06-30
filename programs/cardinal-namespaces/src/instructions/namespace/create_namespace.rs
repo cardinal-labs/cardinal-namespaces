@@ -15,6 +15,7 @@ pub struct CreateNamespaceIx {
     pub max_rental_seconds: Option<i64>,
     pub transferable_entries: bool,
     pub limit: Option<u32>,
+    pub max_expiration: Option<i64>,
 }
 
 #[derive(Accounts)]
@@ -49,6 +50,7 @@ pub fn handler(ctx: Context<CreateNamespace>, ix: CreateNamespaceIx) -> Result<(
     namespace.schema = ix.schema;
     namespace.transferable_entries = ix.transferable_entries;
     namespace.limit = ix.limit;
+    namespace.max_expiration = ix.max_expiration;
     namespace.count = 0;
     Ok(())
 }
