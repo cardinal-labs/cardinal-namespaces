@@ -46,4 +46,6 @@ pub enum ErrorCode {
     NameEntryAlreadyClaimed,
     #[msg("Invalid certificate")]
     InvalidCertificate,
+    #[msg("Namespace has reached the limit")]
+    NamespaceReachedLimit,
 }

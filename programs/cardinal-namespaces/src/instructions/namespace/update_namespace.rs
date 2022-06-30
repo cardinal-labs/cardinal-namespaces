@@ -12,6 +12,7 @@ pub struct UpdateNamespaceIx {
     pub min_rental_seconds: Option<i64>,
     pub max_rental_seconds: Option<i64>,
     pub transferable_entries: Option<bool>,
+    pub limit: Option<u32>,
 }
 
 #[derive(Accounts)]
@@ -40,5 +41,8 @@ pub fn handler(ctx: Context<UpdateNamepsace>, ix: UpdateNamespaceIx) -> Result<(
         namespace.max_rental_seconds = ix.max_rental_seconds;
     }
     namespace.transferable_entries = ix.transferable_entries.unwrap_or(namespace.transferable_entries);
+    if ix.limit.is_some() {
+        namespace.limit = ix.limit;
+    }
     Ok(())
 }

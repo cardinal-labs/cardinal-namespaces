@@ -2,7 +2,6 @@ use {crate::state::*, anchor_lang::prelude::*};
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct CreateNamespaceIx {
-    pub bump: u8,
     pub name: String,
     pub update_authority: Pubkey,
     pub rent_authority: Pubkey,
@@ -15,6 +14,7 @@ pub struct CreateNamespaceIx {
     pub min_rental_seconds: i64,
     pub max_rental_seconds: Option<i64>,
     pub transferable_entries: bool,
+    pub limit: Option<u32>,
 }
 
 #[derive(Accounts)]
@@ -48,5 +48,7 @@ pub fn handler(ctx: Context<CreateNamespace>, ix: CreateNamespaceIx) -> Result<(
     namespace.max_rental_seconds = ix.max_rental_seconds;
     namespace.schema = ix.schema;
     namespace.transferable_entries = ix.transferable_entries;
+    namespace.limit = ix.limit;
+    namespace.count = 0;
     Ok(())
 }

@@ -6,6 +6,7 @@ use {
 
 #[derive(Accounts)]
 pub struct InvalidateExpiredNameEntryCtx<'info> {
+    #[account(mut)]
     pub namespace: Account<'info, Namespace>,
     #[account(
         mut,
@@ -30,5 +31,8 @@ pub fn handler(ctx: Context<InvalidateExpiredNameEntryCtx>) -> Result<()> {
     let name_entry = &mut ctx.accounts.name_entry;
     name_entry.data = None;
     name_entry.is_claimed = false;
+
+    let namespace = &mut ctx.accounts.namespace;
+    namespace.count = namespace.count.checked_sub(1).expect("Sub error");
     Ok(())
 }

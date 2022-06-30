@@ -32,6 +32,8 @@ pub struct Namespace {
     pub min_rental_seconds: i64,
     pub max_rental_seconds: Option<i64>,
     pub transferable_entries: bool,
+    pub count: u32,
+    pub limit: Option<u32>,
 }
 
 pub const CLAIM_REQUEST_SIZE: usize = 8 + std::mem::size_of::<ClaimRequest>() + 24;

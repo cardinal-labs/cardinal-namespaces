@@ -3,6 +3,7 @@ import { SignerWallet } from "@saberhq/solana-contrib";
 import type * as splToken from "@solana/spl-token";
 import * as web3 from "@solana/web3.js";
 import assert from "assert";
+import { BN } from "bn.js";
 
 import {
   getNamespace,
@@ -38,19 +39,20 @@ describe("namespace-create-update", () => {
     const transaction = new web3.Transaction();
 
     await withCreateNamespace(
+      transaction,
       provider.connection,
       provider.wallet,
-      NAMESPACE_NAME,
-      provider.wallet.publicKey,
-      provider.wallet.publicKey,
-      provider.wallet.publicKey,
-      0,
-      new anchor.BN(1),
-      paymentMint.publicKey,
-      new anchor.BN(100),
-      new anchor.BN(86400),
-      false,
-      transaction
+      {
+        namespaceName: NAMESPACE_NAME,
+        updateAuthority: provider.wallet.publicKey,
+        rentAuthority: provider.wallet.publicKey,
+        approveAuthority: provider.wallet.publicKey,
+        minRentalSeconds: new BN(100),
+        maxRentalSeconds: new BN(86400),
+        paymentAmountDaily: new BN(1),
+        paymentMint: paymentMint.publicKey,
+        transferableEntries: true,
+      }
     );
     transaction.feePayer = provider.wallet.publicKey;
     transaction.recentBlockhash = (
@@ -73,18 +75,20 @@ describe("namespace-create-update", () => {
   it("Update a namespace not authority", async () => {
     const transaction = new web3.Transaction();
     await withUpdateNamespace(
+      transaction,
       provider.connection,
       provider.wallet,
       NAMESPACE_NAME,
-      provider.wallet.publicKey,
-      provider.wallet.publicKey,
-      provider.wallet.publicKey,
-      new anchor.BN(1),
-      paymentMint.publicKey,
-      new anchor.BN(100),
-      new anchor.BN(86400),
-      true,
-      transaction
+      {
+        updateAuthority: mintAuthority.publicKey,
+        rentAuthority: mintAuthority.publicKey,
+        approveAuthority: mintAuthority.publicKey,
+        minRentalSeconds: new BN(100),
+        maxRentalSeconds: new BN(86400),
+        paymentAmountDaily: new BN(1),
+        paymentMint: paymentMint.publicKey,
+        transferableEntries: true,
+      }
     );
     transaction.feePayer = mintAuthority.publicKey;
     transaction.recentBlockhash = (
@@ -111,18 +115,20 @@ describe("namespace-create-update", () => {
 
     const transaction = new web3.Transaction();
     await withUpdateNamespace(
+      transaction,
       provider.connection,
       provider.wallet,
       NAMESPACE_NAME,
-      provider.wallet.publicKey,
-      provider.wallet.publicKey,
-      provider.wallet.publicKey,
-      new anchor.BN(1),
-      paymentMint.publicKey,
-      new anchor.BN(100),
-      new anchor.BN(86500),
-      true,
-      transaction
+      {
+        updateAuthority: provider.wallet.publicKey,
+        rentAuthority: provider.wallet.publicKey,
+        approveAuthority: provider.wallet.publicKey,
+        minRentalSeconds: new BN(100),
+        maxRentalSeconds: new BN(86500),
+        paymentAmountDaily: new BN(1),
+        paymentMint: paymentMint.publicKey,
+        transferableEntries: true,
+      }
     );
     transaction.feePayer = provider.wallet.publicKey;
     transaction.recentBlockhash = (

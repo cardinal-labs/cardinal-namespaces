@@ -74,19 +74,22 @@ export async function withInit(
 }
 
 export async function withCreateNamespace(
+  transaction: Transaction,
   connection: Connection,
   wallet: Wallet,
-  name: string,
-  updateAuthority: PublicKey,
-  rentAuthority: PublicKey,
-  approveAuthority: PublicKey | null,
-  schema: number,
-  paymentAmountDaily: anchor.BN,
-  paymentMint: PublicKey,
-  minRentalSeconds: anchor.BN,
-  maxRentalSeconds: anchor.BN | null,
-  transferableEntries: boolean,
-  transaction: Transaction
+  params: {
+    namespaceName: string;
+    schema?: number;
+    updateAuthority: PublicKey;
+    rentAuthority: PublicKey;
+    approveAuthority?: PublicKey;
+    paymentAmountDaily?: anchor.BN;
+    paymentMint?: PublicKey;
+    minRentalSeconds?: anchor.BN;
+    maxRentalSeconds?: anchor.BN;
+    transferableEntries: boolean;
+    limit?: number;
+  }
 ): Promise<Transaction> {
   const provider = new anchor.AnchorProvider(connection, wallet, {});
   const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
@@ -95,10 +98,10 @@ export async function withCreateNamespace(
     provider
   );
 
-  const [namespaceId, bump] = await PublicKey.findProgramAddress(
+  const [namespaceId] = await PublicKey.findProgramAddress(
     [
       anchor.utils.bytes.utf8.encode(NAMESPACE_SEED),
-      anchor.utils.bytes.utf8.encode(name),
+      anchor.utils.bytes.utf8.encode(params.namespaceName),
     ],
     namespacesProgram.programId
   );
@@ -106,17 +109,17 @@ export async function withCreateNamespace(
   transaction.add(
     namespacesProgram.instruction.createNamespace(
       {
-        bump,
-        name,
-        updateAuthority,
-        rentAuthority,
-        approveAuthority,
-        schema,
-        paymentAmountDaily,
-        paymentMint,
-        minRentalSeconds,
-        maxRentalSeconds,
-        transferableEntries,
+        name: params.namespaceName,
+        updateAuthority: params.updateAuthority,
+        rentAuthority: params.rentAuthority,
+        approveAuthority: params.approveAuthority ?? null,
+        schema: params.schema ?? 0,
+        paymentAmountDaily: params.paymentAmountDaily ?? new anchor.BN(0),
+        paymentMint: params.paymentMint ?? PublicKey.default,
+        minRentalSeconds: params.minRentalSeconds ?? new anchor.BN(0),
+        maxRentalSeconds: params.maxRentalSeconds ?? null,
+        transferableEntries: params.transferableEntries,
+        limit: params.limit ?? null,
       },
       {
         accounts: {
@@ -132,18 +135,21 @@ export async function withCreateNamespace(
 }
 
 export async function withUpdateNamespace(
+  transaction: Transaction,
   connection: Connection,
   wallet: Wallet,
-  name: string,
-  updateAuthority: PublicKey,
-  rentAuthority: PublicKey,
-  approveAuthority: PublicKey | null,
-  paymentAmountDaily: anchor.BN,
-  paymentMint: PublicKey,
-  minRentalSeconds: anchor.BN,
-  maxRentalSeconds: anchor.BN | null,
-  transferableEntries: boolean,
-  transaction: Transaction
+  namespaceName: string,
+  params: {
+    updateAuthority: PublicKey;
+    rentAuthority: PublicKey;
+    approveAuthority?: PublicKey;
+    paymentAmountDaily?: anchor.BN;
+    paymentMint?: PublicKey;
+    minRentalSeconds?: anchor.BN;
+    maxRentalSeconds?: anchor.BN;
+    transferableEntries: boolean;
+    limit?: number;
+  }
 ): Promise<Transaction> {
   const provider = new anchor.AnchorProvider(connection, wallet, {});
   const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
@@ -152,25 +158,19 @@ export async function withUpdateNamespace(
     provider
   );
 
-  const [namespaceId] = await PublicKey.findProgramAddress(
-    [
-      anchor.utils.bytes.utf8.encode(NAMESPACE_SEED),
-      anchor.utils.bytes.utf8.encode(name),
-    ],
-    namespacesProgram.programId
-  );
-
+  const [namespaceId] = await findNamespaceId(namespaceName);
   transaction.add(
     namespacesProgram.instruction.updateNamespace(
       {
-        updateAuthority,
-        rentAuthority,
-        approveAuthority,
-        paymentAmountDaily,
-        paymentMint,
-        minRentalSeconds,
-        maxRentalSeconds,
-        transferableEntries,
+        updateAuthority: params.updateAuthority,
+        rentAuthority: params.rentAuthority,
+        approveAuthority: params.approveAuthority ?? null,
+        paymentAmountDaily: params.paymentAmountDaily ?? null,
+        paymentMint: params.paymentMint ?? null,
+        minRentalSeconds: params.minRentalSeconds ?? null,
+        maxRentalSeconds: params.maxRentalSeconds ?? null,
+        transferableEntries: params.transferableEntries,
+        limit: params.limit ?? null,
       },
       {
         accounts: {

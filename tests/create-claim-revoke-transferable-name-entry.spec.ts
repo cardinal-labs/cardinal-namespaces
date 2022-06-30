@@ -51,19 +51,18 @@ describe("create-claim-revoke-transferable-name-entry", () => {
 
     const transaction = new web3.Transaction();
     await withCreateNamespace(
+      transaction,
       provider.connection,
       provider.wallet,
-      namespaceName,
-      provider.wallet.publicKey,
-      provider.wallet.publicKey,
-      provider.wallet.publicKey,
-      0,
-      paymentAmountDaily,
-      paymentMint.publicKey,
-      new anchor.BN(0),
-      null,
-      true,
-      transaction
+      {
+        namespaceName,
+        updateAuthority: provider.wallet.publicKey,
+        rentAuthority: provider.wallet.publicKey,
+        approveAuthority: provider.wallet.publicKey,
+        paymentAmountDaily,
+        paymentMint: paymentMint.publicKey,
+        transferableEntries: true,
+      }
     );
     await expectTXTable(
       new TransactionEnvelope(
