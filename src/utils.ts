@@ -14,15 +14,27 @@ import type { AccountMeta, Connection, Transaction } from "@solana/web3.js";
 import { PublicKey } from "@solana/web3.js";
 
 import { getNamespace, getReverseEntry } from "./accounts";
-import { DEFAULT_PAYMENT_MANAGER } from "./constants";
+import { DEFAULT_PAYMENT_MANAGER, IDENTITIES } from "./constants";
 
 export function formatName(namespace: string, name: string): string {
-  return namespace === "twitter" ? `@${name}` : `${name}.${namespace}`;
+  return IDENTITIES.includes(namespace) ? `@${name}` : `${name}.${namespace}`;
 }
 
 export function breakName(fullName: string): [string, string] {
   if (fullName.startsWith("@")) {
     return ["twitter", fullName.split("@")[1]!];
+  }
+  const [entryName, namespace] = fullName.split(".");
+  return [namespace!, entryName!];
+}
+
+export function breakIdentity(fullName: string): [string, string] {
+  if (fullName.startsWith("@")) {
+    const namespace = fullName.split(":").at(-1) || "twitter";
+    const entryName = fullName.includes(":")
+      ? fullName.split("@")[1]!.split(":")[0]!
+      : fullName.split("@")[1]!;
+    return [namespace, entryName];
   }
   const [entryName, namespace] = fullName.split(".");
   return [namespace!, entryName!];
