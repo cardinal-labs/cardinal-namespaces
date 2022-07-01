@@ -873,3 +873,27 @@ export async function withUpdateMintMetadata(
   );
   return transaction;
 }
+
+export function withCloseNameEntry(
+  connection: Connection,
+  wallet: Wallet,
+  namespaceId: PublicKey,
+  transaction: Transaction
+): Transaction {
+  const provider = new anchor.AnchorProvider(connection, wallet, {});
+  const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
+    NAMESPACES_IDL,
+    NAMESPACES_PROGRAM_ID,
+    provider
+  );
+
+  transaction.add(
+    namespacesProgram.instruction.closeNameEntry({
+      accounts: {
+        namespace: namespaceId,
+        invalidator: wallet.publicKey,
+      },
+    })
+  );
+  return transaction;
+}

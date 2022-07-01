@@ -474,6 +474,22 @@ export type Namespaces = {
       ];
     },
     {
+      name: "closeNameEntry";
+      accounts: [
+        {
+          name: "namespace";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "invalidator";
+          isMut: true;
+          isSigner: false;
+        }
+      ];
+      args: [];
+    },
+    {
       name: "collectNamespaceFunds";
       accounts: [
         {
@@ -1708,51 +1724,56 @@ export type Namespaces = {
     },
     {
       code: 6014;
+      name: "InvalidUpdateAuthority";
+      msg: "Invalid udapte authority";
+    },
+    {
+      code: 6015;
       name: "InvalidApproveAuthority";
       msg: "Invalid approve authority";
     },
     {
-      code: 6015;
+      code: 6016;
       name: "NamespaceRequiresToken";
       msg: "Namespace requires token";
     },
     {
-      code: 6016;
+      code: 6017;
       name: "MintAlreadyInitialized";
       msg: "Mint already initialized";
     },
     {
-      code: 6017;
+      code: 6018;
       name: "InvalidEntryMint";
       msg: "Mint invalid for entry";
     },
     {
-      code: 6018;
+      code: 6019;
       name: "InvalidTimeInvalidatorProgramId";
       msg: "Time invalidator program ID is invalid";
     },
     {
-      code: 6019;
+      code: 6020;
       name: "InvalidTokenManager";
       msg: "Invalid token manager";
     },
     {
-      code: 6020;
+      code: 6021;
       name: "NameEntryAlreadyClaimed";
       msg: "Name Entry already claimed";
     },
     {
-      code: 6021;
+      code: 6022;
       name: "InvalidCertificate";
       msg: "Invalid certificate";
     },
     {
-      code: 6022;
+      code: 6023;
       name: "NamespaceReachedLimit";
       msg: "Namespace has reached the limit";
     },
     {
-      code: 6023;
+      code: 6024;
       name: "InvalidInvalidationType";
       msg: "Namespace has invalid invalidation type";
     }
@@ -2233,6 +2254,22 @@ export const IDL: Namespaces = {
           },
         },
       ],
+    },
+    {
+      name: "closeNameEntry",
+      accounts: [
+        {
+          name: "namespace",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "invalidator",
+          isMut: true,
+          isSigner: false,
+        },
+      ],
+      args: [],
     },
     {
       name: "collectNamespaceFunds",
@@ -3469,51 +3506,56 @@ export const IDL: Namespaces = {
     },
     {
       code: 6014,
+      name: "InvalidUpdateAuthority",
+      msg: "Invalid udapte authority",
+    },
+    {
+      code: 6015,
       name: "InvalidApproveAuthority",
       msg: "Invalid approve authority",
     },
     {
-      code: 6015,
+      code: 6016,
       name: "NamespaceRequiresToken",
       msg: "Namespace requires token",
     },
     {
-      code: 6016,
+      code: 6017,
       name: "MintAlreadyInitialized",
       msg: "Mint already initialized",
     },
     {
-      code: 6017,
+      code: 6018,
       name: "InvalidEntryMint",
       msg: "Mint invalid for entry",
     },
     {
-      code: 6018,
+      code: 6019,
       name: "InvalidTimeInvalidatorProgramId",
       msg: "Time invalidator program ID is invalid",
     },
     {
-      code: 6019,
+      code: 6020,
       name: "InvalidTokenManager",
       msg: "Invalid token manager",
     },
     {
-      code: 6020,
+      code: 6021,
       name: "NameEntryAlreadyClaimed",
       msg: "Name Entry already claimed",
     },
     {
-      code: 6021,
+      code: 6022,
       name: "InvalidCertificate",
       msg: "Invalid certificate",
     },
     {
-      code: 6022,
+      code: 6023,
       name: "NamespaceReachedLimit",
       msg: "Namespace has reached the limit",
     },
     {
-      code: 6023,
+      code: 6024,
       name: "InvalidInvalidationType",
       msg: "Namespace has invalid invalidation type",
     },

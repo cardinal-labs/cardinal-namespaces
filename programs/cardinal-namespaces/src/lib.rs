@@ -57,6 +57,10 @@ pub mod namespaces {
         name_entry::update_name_entry_mint_metadata::handler(ctx, ix)
     }
 
+    pub fn close_name_entry(ctx: Context<CloseNameEntryCtx>) -> Result<()> {
+        name_entry::close_name_entry::handler(ctx)
+    }
+
     // namespace
     pub fn collect_namespace_funds(ctx: Context<CollectNamespaceFundsCtx>, amount: u64) -> Result<()> {
         namespace::collect_namespace_funds::handler(ctx, amount)
