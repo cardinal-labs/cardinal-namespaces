@@ -8,13 +8,8 @@ use {
 pub struct InvalidateExpiredNameEntryCtx<'info> {
     #[account(mut)]
     pub namespace: Account<'info, Namespace>,
-    #[account(
-        mut,
-        close = invalidator,
-        // Must invalidate reverse entry first
-        constraint = name_entry.namespace == namespace.key() && name_entry.reverse_entry == None
-        @ ErrorCode::InvalidEntry
-    )]
+    // Must invalidate reverse entry first
+    #[account(mut, constraint = name_entry.namespace == namespace.key() && name_entry.reverse_entry == None @ ErrorCode::InvalidEntry)]
     pub name_entry: Account<'info, Entry>,
     #[account(mut, constraint =
         namespace_token_account.mint == name_entry.mint
