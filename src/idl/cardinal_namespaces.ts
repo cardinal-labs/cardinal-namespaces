@@ -1,5 +1,5 @@
 export type Namespaces = {
-  version: "4.1.17";
+  version: "4.1.18";
   name: "namespaces";
   instructions: [
     {
@@ -1367,64 +1367,6 @@ export type Namespaces = {
       };
     },
     {
-      name: "InitEntryIx";
-      type: {
-        kind: "struct";
-        fields: [
-          {
-            name: "name";
-            type: "string";
-          },
-          {
-            name: "entryBump";
-            type: "u8";
-          },
-          {
-            name: "mintManagerBump";
-            type: "u8";
-          }
-        ];
-      };
-    },
-    {
-      name: "InitGlobalContextIx";
-      type: {
-        kind: "struct";
-        fields: [
-          {
-            name: "feeBasisPoints";
-            type: "u64";
-          }
-        ];
-      };
-    },
-    {
-      name: "UpdateGlobalContextIx";
-      type: {
-        kind: "struct";
-        fields: [
-          {
-            name: "updateAuthority";
-            type: {
-              option: "publicKey";
-            };
-          },
-          {
-            name: "rentAuthority";
-            type: {
-              option: "publicKey";
-            };
-          },
-          {
-            name: "feeBasisPoints";
-            type: {
-              option: "u64";
-            };
-          }
-        ];
-      };
-    },
-    {
       name: "ClaimNameEntryIx";
       type: {
         kind: "struct";
@@ -1433,66 +1375,6 @@ export type Namespaces = {
             name: "duration";
             type: {
               option: "i64";
-            };
-          }
-        ];
-      };
-    },
-    {
-      name: "Creator";
-      type: {
-        kind: "struct";
-        fields: [
-          {
-            name: "address";
-            type: "publicKey";
-          },
-          {
-            name: "verified";
-            type: "bool";
-          },
-          {
-            name: "share";
-            type: "u8";
-          }
-        ];
-      };
-    },
-    {
-      name: "InitNameEntryIx";
-      type: {
-        kind: "struct";
-        fields: [
-          {
-            name: "name";
-            type: "string";
-          }
-        ];
-      };
-    },
-    {
-      name: "UpdateNameEntryMintMetadataIx";
-      type: {
-        kind: "struct";
-        fields: [
-          {
-            name: "sellerFeeBasisPoints";
-            type: "u16";
-          },
-          {
-            name: "creators";
-            type: {
-              option: {
-                vec: {
-                  defined: "Creator";
-                };
-              };
-            };
-          },
-          {
-            name: "primarySaleHappened";
-            type: {
-              option: "bool";
             };
           }
         ];
@@ -1562,6 +1444,124 @@ export type Namespaces = {
           {
             name: "invalidationType";
             type: "u8";
+          }
+        ];
+      };
+    },
+    {
+      name: "InitEntryIx";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "name";
+            type: "string";
+          },
+          {
+            name: "entryBump";
+            type: "u8";
+          },
+          {
+            name: "mintManagerBump";
+            type: "u8";
+          }
+        ];
+      };
+    },
+    {
+      name: "InitGlobalContextIx";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "feeBasisPoints";
+            type: "u64";
+          }
+        ];
+      };
+    },
+    {
+      name: "InitNameEntryIx";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "name";
+            type: "string";
+          }
+        ];
+      };
+    },
+    {
+      name: "Creator";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "address";
+            type: "publicKey";
+          },
+          {
+            name: "verified";
+            type: "bool";
+          },
+          {
+            name: "share";
+            type: "u8";
+          }
+        ];
+      };
+    },
+    {
+      name: "UpdateGlobalContextIx";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "updateAuthority";
+            type: {
+              option: "publicKey";
+            };
+          },
+          {
+            name: "rentAuthority";
+            type: {
+              option: "publicKey";
+            };
+          },
+          {
+            name: "feeBasisPoints";
+            type: {
+              option: "u64";
+            };
+          }
+        ];
+      };
+    },
+    {
+      name: "UpdateNameEntryMintMetadataIx";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "sellerFeeBasisPoints";
+            type: "u16";
+          },
+          {
+            name: "creators";
+            type: {
+              option: {
+                vec: {
+                  defined: "Creator";
+                };
+              };
+            };
+          },
+          {
+            name: "primarySaleHappened";
+            type: {
+              option: "bool";
+            };
           }
         ];
       };
@@ -1760,7 +1760,7 @@ export type Namespaces = {
 };
 
 export const IDL: Namespaces = {
-  version: "4.1.17",
+  version: "4.1.18",
   name: "namespaces",
   instructions: [
     {
@@ -3128,64 +3128,6 @@ export const IDL: Namespaces = {
       },
     },
     {
-      name: "InitEntryIx",
-      type: {
-        kind: "struct",
-        fields: [
-          {
-            name: "name",
-            type: "string",
-          },
-          {
-            name: "entryBump",
-            type: "u8",
-          },
-          {
-            name: "mintManagerBump",
-            type: "u8",
-          },
-        ],
-      },
-    },
-    {
-      name: "InitGlobalContextIx",
-      type: {
-        kind: "struct",
-        fields: [
-          {
-            name: "feeBasisPoints",
-            type: "u64",
-          },
-        ],
-      },
-    },
-    {
-      name: "UpdateGlobalContextIx",
-      type: {
-        kind: "struct",
-        fields: [
-          {
-            name: "updateAuthority",
-            type: {
-              option: "publicKey",
-            },
-          },
-          {
-            name: "rentAuthority",
-            type: {
-              option: "publicKey",
-            },
-          },
-          {
-            name: "feeBasisPoints",
-            type: {
-              option: "u64",
-            },
-          },
-        ],
-      },
-    },
-    {
       name: "ClaimNameEntryIx",
       type: {
         kind: "struct",
@@ -3194,66 +3136,6 @@ export const IDL: Namespaces = {
             name: "duration",
             type: {
               option: "i64",
-            },
-          },
-        ],
-      },
-    },
-    {
-      name: "Creator",
-      type: {
-        kind: "struct",
-        fields: [
-          {
-            name: "address",
-            type: "publicKey",
-          },
-          {
-            name: "verified",
-            type: "bool",
-          },
-          {
-            name: "share",
-            type: "u8",
-          },
-        ],
-      },
-    },
-    {
-      name: "InitNameEntryIx",
-      type: {
-        kind: "struct",
-        fields: [
-          {
-            name: "name",
-            type: "string",
-          },
-        ],
-      },
-    },
-    {
-      name: "UpdateNameEntryMintMetadataIx",
-      type: {
-        kind: "struct",
-        fields: [
-          {
-            name: "sellerFeeBasisPoints",
-            type: "u16",
-          },
-          {
-            name: "creators",
-            type: {
-              option: {
-                vec: {
-                  defined: "Creator",
-                },
-              },
-            },
-          },
-          {
-            name: "primarySaleHappened",
-            type: {
-              option: "bool",
             },
           },
         ],
@@ -3323,6 +3205,124 @@ export const IDL: Namespaces = {
           {
             name: "invalidationType",
             type: "u8",
+          },
+        ],
+      },
+    },
+    {
+      name: "InitEntryIx",
+      type: {
+        kind: "struct",
+        fields: [
+          {
+            name: "name",
+            type: "string",
+          },
+          {
+            name: "entryBump",
+            type: "u8",
+          },
+          {
+            name: "mintManagerBump",
+            type: "u8",
+          },
+        ],
+      },
+    },
+    {
+      name: "InitGlobalContextIx",
+      type: {
+        kind: "struct",
+        fields: [
+          {
+            name: "feeBasisPoints",
+            type: "u64",
+          },
+        ],
+      },
+    },
+    {
+      name: "InitNameEntryIx",
+      type: {
+        kind: "struct",
+        fields: [
+          {
+            name: "name",
+            type: "string",
+          },
+        ],
+      },
+    },
+    {
+      name: "Creator",
+      type: {
+        kind: "struct",
+        fields: [
+          {
+            name: "address",
+            type: "publicKey",
+          },
+          {
+            name: "verified",
+            type: "bool",
+          },
+          {
+            name: "share",
+            type: "u8",
+          },
+        ],
+      },
+    },
+    {
+      name: "UpdateGlobalContextIx",
+      type: {
+        kind: "struct",
+        fields: [
+          {
+            name: "updateAuthority",
+            type: {
+              option: "publicKey",
+            },
+          },
+          {
+            name: "rentAuthority",
+            type: {
+              option: "publicKey",
+            },
+          },
+          {
+            name: "feeBasisPoints",
+            type: {
+              option: "u64",
+            },
+          },
+        ],
+      },
+    },
+    {
+      name: "UpdateNameEntryMintMetadataIx",
+      type: {
+        kind: "struct",
+        fields: [
+          {
+            name: "sellerFeeBasisPoints",
+            type: "u16",
+          },
+          {
+            name: "creators",
+            type: {
+              option: {
+                vec: {
+                  defined: "Creator",
+                },
+              },
+            },
+          },
+          {
+            name: "primarySaleHappened",
+            type: {
+              option: "bool",
+            },
           },
         ],
       },
