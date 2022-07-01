@@ -126,10 +126,14 @@ pub fn handler<'key, 'accounts, 'remaining, 'info>(ctx: Context<'key, 'accounts,
         } else {
             TokenManagerKind::Edition as u8
         },
-        invalidation_type: if ctx.accounts.namespace.transferable_entries {
-            InvalidationType::Invalidate as u8
+        invalidation_type: if ctx.accounts.namespace.invalidation_type == 0 {
+            if ctx.accounts.namespace.transferable_entries {
+                InvalidationType::Invalidate as u8
+            } else {
+                InvalidationType::Return as u8
+            }
         } else {
-            InvalidationType::Return as u8
+            ctx.accounts.namespace.invalidation_type
         },
         num_invalidators: if ctx.accounts.namespace.payment_amount_daily > 0 || ctx.accounts.namespace.max_expiration.is_some() {
             2

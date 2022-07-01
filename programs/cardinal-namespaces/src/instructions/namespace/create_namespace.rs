@@ -1,4 +1,8 @@
-use {crate::state::*, anchor_lang::prelude::*};
+use {
+    crate::{errors::ErrorCode, state::*},
+    anchor_lang::prelude::*,
+    cardinal_token_manager::state::InvalidationType,
+};
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct CreateNamespaceIx {
@@ -16,6 +20,7 @@ pub struct CreateNamespaceIx {
     pub transferable_entries: bool,
     pub limit: Option<u32>,
     pub max_expiration: Option<i64>,
+    pub invalidation_type: u8,
 }
 
 #[derive(Accounts)]
@@ -51,6 +56,18 @@ pub fn handler(ctx: Context<CreateNamespace>, ix: CreateNamespaceIx) -> Result<(
     namespace.transferable_entries = ix.transferable_entries;
     namespace.limit = ix.limit;
     namespace.max_expiration = ix.max_expiration;
+    namespace.invalidation_type = ix.invalidation_type;
     namespace.count = 0;
+
+    if ix.invalidation_type != InvalidationType::Return as u8
+        && ix.invalidation_type != InvalidationType::Invalidate as u8
+        && ix.invalidation_type != InvalidationType::Release as u8
+        && ix.invalidation_type != InvalidationType::Reissue as u8
+    {
+        return Err(error!(ErrorCode::InvalidInvalidationType));
+    }
+    if ix.invalidation_type == InvalidationType::Return as u8 && ix.transferable_entries == true {
+        return Err(error!(ErrorCode::InvalidInvalidationType));
+    }
     Ok(())
 }

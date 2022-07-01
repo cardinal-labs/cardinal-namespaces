@@ -2,6 +2,7 @@ import { withFindOrInitAssociatedTokenAccount } from "@cardinal/certificates";
 import { findAta } from "@cardinal/common";
 import {
   getRemainingAccountsForKind,
+  InvalidationType,
   TOKEN_MANAGER_ADDRESS,
   TokenManagerKind,
   withRemainingAccountsForReturn,
@@ -86,6 +87,7 @@ export async function withCreateNamespace(
     transferableEntries: boolean;
     limit?: number;
     maxExpiration?: anchor.BN;
+    invalidationType?: InvalidationType;
   }
 ): Promise<Transaction> {
   const provider = new anchor.AnchorProvider(connection, wallet, {});
@@ -112,6 +114,10 @@ export async function withCreateNamespace(
         transferableEntries: params.transferableEntries,
         limit: params.limit ?? null,
         maxExpiration: params.maxExpiration ?? null,
+        invalidationType:
+          params.invalidationType ?? params.transferableEntries
+            ? InvalidationType.Invalidate
+            : InvalidationType.Return,
       },
       {
         accounts: {
@@ -449,10 +455,12 @@ export async function withInvalidateExpiredNameEntry(
   transaction: Transaction,
   connection: Connection,
   wallet: Wallet,
-  namespaceName: string,
-  mintId: PublicKey,
-  entryName: string,
-  invalidator?: PublicKey
+  params: {
+    namespaceName: string;
+    mintId: PublicKey;
+    entryName: string;
+    invalidator?: PublicKey;
+  }
 ): Promise<Transaction> {
   const provider = new anchor.AnchorProvider(connection, wallet, {});
   const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
@@ -460,20 +468,86 @@ export async function withInvalidateExpiredNameEntry(
     NAMESPACES_PROGRAM_ID,
     provider
   );
-  const [namespaceId] = await findNamespaceId(namespaceName);
-  const [nameEntryId] = await findNameEntryId(namespaceId, entryName);
-  const namespaceTokenAccountId = await findAta(mintId, namespaceId, true);
+  const [namespaceId] = await findNamespaceId(params.namespaceName);
+  const [nameEntryId] = await findNameEntryId(namespaceId, params.entryName);
+  const namespaceTokenAccountId = await findAta(
+    params.mintId,
+    namespaceId,
+    true
+  );
   transaction.add(
     namespacesProgram.instruction.invalidateExpiredNameEntry({
       accounts: {
         namespace: namespaceId,
         nameEntry: nameEntryId,
         namespaceTokenAccount: namespaceTokenAccountId,
-        invalidator: invalidator || namespaceId,
+        invalidator: params.invalidator || namespaceId,
       },
     })
   );
   return transaction;
+}
+
+export async function withInvalidateTransferableNameEntry(
+  transaction: Transaction,
+  connection: Connection,
+  wallet: Wallet,
+  params: {
+    namespaceName: string;
+    mintId: PublicKey;
+    entryName: string;
+    invalidator?: PublicKey;
+  }
+): Promise<Transaction> {
+  const provider = new anchor.AnchorProvider(connection, wallet, {});
+  const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
+    NAMESPACES_IDL,
+    NAMESPACES_PROGRAM_ID,
+    provider
+  );
+  const [namespaceId] = await findNamespaceId(params.namespaceName);
+  const [nameEntryId] = await findNameEntryId(namespaceId, params.entryName);
+  const [tokenManagerId] = await findTokenManagerAddress(params.mintId);
+  transaction.add(
+    namespacesProgram.instruction.invalidateTransferableNameEntry({
+      accounts: {
+        namespace: namespaceId,
+        nameEntry: nameEntryId,
+        tokenManager: tokenManagerId,
+        invalidator: params.invalidator || namespaceId,
+      },
+    })
+  );
+  return transaction;
+}
+
+export async function withInvalidateNameEntry(
+  transaction: Transaction,
+  connection: Connection,
+  wallet: Wallet,
+  params: {
+    namespaceName: string;
+    mintId: PublicKey;
+    entryName: string;
+    invalidator?: PublicKey;
+    transferable: boolean;
+  }
+): Promise<Transaction> {
+  if (params.transferable) {
+    return withInvalidateTransferableNameEntry(
+      transaction,
+      connection,
+      wallet,
+      params
+    );
+  } else {
+    return withInvalidateExpiredNameEntry(
+      transaction,
+      connection,
+      wallet,
+      params
+    );
+  }
 }
 
 export async function withSetEntryData(
@@ -670,11 +744,13 @@ export async function withInvalidateExpiredReverseEntry(
   transaction: Transaction,
   connection: Connection,
   wallet: Wallet,
-  namespaceName: string,
-  mintId: PublicKey,
-  entryName: string,
-  reverseEntryId: PublicKey,
-  invalidator?: PublicKey
+  params: {
+    namespaceName: string;
+    mintId: PublicKey;
+    entryName: string;
+    reverseEntryId: PublicKey;
+    invalidator?: PublicKey;
+  }
 ): Promise<Transaction> {
   const provider = new anchor.AnchorProvider(connection, wallet, {});
   const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
@@ -682,21 +758,90 @@ export async function withInvalidateExpiredReverseEntry(
     NAMESPACES_PROGRAM_ID,
     provider
   );
-  const [namespaceId] = await findNamespaceId(namespaceName);
-  const [nameEntryId] = await findNameEntryId(namespaceId, entryName);
-  const namespaceTokenAccountId = await findAta(mintId, namespaceId, true);
+  const [namespaceId] = await findNamespaceId(params.namespaceName);
+  const [nameEntryId] = await findNameEntryId(namespaceId, params.entryName);
+  const namespaceTokenAccountId = await findAta(
+    params.mintId,
+    namespaceId,
+    true
+  );
   transaction.add(
     namespacesProgram.instruction.invalidateExpiredReverseEntry({
       accounts: {
         namespace: namespaceId,
         nameEntry: nameEntryId,
         namespaceTokenAccount: namespaceTokenAccountId,
-        reverseNameEntry: reverseEntryId,
-        invalidator: invalidator || namespaceId,
+        reverseNameEntry: params.reverseEntryId,
+        invalidator: params.invalidator || namespaceId,
       },
     })
   );
   return transaction;
+}
+
+export async function withInvalidateTransferableReverseEntry(
+  transaction: Transaction,
+  connection: Connection,
+  wallet: Wallet,
+  params: {
+    namespaceName: string;
+    mintId: PublicKey;
+    entryName: string;
+    reverseEntryId: PublicKey;
+    invalidator?: PublicKey;
+  }
+): Promise<Transaction> {
+  const provider = new anchor.AnchorProvider(connection, wallet, {});
+  const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
+    NAMESPACES_IDL,
+    NAMESPACES_PROGRAM_ID,
+    provider
+  );
+  const [namespaceId] = await findNamespaceId(params.namespaceName);
+  const [nameEntryId] = await findNameEntryId(namespaceId, params.entryName);
+  const [tokenManagerId] = await findTokenManagerAddress(params.mintId);
+  transaction.add(
+    namespacesProgram.instruction.invalidateTransferableReverseEntry({
+      accounts: {
+        namespace: namespaceId,
+        nameEntry: nameEntryId,
+        tokenManager: tokenManagerId,
+        reverseNameEntry: params.reverseEntryId,
+        invalidator: params.invalidator || namespaceId,
+      },
+    })
+  );
+  return transaction;
+}
+
+export async function withInvalidateReverseEntry(
+  transaction: Transaction,
+  connection: Connection,
+  wallet: Wallet,
+  params: {
+    namespaceName: string;
+    mintId: PublicKey;
+    entryName: string;
+    reverseEntryId: PublicKey;
+    invalidator?: PublicKey;
+    transferable: boolean;
+  }
+): Promise<Transaction> {
+  if (params.transferable) {
+    return withInvalidateTransferableReverseEntry(
+      transaction,
+      connection,
+      wallet,
+      params
+    );
+  } else {
+    return withInvalidateExpiredReverseEntry(
+      transaction,
+      connection,
+      wallet,
+      params
+    );
+  }
 }
 
 export async function withUpdateMintMetadata(
