@@ -1,8 +1,8 @@
 import { withFindOrInitAssociatedTokenAccount } from "@cardinal/certificates";
 import { findAta } from "@cardinal/common";
-import { InvalidationType } from "@cardinal/token-manager/dist/cjs/programs/tokenManager";
 import {
   getRemainingAccountsForKind,
+  InvalidationType,
   TOKEN_MANAGER_ADDRESS,
   TokenManagerKind,
   withRemainingAccountsForReturn,

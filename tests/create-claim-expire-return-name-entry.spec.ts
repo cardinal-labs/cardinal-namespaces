@@ -387,7 +387,7 @@ describe("create-claim-expire-name-entry", () => {
         }),
         transaction.instructions
       ),
-      "Wait and invalidate",
+      "Invalidate entry",
       {
         verbosity: "always",
         formatLogs: true,
@@ -429,7 +429,8 @@ describe("create-claim-expire-name-entry", () => {
         nameEntry.parsed.mint,
         (
           await findNamespaceId(namespaceName)
-        )[0]
+        )[0],
+        true
       )
     );
     expect(checkNamespaceTokenAccount.amount.toNumber()).to.eq(1);

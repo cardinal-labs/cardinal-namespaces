@@ -1,9 +1,6 @@
 import { findAta, tryGetAccount } from "@cardinal/common";
 import { withInvalidate } from "@cardinal/token-manager";
-import { getTimeInvalidator } from "@cardinal/token-manager/dist/cjs/programs/timeInvalidator/accounts";
-import { findTimeInvalidatorAddress } from "@cardinal/token-manager/dist/cjs/programs/timeInvalidator/pda";
 import { InvalidationType } from "@cardinal/token-manager/dist/cjs/programs/tokenManager";
-import { findTokenManagerAddress } from "@cardinal/token-manager/dist/cjs/programs/tokenManager/pda";
 import * as anchor from "@project-serum/anchor";
 import { TOKEN_PROGRAM_ID } from "@project-serum/anchor/dist/cjs/utils/token";
 import { expectTXTable } from "@saberhq/chai-solana";
@@ -29,15 +26,15 @@ import {
   withCreateNamespace,
   withInitNameEntry,
   withInitNameEntryMint,
-  withInvalidateExpiredNameEntry,
-  withInvalidateExpiredReverseEntry,
+  withInvalidateTransferableNameEntry,
+  withInvalidateTransferableReverseEntry,
   withSetNamespaceReverseEntry,
   withUpdateClaimRequest,
 } from "../src";
 import { createMint } from "./utils";
 import { getProvider } from "./workspace";
 
-describe("create-claim-expire-name-entry", () => {
+describe("create-claim-expire-released-name-entry", () => {
   const provider = getProvider();
 
   // test params
@@ -311,13 +308,6 @@ describe("create-claim-expire-name-entry", () => {
     );
     const mintId = nameEntry.parsed.mint;
 
-    const [tokenManagerId] = await findTokenManagerAddress(mintId);
-    const [timeInvalidatorId] = await findTimeInvalidatorAddress(
-      tokenManagerId
-    );
-    const ti = await getTimeInvalidator(provider.connection, timeInvalidatorId);
-    console.log(ti, ti.parsed.maxExpiration?.toString());
-
     const transaction = new web3.Transaction();
     await withInvalidate(
       transaction,
@@ -347,7 +337,8 @@ describe("create-claim-expire-name-entry", () => {
       TOKEN_PROGRAM_ID,
       web3.Keypair.generate()
     ).getAccountInfo(await findAta(mintId, provider.wallet.publicKey));
-    expect(checkRecipientTokenAccount.amount.toNumber()).to.eq(0);
+    expect(checkRecipientTokenAccount.amount.toNumber()).to.eq(1);
+    expect(checkRecipientTokenAccount.isFrozen).to.eq(false);
   });
 
   it("Invalidate entry", async () => {
@@ -358,7 +349,7 @@ describe("create-claim-expire-name-entry", () => {
     );
 
     const transaction = new web3.Transaction();
-    await withInvalidateExpiredReverseEntry(
+    await withInvalidateTransferableReverseEntry(
       transaction,
       provider.connection,
       new SignerWallet(invalidator),
@@ -370,7 +361,7 @@ describe("create-claim-expire-name-entry", () => {
       }
     );
 
-    await withInvalidateExpiredNameEntry(
+    await withInvalidateTransferableNameEntry(
       transaction,
       provider.connection,
       new SignerWallet(invalidator),
@@ -431,7 +422,8 @@ describe("create-claim-expire-name-entry", () => {
         nameEntry.parsed.mint,
         (
           await findNamespaceId(namespaceName)
-        )[0]
+        )[0],
+        true
       )
     );
     expect(checkNamespaceTokenAccount.amount.toNumber()).to.eq(0);
