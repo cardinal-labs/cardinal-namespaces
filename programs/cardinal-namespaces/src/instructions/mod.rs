@@ -16,6 +16,7 @@ pub use global_context::update_global_context::*;
 // name_entry
 pub mod name_entry;
 pub use name_entry::claim_name_entry::*;
+pub use name_entry::close_name_entry::*;
 pub use name_entry::init_name_entry::*;
 pub use name_entry::init_name_entry_mint::*;
 pub use name_entry::invalidate_expired_name_entry::*;

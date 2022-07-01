@@ -1,4 +1,5 @@
 pub mod claim_name_entry;
+pub mod close_name_entry;
 pub mod init_name_entry;
 pub mod init_name_entry_mint;
 pub mod invalidate_expired_name_entry;

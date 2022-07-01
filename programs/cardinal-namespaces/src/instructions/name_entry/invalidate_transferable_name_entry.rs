@@ -10,12 +10,7 @@ use {
 pub struct InvalidateTransferableNameEntryCtx<'info> {
     #[account(mut)]
     namespace: Account<'info, Namespace>,
-    #[account(
-        mut,
-        close = invalidator,
-        constraint = name_entry.namespace == namespace.key() && name_entry.reverse_entry == None
-        @ ErrorCode::InvalidEntry
-    )]
+    #[account(mut, constraint = name_entry.namespace == namespace.key() && name_entry.reverse_entry == None @ ErrorCode::InvalidEntry)]
     name_entry: Account<'info, Entry>,
     /// CHECK: This is not dangerous because we don't read or write from this account
     token_manager: UncheckedAccount<'info>,

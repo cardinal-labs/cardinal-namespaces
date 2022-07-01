@@ -354,6 +354,10 @@ describe("create-claim-expire-name-entry", () => {
       namespaceName,
       entryName
     );
+    const namespaceDataBefore = await getNamespaceByName(
+      provider.connection,
+      namespaceName
+    );
 
     const transaction = new web3.Transaction();
     await withInvalidateExpiredReverseEntry(
@@ -394,6 +398,15 @@ describe("create-claim-expire-name-entry", () => {
       }
     ).to.be.fulfilled;
 
+    const namespaceDataAfter = await getNamespaceByName(
+      provider.connection,
+      namespaceName
+    );
+
+    expect(namespaceDataAfter.parsed.count).to.eq(
+      namespaceDataBefore.parsed.count - 1
+    );
+
     const [reverseEntryId] = await findReverseEntryId(
       (
         await findNamespaceId(namespaceName)
@@ -417,7 +430,8 @@ describe("create-claim-expire-name-entry", () => {
     const entryAfter = await tryGetAccount(() =>
       getNameEntry(provider.connection, namespaceName, entryName)
     );
-    expect(entryAfter).to.eq(null);
+    expect(entryAfter?.parsed.isClaimed).to.be.false;
+    expect(entryAfter?.parsed.data).to.be.null;
 
     const checkNamespaceTokenAccount = await new splToken.Token(
       provider.connection,
