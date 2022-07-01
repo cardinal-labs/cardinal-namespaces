@@ -114,7 +114,6 @@ export async function claimTransaction(
     ////////////////////// Init and claim //////////////////////
     console.log("---> Initializing and claiming entry:", entryName);
     const certificateMint = Keypair.generate();
-    const transaction = new Transaction();
     const wallet = emptyWallet(new PublicKey(publicKey));
     await deprecated.withInitEntry(
       connection,
