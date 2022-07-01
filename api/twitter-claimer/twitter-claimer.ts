@@ -80,6 +80,7 @@ export async function claimTransaction(
     new PublicKey(publicKey)
   );
   let transaction = new Transaction();
+  let mintKeypair: Keypair | undefined;
   if (!tryClaimRequest) {
     console.log("Creating claim request");
     await withCreateClaimRequest(
@@ -113,12 +114,12 @@ export async function claimTransaction(
   if (!checkNameEntry) {
     ////////////////////// Init and claim //////////////////////
     console.log("---> Initializing and claiming entry:", entryName);
-    const certificateMint = Keypair.generate();
+    mintKeypair = Keypair.generate();
     const wallet = emptyWallet(new PublicKey(publicKey));
     await deprecated.withInitEntry(
       connection,
       wallet,
-      certificateMint.publicKey,
+      mintKeypair.publicKey,
       NAMESPACE_NAME,
       entryName,
       transaction
@@ -128,7 +129,7 @@ export async function claimTransaction(
       wallet,
       NAMESPACE_NAME,
       entryName,
-      certificateMint.publicKey,
+      mintKeypair.publicKey,
       0,
       transaction
     );
@@ -137,7 +138,7 @@ export async function claimTransaction(
       wallet,
       NAMESPACE_NAME,
       entryName,
-      certificateMint.publicKey,
+      mintKeypair.publicKey,
       transaction
     );
   } else if (checkNameEntry && !checkNameEntry.parsed.isClaimed) {
@@ -200,7 +201,7 @@ export async function claimTransaction(
         await withRevokeReverseEntry(
           transaction,
           connection,
-          wallet as Wallet,
+          wallet,
           NAMESPACE_NAME,
           entryName,
           checkNameEntry.parsed.reverseEntry,
@@ -242,6 +243,7 @@ export async function claimTransaction(
     await connection.getRecentBlockhash("max")
   ).blockhash;
   transaction.partialSign(WALLET);
+  mintKeypair && transaction.partialSign(mintKeypair);
   transaction = Transaction.from(
     transaction.serialize({
       verifySignatures: false,
