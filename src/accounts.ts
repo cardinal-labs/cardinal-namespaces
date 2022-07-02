@@ -229,6 +229,29 @@ export async function getPendingClaimRequests(
   return pendingClaimRequests;
 }
 
+export async function getNamespaceReverseNameEntry(
+  connection: Connection,
+  namespace: PublicKey,
+  pubkey: PublicKey
+): Promise<AccountData<ReverseEntryData>> {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const provider = new AnchorProvider(connection, null, {});
+  const namespacesProgram = new Program<NAMESPACES_PROGRAM>(
+    NAMESPACES_IDL,
+    NAMESPACES_PROGRAM_ID,
+    provider
+  );
+  const [reverseEntryId] = await findReverseEntryId(namespace, pubkey);
+  const parsed = await namespacesProgram.account.reverseEntry.fetch(
+    reverseEntryId
+  );
+  return {
+    parsed,
+    pubkey: reverseEntryId,
+  };
+}
+
 export async function getReverseEntry(
   connection: Connection,
   namespace: PublicKey,
