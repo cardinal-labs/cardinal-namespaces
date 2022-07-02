@@ -273,10 +273,10 @@ describe("create-claim-expire-released-name-entry", () => {
 
     const checkReverseEntry = await getReverseEntry(
       provider.connection,
+      provider.wallet.publicKey,
       (
         await findNamespaceId(namespaceName)
-      )[0],
-      provider.wallet.publicKey
+      )[0]
     );
     assert.equal(checkReverseEntry.parsed.entryName, entryName);
   });
@@ -412,10 +412,10 @@ describe("create-claim-expire-released-name-entry", () => {
     const checkReverseEntry = await tryGetAccount(async () =>
       getReverseEntry(
         provider.connection,
+        provider.wallet.publicKey,
         (
           await findNamespaceId(namespaceName)
-        )[0],
-        provider.wallet.publicKey
+        )[0]
       )
     );
     expect(checkReverseEntry).to.eq(null);
