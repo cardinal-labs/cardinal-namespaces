@@ -229,10 +229,10 @@ export async function getPendingClaimRequests(
   return pendingClaimRequests;
 }
 
-export async function getNamespaceReverseNameEntry(
+export async function getReverseNameEntryForNamespace(
   connection: Connection,
-  namespace: PublicKey,
-  pubkey: PublicKey
+  pubkey: PublicKey,
+  namespace: PublicKey
 ): Promise<AccountData<ReverseEntryData>> {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
@@ -254,8 +254,8 @@ export async function getNamespaceReverseNameEntry(
 
 export async function getReverseEntry(
   connection: Connection,
-  namespace: PublicKey,
-  pubkey: PublicKey
+  pubkey: PublicKey,
+  namespace?: PublicKey
 ): Promise<AccountData<ReverseEntryData>> {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
@@ -294,11 +294,21 @@ export async function getReverseEntry(
 
 export async function tryGetReverseEntry(
   connection: Connection,
-  namespace: PublicKey,
-  pubkey: PublicKey
+  pubkey: PublicKey,
+  namespace?: PublicKey
 ): Promise<AccountData<ReverseEntryData> | null> {
   try {
-    return await getReverseEntry(connection, namespace, pubkey);
+    let reverseEntry: AccountData<ReverseEntryData> | undefined;
+    if (namespace) {
+      reverseEntry = await getReverseNameEntryForNamespace(
+        connection,
+        pubkey,
+        namespace
+      );
+    } else {
+      reverseEntry = await getReverseEntry(connection, pubkey);
+    }
+    return reverseEntry;
   } catch (e) {
     console.log(`Failed to get reverse entry`);
     return null;
