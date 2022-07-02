@@ -30,7 +30,7 @@ export function breakName(fullName: string): [string, string] {
 
 export function breakIdentity(fullName: string): [string, string] {
   if (fullName.startsWith("@")) {
-    const namespace = fullName.split(":").at(-1) || "twitter";
+    const namespace = fullName.split(":")[1] || "twitter";
     const entryName = fullName.includes(":")
       ? fullName.split("@")[1]!.split(":")[0]!
       : fullName.split("@")[1]!;
