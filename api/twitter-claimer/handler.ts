@@ -8,12 +8,12 @@ module.exports.claim = async (event) => {
   const account = data.account as string;
   try {
     if (
-      !event?.queryStringParameters?.tweetId ||
-      event?.queryStringParameters?.tweetId === "undefined" ||
       !account ||
       !tryPublicKey(account) ||
       !event?.queryStringParameters?.handle ||
-      event?.queryStringParameters?.handle === "undefined"
+      event?.queryStringParameters?.handle === "undefined" ||
+      !event?.queryStringParameters?.namespace ||
+      event?.queryStringParameters?.namespace === "undefined"
     ) {
       return {
         statusCode: 412,
@@ -21,11 +21,35 @@ module.exports.claim = async (event) => {
       };
     }
 
+    // custom params for each identity namespace
+    const namespace = event?.queryStringParameters?.namespace;
+    if (
+      (namespace === "twitter" && !event?.queryStringParameters?.tweetId) ||
+      event?.queryStringParameters?.tweetId === "undefined"
+    ) {
+      return {
+        statusCode: 412,
+        body: JSON.stringify({ error: "Invalid API request" }),
+      };
+    } else if (
+      (namespace === "discord" && !event?.queryStringParameters?.accessToken) ||
+      event?.queryStringParameters?.accessToken === "undefined"
+    ) {
+      return {
+        statusCode: 412,
+        body: JSON.stringify({ error: "Invalid API request" }),
+      };
+    } else {
+      ("pass");
+    }
+
     const { status, transaction, message } =
       await twitterClaimer.claimTransaction(
-        event?.queryStringParameters?.tweetId,
+        event?.queryStringParameters?.namespace,
         account,
         event?.queryStringParameters?.handle,
+        event?.queryStringParameters?.tweetId,
+        event?.queryStringParameters?.accessToken,
         event?.queryStringParameters?.cluster
       );
     return {

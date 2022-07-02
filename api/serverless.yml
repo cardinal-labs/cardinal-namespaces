@@ -21,6 +21,7 @@ functions:
     timeout: 30
     environment:
       TWITTER_SOLANA_KEY: ${ssm:/TWITTER_SOLANA_KEY~true}
+      DISCORD_SOLANA_KEY: ${ssm:/DISCORD_SOLANA_KEY~true}
     events:
       - http:
           path: /approve
@@ -31,6 +32,7 @@ functions:
     timeout: 30
     environment:
       TWITTER_SOLANA_KEY: ${ssm:/TWITTER_SOLANA_KEY~true}
+      DISCORD_SOLANA_KEY: ${ssm:/DISCORD_SOLANA_KEY~true}
     events:
       - http:
           path: /revoke
@@ -58,6 +60,7 @@ functions:
     timeout: 30
     environment:
       TWITTER_SOLANA_KEY: ${ssm:/TWITTER_SOLANA_KEY~true}
+      DISCORD_SOLANA_KEY: ${ssm:/DISCORD_SOLANA_KEY~true}
     events:
       - http:
           path: /twitter/approve
@@ -67,6 +70,7 @@ functions:
     handler: twitter-verifier/handler.verify
     environment:
       TWITTER_SOLANA_KEY: ${ssm:/TWITTER_SOLANA_KEY~true}
+      DISCORD_SOLANA_KEY: ${ssm:/DISCORD_SOLANA_KEY~true}
     events:
       - http:
           path: /twitter/verify
@@ -76,6 +80,7 @@ functions:
     handler: twitter-claimer/handler.claim
     environment:
       TWITTER_SOLANA_KEY: ${ssm:/TWITTER_SOLANA_KEY~true}
+      DISCORD_SOLANA_KEY_KEY: ${ssm:/DISCORD_SOLANA_KEY~true}
     events:
       - http:
           path: /twitter/claim
@@ -86,6 +91,7 @@ functions:
     timeout: 30
     environment:
       TWITTER_SOLANA_KEY: ${ssm:/TWITTER_SOLANA_KEY~true}
+      DISCORD_SOLANA_KEY: ${ssm:/DISCORD_SOLANA_KEY~true}
     events:
       - http:
           path: /twitter/revoke
