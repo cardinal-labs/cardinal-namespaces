@@ -24,16 +24,18 @@ module.exports.claim = async (event) => {
     // custom params for each identity namespace
     const namespace = event?.queryStringParameters?.namespace;
     if (
-      (namespace === "twitter" && !event?.queryStringParameters?.tweetId) ||
-      event?.queryStringParameters?.tweetId === "undefined"
+      namespace === "twitter" &&
+      (!event?.queryStringParameters?.tweetId ||
+        event?.queryStringParameters?.tweetId === "undefined")
     ) {
       return {
         statusCode: 412,
         body: JSON.stringify({ error: "Invalid API request" }),
       };
     } else if (
-      (namespace === "discord" && !event?.queryStringParameters?.accessToken) ||
-      event?.queryStringParameters?.accessToken === "undefined"
+      namespace === "discord" &&
+      (!event?.queryStringParameters?.accessToken ||
+        event?.queryStringParameters?.accessToken === "undefined")
     ) {
       return {
         statusCode: 412,
