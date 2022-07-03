@@ -14,7 +14,7 @@ export async function verifyTweet(
   accessToken?: string,
   cluster = "mainnet"
 ): Promise<{ status: number; message?: string; info?: any }> {
-  if (namespace === "twitter") {
+  if (!namespace || namespace === "twitter") {
     console.log(
       `Attempting to verify tweet for tweet (${tweetId!}) publicKey ${publicKey} entryName ${entryName!} cluster ${cluster} `
     );
