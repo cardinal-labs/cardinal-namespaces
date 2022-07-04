@@ -7,6 +7,7 @@ use {
     },
     cardinal_certificate::{self, cpi::accounts::CreateMintManagerCtx, program::CardinalCertificate},
     mpl_token_metadata::{instruction::create_metadata_accounts, state::Creator as MCreator},
+    urlencoding::encode,
 };
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
@@ -88,7 +89,7 @@ pub fn handler(ctx: Context<InitEntry>, ix: InitEntryIx) -> Result<()> {
             ctx.accounts.namespace.name.clone(),
             "NAME".to_string(),
             // generative URL which will inclde image of the name with expiration data
-            "https://nft.cardinal.so/metadata/".to_string() + &ctx.accounts.certificate_mint.key().to_string() + &"?name=".to_string() + &ctx.accounts.entry.name.to_string(),
+            "https://nft.cardinal.so/metadata/".to_string() + &ctx.accounts.certificate_mint.key().to_string() + &"?name=".to_string() + &encode(ctx.accounts.entry.name.as_str()).into_owned(),
             Some(vec![MCreator {
                 address: ctx.accounts.namespace.key(),
                 verified: true,
