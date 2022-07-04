@@ -37,15 +37,24 @@ export async function claimTransaction(
   cluster = "mainnet"
 ): Promise<{ status: number; transaction?: string; message?: string }> {
   const connection = connectionFor(cluster);
-  const wallet = Keypair.fromSecretKey(
-    anchor.utils.bytes.bs58.decode(
-      namespace === "twitter"
-        ? process.env.TWITTER_SOLANA_KEY || ""
-        : namespace === "discord"
-        ? process.env.DISCORD_SOLANA_KEY || ""
-        : ""
-    )
-  );
+  let wallet: Keypair | undefined;
+  try {
+    wallet = Keypair.fromSecretKey(
+      anchor.utils.bytes.bs58.decode(
+        namespace === "twitter"
+          ? process.env.TWITTER_SOLANA_KEY || ""
+          : namespace === "discord"
+          ? process.env.DISCORD_SOLANA_KEY || ""
+          : ""
+      )
+    );
+  } catch {
+    throw new Error(
+      `${namespace} pk incorrect or not found ${
+        process.env.DISCORD_SOLANA_KEY || ""
+      }`
+    );
+  }
 
   if (namespace === "twitter") {
     console.log(
@@ -307,6 +316,6 @@ export async function claimTransaction(
   return {
     status: 200,
     transaction: base64,
-    message: `Returned succesful transaciton for ${publicKey} to claim handle (${entryName})`,
+    message: `Returned succesfull transaction for ${publicKey} to claim handle (${entryName})`,
   };
 }

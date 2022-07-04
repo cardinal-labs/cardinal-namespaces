@@ -53,22 +53,25 @@ module.exports.claim = async (event) => {
       ("pass");
     }
 
-    const { status, transaction, message } =
-      await twitterClaimer.claimTransaction(
-        event?.queryStringParameters?.namespace,
-        account,
-        event?.queryStringParameters?.handle,
-        event?.queryStringParameters?.tweetId,
-        event?.queryStringParameters?.accessToken,
-        event?.queryStringParameters?.cluster
-      );
+    const response = await twitterClaimer.claimTransaction(
+      event?.queryStringParameters?.namespace,
+      account,
+      event?.queryStringParameters?.handle,
+      event?.queryStringParameters?.tweetId,
+      event?.queryStringParameters?.accessToken,
+      event?.queryStringParameters?.cluster
+    );
     return {
       headers: headers,
-      statusCode: status,
-      body: JSON.stringify({ result: "done", transaction, message }),
+      statusCode: response.status,
+      body: JSON.stringify({
+        result: "done",
+        transaction: response.transaction || "",
+        message: response.message || "",
+      }),
     };
   } catch (e) {
-    console.log("Error approving claim request: ", e);
+    console.log("Error building claim transaction: ", e);
     return {
       headers: headers,
       statusCode: 500,
