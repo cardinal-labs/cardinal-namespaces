@@ -2,11 +2,55 @@
 import * as twitterApprover from "./twitter-revoker";
 
 module.exports.revoke = async (event) => {
+  const headers = {
+    "Access-Control-Allow-Methods": "*",
+    "Access-Control-Allow-Origin": "*", // Required for CORS support to work
+    "Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS
+  };
   try {
+    if (
+      !event?.queryStringParameters?.namespace ||
+      event?.queryStringParameters?.namespace === "undefined"
+    ) {
+      return {
+        headers: headers,
+        statusCode: 412,
+        body: JSON.stringify({ error: "Invalid API request" }),
+      };
+    }
+
+    // custom params for each identity namespace
+    const namespace = event?.queryStringParameters?.namespace;
+    if (
+      namespace === "twitter" &&
+      (!event?.queryStringParameters?.tweetId ||
+        event?.queryStringParameters?.tweetId === "undefined")
+    ) {
+      return {
+        headers: headers,
+        statusCode: 412,
+        body: JSON.stringify({ error: "Invalid API request" }),
+      };
+    } else if (
+      namespace === "discord" &&
+      (!event?.queryStringParameters?.accessToken ||
+        event?.queryStringParameters?.accessToken === "undefined")
+    ) {
+      return {
+        headers: headers,
+        statusCode: 412,
+        body: JSON.stringify({ error: "Invalid API request" }),
+      };
+    } else {
+      ("pass");
+    }
+
     const { status, txid, message } = await twitterApprover.revokeHolder(
-      event?.queryStringParameters?.tweetId,
+      namespace,
       event?.queryStringParameters?.publicKey,
       event?.queryStringParameters?.handle,
+      event?.queryStringParameters?.tweetId,
+      event?.queryStringParameters?.accessToken,
       event?.queryStringParameters?.cluster
     );
     return {
@@ -22,11 +66,7 @@ module.exports.revoke = async (event) => {
     console.log("Error: ", e);
     return {
       statusCode: 500,
-      headers: {
-        "Access-Control-Allow-Methods": "*",
-        "Access-Control-Allow-Origin": "*", // Required for CORS support to work
-        "Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS
-      },
+      headers: headers,
       body: JSON.stringify({ error: String(e) }),
     };
   }

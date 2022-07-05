@@ -53,10 +53,16 @@ module.exports.claim = async (event) => {
       ("pass");
     }
 
+    // account for special characters
+    let handle = String(event?.queryStringParameters?.handle);
+    if (namespace === "discord") {
+      const temp = handle.split(">");
+      handle = temp.slice(0, -1).join() + "#" + String(temp.pop());
+    }
     const response = await twitterClaimer.claimTransaction(
       event?.queryStringParameters?.namespace,
       account,
-      event?.queryStringParameters?.handle,
+      handle,
       event?.queryStringParameters?.tweetId,
       event?.queryStringParameters?.accessToken,
       event?.queryStringParameters?.cluster

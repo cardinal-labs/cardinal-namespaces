@@ -6,6 +6,12 @@ import type { Connection, PublicKey } from "@solana/web3.js";
 import { Keypair } from "@solana/web3.js";
 import fetch from "node-fetch";
 
+import type {
+  DiscordResponseParams,
+  DiscordUserInfoParams,
+  DiscordVerificationResponse,
+} from "../tools/types";
+
 export const TWITTER_API_KEYS = [
   "AAAAAAAAAAAAAAAAAAAAAC7iXgEAAAAAH%2BlE4oemN1y5aLOsCimsV32G9Cs%3DKgaXQRuggNA5UzuJmN1X9twXNARy7qxSiBxNf4oCc6CxKwIhxa",
   "AAAAAAAAAAAAAAAAAAAAAIeiYAEAAAAA0xfvS2Oonb3ijLTis8MmrSsRWm0%3DotAZj0h9Aq6qEa7VKLckzfeRH3eDxj2Gp69rxD4B7pJlf7kdQy",
@@ -163,41 +169,16 @@ export const verifyDiscord = async (
       erroeMessage: "Error parsing server response",
     };
   }
+  const username = `${parsedUserResponse?.username}#${parsedUserResponse?.discriminator}`;
 
   const imageURI = `https://cdn.discordapp.com/avatars/${parsedUserResponse?.id}/${parsedUserResponse?.avatar}.png`;
-  console.log(
-    `Verified username ${parsedUserResponse?.username} with image ${imageURI}`
-  );
+  console.log(`Verified username ${username} with image ${imageURI}`);
   return {
     verified: true,
     info: {
-      username: parsedUserResponse.username,
+      username: username,
       imageURI: imageURI,
       accessToken: accessToken,
     },
   };
-};
-
-type DiscordVerificationResponse = {
-  verified: boolean;
-  info?: {
-    username: string;
-    imageURI: string;
-    accessToken: string;
-  };
-  erroeMessage?: string;
-};
-
-type DiscordResponseParams = {
-  access_token: string;
-  expires_in: number;
-  refresh_token: string;
-  scope: string;
-  token_type: string;
-};
-
-type DiscordUserInfoParams = {
-  id: string;
-  username: string;
-  avatar: string;
 };
