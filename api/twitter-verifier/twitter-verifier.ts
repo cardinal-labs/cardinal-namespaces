@@ -57,7 +57,6 @@ export async function verifyTweet(
       `Attempting to verify discord handle publicKey ${publicKey} cluster ${cluster} `
     );
     const response = await verifyDiscord(code, accessToken);
-    console.log(response.info);
 
     if (!response.verified) {
       return {
