@@ -1,4 +1,3 @@
-import type { AccountData } from "@cardinal/common";
 import {
   findAta,
   tryGetAccount,
@@ -14,12 +13,7 @@ import type { Wallet } from "@saberhq/solana-contrib";
 import type { AccountMeta, Connection, Transaction } from "@solana/web3.js";
 import { PublicKey } from "@solana/web3.js";
 
-import {
-  getNamespace,
-  getReverseEntry,
-  getReverseNameEntryForNamespace,
-} from "./accounts";
-import type { ReverseEntryData } from "./constants";
+import { getNamespace, getReverseEntry } from "./accounts";
 import { DEFAULT_PAYMENT_MANAGER, IDENTITIES } from "./constants";
 
 export function formatName(namespace: string, name: string): string {
@@ -65,19 +59,16 @@ export function displayAddress(address: string, shorten = true): string {
 export async function tryGetName(
   connection: Connection,
   pubkey: PublicKey,
-  namespace?: PublicKey
+  namespace?: PublicKey,
+  disallowGlobal?: boolean
 ): Promise<string | undefined> {
   try {
-    let reverseEntry: AccountData<ReverseEntryData> | undefined;
-    if (namespace) {
-      reverseEntry = await getReverseNameEntryForNamespace(
-        connection,
-        pubkey,
-        namespace
-      );
-    } else {
-      reverseEntry = await getReverseEntry(connection, pubkey);
-    }
+    const reverseEntry = await getReverseEntry(
+      connection,
+      pubkey,
+      namespace,
+      disallowGlobal
+    );
     return formatName(
       reverseEntry.parsed.namespaceName,
       reverseEntry.parsed.entryName
