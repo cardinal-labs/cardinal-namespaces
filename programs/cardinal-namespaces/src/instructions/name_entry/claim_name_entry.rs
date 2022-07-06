@@ -182,7 +182,7 @@ pub fn handler<'key, 'accounts, 'remaining, 'info>(ctx: Context<'key, 'accounts,
         let init_ix = cardinal_time_invalidator::instructions::InitIx {
             collector: ctx.accounts.namespace.key(),
             payment_manager: payment_manager_account_info.expect("Expected payment_manager").key(),
-            duration_seconds: Some(0),
+            duration_seconds: if ctx.accounts.namespace.payment_amount_daily > 0 { Some(0) } else { None },
             extension_payment_amount: if ctx.accounts.namespace.payment_amount_daily > 0 {
                 Some(ctx.accounts.namespace.payment_amount_daily)
             } else {
