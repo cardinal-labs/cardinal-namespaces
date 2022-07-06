@@ -61,7 +61,7 @@ export async function tryGetName(
   pubkey: PublicKey,
   namespace?: PublicKey,
   disallowGlobal?: boolean
-): Promise<string | undefined> {
+): Promise<string[] | undefined> {
   try {
     const reverseEntry = await getReverseEntry(
       connection,
@@ -69,10 +69,13 @@ export async function tryGetName(
       namespace,
       disallowGlobal
     );
-    return formatName(
+    return [
+      formatName(
+        reverseEntry.parsed.namespaceName,
+        reverseEntry.parsed.entryName
+      ),
       reverseEntry.parsed.namespaceName,
-      reverseEntry.parsed.entryName
-    );
+    ];
   } catch (e) {
     console.log(e);
   }
@@ -85,7 +88,7 @@ export async function nameForDisplay(
   namespace: PublicKey
 ): Promise<string> {
   const name = await tryGetName(connection, pubkey, namespace);
-  return name || displayAddress(pubkey.toString());
+  return (name && name[0]) || displayAddress(pubkey.toString());
 }
 
 export const withRemainingAccountsForClaim = async (
