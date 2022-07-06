@@ -255,7 +255,8 @@ export async function getReverseNameEntryForNamespace(
 export async function getReverseEntry(
   connection: Connection,
   pubkey: PublicKey,
-  namespace?: PublicKey
+  namespace?: PublicKey,
+  disallowGlobal?: boolean
 ): Promise<AccountData<ReverseEntryData>> {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
@@ -281,6 +282,11 @@ export async function getReverseEntry(
       pubkey: reverseEntryId,
     };
   } catch (e) {
+    if (disallowGlobal) {
+      throw new Error(
+        "Reverse entry not found and global reverse entry disallowed"
+      );
+    }
     const [reverseEntryId] = await findDeprecatedReverseEntryId(pubkey);
     const parsed = await namespacesProgram.account.reverseEntry.fetch(
       reverseEntryId
@@ -289,28 +295,5 @@ export async function getReverseEntry(
       parsed,
       pubkey: reverseEntryId,
     };
-  }
-}
-
-export async function tryGetReverseEntry(
-  connection: Connection,
-  pubkey: PublicKey,
-  namespace?: PublicKey
-): Promise<AccountData<ReverseEntryData> | null> {
-  try {
-    let reverseEntry: AccountData<ReverseEntryData> | undefined;
-    if (namespace) {
-      reverseEntry = await getReverseNameEntryForNamespace(
-        connection,
-        pubkey,
-        namespace
-      );
-    } else {
-      reverseEntry = await getReverseEntry(connection, pubkey);
-    }
-    return reverseEntry;
-  } catch (e) {
-    console.log(`Failed to get reverse entry`);
-    return null;
   }
 }
