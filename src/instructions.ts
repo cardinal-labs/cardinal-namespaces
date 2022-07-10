@@ -1,5 +1,8 @@
-import { withFindOrInitAssociatedTokenAccount } from "@cardinal/certificates";
-import { findAta } from "@cardinal/common";
+import {
+  certificateIdForMint,
+  withFindOrInitAssociatedTokenAccount,
+} from "@cardinal/certificates";
+import { findAta, tryGetAccount } from "@cardinal/common";
 import {
   getRemainingAccountsForKind,
   InvalidationType,
@@ -622,7 +625,14 @@ export async function withSetNamespaceReverseEntry(
     mintId,
     provider.wallet.publicKey
   );
-  const [tokenManagerId] = await findTokenManagerAddress(mintId);
+  let [tokenManagerId] = await findTokenManagerAddress(mintId);
+  const checkTm = await tryGetAccount(() =>
+    getTokenManager(connection, tokenManagerId)
+  );
+  if (!checkTm) {
+    // old version
+    [tokenManagerId] = await certificateIdForMint(mintId);
+  }
   transaction.add(
     namespacesProgram.instruction.setNamespaceReverseEntry({
       accounts: {

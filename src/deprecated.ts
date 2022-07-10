@@ -2,9 +2,14 @@ import * as certificate from "@cardinal/certificates";
 import {
   CERTIFICATE_PROGRAM_ID,
   CERTIFICATE_SEED,
+  getCertificate,
   MINT_MANAGER_SEED,
 } from "@cardinal/certificates";
-import { withFindOrInitAssociatedTokenAccount } from "@cardinal/common";
+import {
+  tryGetAccount,
+  withFindOrInitAssociatedTokenAccount,
+} from "@cardinal/common";
+import { findTokenManagerAddress } from "@cardinal/token-manager/dist/cjs/programs/tokenManager/pda";
 import * as mplTokenMetadata from "@metaplex-foundation/mpl-token-metadata";
 import * as anchor from "@project-serum/anchor";
 import type { Wallet } from "@saberhq/solana-contrib";
@@ -506,9 +511,16 @@ export async function withSetReverseEntry(
     namespacesProgram.programId
   );
 
-  const [certificateId] = await certificate.certificateIdForMint(
+  let [certificateId] = await certificate.certificateIdForMint(
     certificateMintId
   );
+  const checkCert = await tryGetAccount(() =>
+    getCertificate(connection, certificateId)
+  );
+  if (!checkCert) {
+    // new version
+    [certificateId] = await findTokenManagerAddress(certificateMintId);
+  }
 
   const userCertificateTokenAccountId =
     await splToken.Token.getAssociatedTokenAddress(

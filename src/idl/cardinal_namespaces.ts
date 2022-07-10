@@ -779,7 +779,7 @@ export type Namespaces = {
         },
         {
           name: "tokenManager";
-          isMut: false;
+          isMut: true;
           isSigner: false;
         },
         {
@@ -1057,7 +1057,7 @@ export type Namespaces = {
         },
         {
           name: "certificate";
-          isMut: false;
+          isMut: true;
           isSigner: false;
         },
         {
@@ -1776,6 +1776,11 @@ export type Namespaces = {
       code: 6024;
       name: "InvalidInvalidationType";
       msg: "Namespace has invalid invalidation type";
+    },
+    {
+      code: 6025;
+      name: "InvalidTokenManagerOrCertificate";
+      msg: "Invalid token manager or certificate account";
     }
   ];
 };
@@ -2561,7 +2566,7 @@ export const IDL: Namespaces = {
         },
         {
           name: "tokenManager",
-          isMut: false,
+          isMut: true,
           isSigner: false,
         },
         {
@@ -2839,7 +2844,7 @@ export const IDL: Namespaces = {
         },
         {
           name: "certificate",
-          isMut: false,
+          isMut: true,
           isSigner: false,
         },
         {
@@ -3558,6 +3563,11 @@ export const IDL: Namespaces = {
       code: 6024,
       name: "InvalidInvalidationType",
       msg: "Namespace has invalid invalidation type",
+    },
+    {
+      code: 6025,
+      name: "InvalidTokenManagerOrCertificate",
+      msg: "Invalid token manager or certificate account",
     },
   ],
 };

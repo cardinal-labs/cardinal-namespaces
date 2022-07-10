@@ -4,7 +4,7 @@ use {
     anchor_lang::prelude::*,
     cardinal_certificate::{
         self,
-        state::{Certificate, CertificateState, CERTIFICATE_SEED},
+        state::{Certificate, CertificateState},
     },
     cardinal_token_manager::state::{TokenManager, TokenManagerState},
 };
@@ -51,21 +51,21 @@ pub fn handler(ctx: Context<SetNamespaceReverseNameEntryCtx>) -> Result<()> {
     reverse_entry.entry_name = name_entry.name.clone();
     reverse_entry.namespace_name = ctx.accounts.namespace.name.clone();
 
-    let mint = ctx.accounts.user_token_account.mint.key();
-    let path = &[CERTIFICATE_SEED.as_bytes(), mint.as_ref()];
-    let (key, _) = Pubkey::find_program_address(path, ctx.program_id);
-    if key == cardinal_certificate::ID {
+    let mint = ctx.accounts.name_entry.mint.key();
+    if ctx.accounts.token_manager.owner.key() == cardinal_certificate::ID {
         // certificate
         let certificate = Account::<Certificate>::try_from(&ctx.accounts.token_manager)?;
-        if certificate.mint != mint || certificate.issuer != ctx.accounts.namespace.key() || certificate.state != CertificateState::Invalidated as u8 {
+        if certificate.mint != mint || certificate.issuer != ctx.accounts.namespace.key() || certificate.state == CertificateState::Invalidated as u8 {
+            return Err(error!(ErrorCode::InvalidCertificate));
+        }
+    } else if ctx.accounts.token_manager.owner.key() == cardinal_token_manager::ID {
+        // token manager
+        let token_manager = Account::<TokenManager>::try_from(&ctx.accounts.token_manager)?;
+        if token_manager.mint != mint || token_manager.issuer != ctx.accounts.namespace.key() || token_manager.state == TokenManagerState::Invalidated as u8 {
             return Err(error!(ErrorCode::InvalidTokenManager));
         }
-    }
-
-    // token manager
-    let token_manager = Account::<TokenManager>::try_from(&ctx.accounts.token_manager)?;
-    if token_manager.mint != mint || token_manager.issuer != ctx.accounts.namespace.key() || token_manager.state != TokenManagerState::Invalidated as u8 {
-        return Err(error!(ErrorCode::InvalidTokenManager));
+    } else {
+        return Err(error!(ErrorCode::InvalidTokenManagerOrCertificate));
     }
 
     Ok(())
