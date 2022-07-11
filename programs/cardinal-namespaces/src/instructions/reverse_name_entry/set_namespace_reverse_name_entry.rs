@@ -54,13 +54,13 @@ pub fn handler(ctx: Context<SetNamespaceReverseNameEntryCtx>) -> Result<()> {
     let mint = ctx.accounts.name_entry.mint.key();
     if ctx.accounts.token_manager.owner.key() == cardinal_certificate::ID {
         // certificate
-        let certificate = Account::<Certificate>::try_from(&ctx.accounts.token_manager)?;
+        let certificate = Account::<Certificate>::try_from(&ctx.accounts.token_manager).expect("Invalid certificate");
         if certificate.mint != mint || certificate.issuer != ctx.accounts.namespace.key() || certificate.state == CertificateState::Invalidated as u8 {
             return Err(error!(ErrorCode::InvalidCertificate));
         }
     } else if ctx.accounts.token_manager.owner.key() == cardinal_token_manager::ID {
         // token manager
-        let token_manager = Account::<TokenManager>::try_from(&ctx.accounts.token_manager)?;
+        let token_manager = Account::<TokenManager>::try_from(&ctx.accounts.token_manager).expect("Invalid token manager");
         if token_manager.mint != mint || token_manager.issuer != ctx.accounts.namespace.key() || token_manager.state == TokenManagerState::Invalidated as u8 {
             return Err(error!(ErrorCode::InvalidTokenManager));
         }

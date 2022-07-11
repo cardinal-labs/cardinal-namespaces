@@ -263,7 +263,7 @@ describe("namespace-create-rent", () => {
       namespaceName,
       entryName
     );
-    const certificateMintId = entry.parsed.mint;
+    const mintId = entry.parsed.mint;
 
     const transaction = new web3.Transaction();
     await withSetNamespaceReverseEntry(
@@ -272,7 +272,7 @@ describe("namespace-create-rent", () => {
       provider.wallet,
       namespaceName,
       entryName,
-      certificateMintId
+      mintId
     );
     transaction.feePayer = provider.wallet.publicKey;
     transaction.recentBlockhash = (

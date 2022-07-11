@@ -58,13 +58,13 @@ pub fn handler(ctx: Context<SetReverseEntryCtx>, _reverse_entry_bump: u8) -> Res
     let mint = ctx.accounts.entry.mint.key();
     if ctx.accounts.certificate.owner.key() == cardinal_certificate::ID {
         // token manager
-        let token_manager = Account::<Certificate>::try_from(&ctx.accounts.certificate)?;
+        let token_manager = Account::<Certificate>::try_from(&ctx.accounts.certificate).expect("Invalid token manager");
         if token_manager.mint != mint || token_manager.issuer != ctx.accounts.namespace.key() || token_manager.state == TokenManagerState::Invalidated as u8 {
             return Err(error!(ErrorCode::InvalidCertificate));
         }
     } else if ctx.accounts.certificate.owner.key() == cardinal_token_manager::ID {
         // certificate
-        let certificate = Account::<TokenManager>::try_from(&ctx.accounts.certificate)?;
+        let certificate = Account::<TokenManager>::try_from(&ctx.accounts.certificate).expect("Invalid certificate");
         if certificate.mint != mint || certificate.issuer != ctx.accounts.namespace.key() || certificate.state == CertificateState::Invalidated as u8 {
             return Err(error!(ErrorCode::InvalidTokenManager));
         }
