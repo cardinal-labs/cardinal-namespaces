@@ -519,6 +519,7 @@ export async function withSetReverseEntry(
   );
   if (!checkCert) {
     // new version
+    console.log("Skipping to new version");
     [certificateId] = await findTokenManagerAddress(certificateMintId);
   }
 
