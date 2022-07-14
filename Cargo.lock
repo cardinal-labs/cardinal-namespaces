@@ -410,9 +410,9 @@ dependencies = [
 
 [[package]]
 name = "cardinal-payment-manager"
-version = "1.4.6"
+version = "1.4.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e3d22f67a8d66624a5936fbe01608dc46e3b81c3c7ee2114a7a9dfda2bdac7a4"
+checksum = "f9f7d9e11dd82cceb0a0dfff99b3b955e2adf1c682150a85a2cf1b2b6375e422"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -423,9 +423,9 @@ dependencies = [
 
 [[package]]
 name = "cardinal-time-invalidator"
-version = "1.4.6"
+version = "1.4.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5ebcb0451a8ab444e596f9efe7dd99e8adc9a373660ac347587c2de716cbe4d6"
+checksum = "05eb457b6bba5ddb70d6eb2ed72e19ea90e3d5a3c51417a9024cc0a64d5fd9d6"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -438,9 +438,9 @@ dependencies = [
 
 [[package]]
 name = "cardinal-token-manager"
-version = "1.4.6"
+version = "1.4.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "db91c85d86c81a95a0874f7903ce28c1c1920b2f5ca438e65a4feec4e08adfeb"
+checksum = "f6bd82b839265293c79f9596d51a601adb57f8794d555fd4e10e83b34b273ba7"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
