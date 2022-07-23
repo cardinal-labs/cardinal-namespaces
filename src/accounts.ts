@@ -1,11 +1,14 @@
 import type { AccountData } from "@cardinal/common";
+import { findAta } from "@cardinal/common";
 import {
   AnchorProvider,
   BorshAccountsCoder,
   Program,
   utils,
 } from "@project-serum/anchor";
+import * as splToken from "@solana/spl-token";
 import type { Connection, PublicKey } from "@solana/web3.js";
+import { Keypair } from "@solana/web3.js";
 
 import type {
   ClaimRequestData,
@@ -297,3 +300,54 @@ export async function getReverseEntry(
     };
   }
 }
+
+export async function tryGetClaimRequest(
+  connection: Connection,
+  namespaceName: string,
+  entryName: string,
+  user: PublicKey
+) {
+  try {
+    const entry = await getClaimRequest(
+      connection,
+      namespaceName,
+      entryName,
+      user
+    );
+    return entry;
+  } catch (e) {
+    return null;
+  }
+}
+
+export async function tryGetNameEntry(
+  connection: Connection,
+  namespaceName: string,
+  entryName: string
+) {
+  try {
+    const entry = await getNameEntry(connection, namespaceName, entryName);
+    return entry;
+  } catch (e) {
+    return null;
+  }
+}
+
+export const tryGetAta = async (
+  connection: Connection,
+  mint: PublicKey,
+  owner: PublicKey
+): Promise<splToken.AccountInfo | undefined> => {
+  try {
+    const namespaceTokenAccountId = await findAta(mint, owner, true);
+    const tokenMint = new splToken.Token(
+      connection,
+      mint,
+      splToken.TOKEN_PROGRAM_ID,
+      Keypair.generate()
+    );
+    return tokenMint.getAccountInfo(namespaceTokenAccountId);
+  } catch (e) {
+    console.log("Failed to get ata");
+  }
+};
