@@ -35,9 +35,9 @@ export async function claimTransaction(
   cluster = "mainnet"
 ): Promise<{ status: number; transaction?: string; message?: string }> {
   const connection = connectionFor(cluster);
-  let wallet: Keypair | undefined;
+  let approverAuthority: Keypair | undefined;
   try {
-    wallet = Keypair.fromSecretKey(
+    approverAuthority = Keypair.fromSecretKey(
       anchor.utils.bytes.bs58.decode(
         namespace === "twitter"
           ? process.env.TWITTER_SOLANA_KEY || ""
@@ -119,11 +119,12 @@ export async function claimTransaction(
     };
   }
 
+  const userWallet = emptyWallet(new PublicKey(publicKey));
   const [namespaceId] = await findNamespaceId(namespace);
   const [claimRequestId] = await findClaimRequestId(
     namespaceId,
     entryName,
-    new PublicKey(publicKey)
+    userWallet.publicKey
   );
   const checkNameEntry = await tryGetNameEntry(
     connection,
@@ -133,45 +134,13 @@ export async function claimTransaction(
 
   let tx = new Transaction();
   let mintKeypair: Keypair | undefined;
-  // if (!tryClaimRequest) {
-  //   console.log("Creating claim request");
-  //   await withCreateClaimRequest(
-  //     connection,
-  //     new SignerWallet(wallet),
-  //     namespace,
-  //     entryName,
-  //     new PublicKey(publicKey),
-  //     tx
-  //   );
-  // }
 
-  // if (
-  //   !tryClaimRequest ||
-  //   !tryClaimRequest?.parsed?.isApproved ||
-  //   (checkNameEntry &&
-  //     tryClaimRequest &&
-  //     tryClaimRequest.parsed.counter !==
-  //       checkNameEntry.parsed.claimRequestCounter)
-  // ) {
-  //   console.log("Approving claim request");
-  //   await withUpdateClaimRequest(
-  //     connection,
-  //     new SignerWallet(wallet),
-  //     namespace,
-  //     entryName,
-  //     claimRequestId,
-  //     true,
-  //     tx
-  //   );
-  // }
-
-  const userWallet = emptyWallet(new PublicKey(publicKey));
   console.log("Approve claim request");
   await withApproveClaimRequest(tx, connection, userWallet, {
     namespaceName: namespace,
     entryName: entryName,
-    user: new PublicKey(publicKey),
-    approveAuthority: wallet.publicKey,
+    user: userWallet.publicKey,
+    approveAuthority: approverAuthority.publicKey,
   });
 
   if (!checkNameEntry) {
@@ -299,7 +268,7 @@ export async function claimTransaction(
 
   tx.feePayer = userWallet.publicKey;
   tx.recentBlockhash = (await connection.getRecentBlockhash("max")).blockhash;
-  tx.partialSign(wallet);
+  tx.partialSign(approverAuthority);
   mintKeypair && tx.partialSign(mintKeypair);
   tx = Transaction.from(
     tx.serialize({
