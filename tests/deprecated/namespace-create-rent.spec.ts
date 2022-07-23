@@ -11,8 +11,10 @@ import {
   getNameEntry,
   getNamespaceByName,
   getReverseEntry,
+  getReverseNameEntryForNamespace,
   withCreateClaimRequest,
   withCreateNamespace,
+  withSetNamespaceReverseEntry,
   withUpdateClaimRequest,
 } from "../../src";
 import {
@@ -253,6 +255,43 @@ describe("namespace-create-rent", () => {
         .sub(userPaymentTokenAccountAfter.amount)
         .eq(new anchor.BN(expectedPayment))
     );
+  });
+
+  it("Set namespace reverse entry", async () => {
+    const entry = await getNameEntry(
+      provider.connection,
+      namespaceName,
+      entryName
+    );
+    const mintId = entry.parsed.mint;
+
+    const transaction = new web3.Transaction();
+    await withSetNamespaceReverseEntry(
+      transaction,
+      provider.connection,
+      provider.wallet,
+      namespaceName,
+      entryName,
+      mintId
+    );
+    transaction.feePayer = provider.wallet.publicKey;
+    transaction.recentBlockhash = (
+      await provider.connection.getRecentBlockhash("max")
+    ).blockhash;
+    await provider.wallet.signTransaction(transaction);
+    await web3.sendAndConfirmRawTransaction(
+      provider.connection,
+      transaction.serialize()
+    );
+
+    const checkReverseEntry = await getReverseNameEntryForNamespace(
+      provider.connection,
+      provider.wallet.publicKey,
+      (
+        await findNamespaceId(namespaceName)
+      )[0]
+    );
+    assert.equal(checkReverseEntry.parsed.entryName, entryName);
   });
 
   it("Set reverse entry", async () => {

@@ -2,6 +2,10 @@ use anchor_spl::token::TokenAccount;
 use {
     crate::{errors::ErrorCode, state::*},
     anchor_lang::prelude::*,
+    cardinal_certificate::{
+        self,
+        state::{Certificate, CertificateState},
+    },
     cardinal_token_manager::state::{TokenManager, TokenManagerState},
 };
 
@@ -26,13 +30,10 @@ pub struct SetNamespaceReverseNameEntryCtx<'info> {
         @ ErrorCode::InvalidOwnerMint
     )]
     user_token_account: Box<Account<'info, TokenAccount>>,
-    #[account(constraint =
-        token_manager.mint == name_entry.mint
-        && token_manager.issuer == namespace.key()
-        && token_manager.state != TokenManagerState::Invalidated as u8
-        @ ErrorCode::InvalidTokenManager
-    )]
-    token_manager: Box<Account<'info, TokenManager>>,
+
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    token_manager: AccountInfo<'info>,
 
     #[account(mut)]
     user: Signer<'info>,
@@ -49,5 +50,23 @@ pub fn handler(ctx: Context<SetNamespaceReverseNameEntryCtx>) -> Result<()> {
     reverse_entry.bump = *ctx.bumps.get("reverse_entry").unwrap();
     reverse_entry.entry_name = name_entry.name.clone();
     reverse_entry.namespace_name = ctx.accounts.namespace.name.clone();
+
+    let mint = ctx.accounts.name_entry.mint.key();
+    if ctx.accounts.token_manager.owner.key() == cardinal_certificate::ID {
+        // certificate
+        let certificate = Account::<Certificate>::try_from(&ctx.accounts.token_manager).expect("Invalid certificate");
+        if certificate.mint != mint || certificate.issuer != ctx.accounts.namespace.key() || certificate.state == CertificateState::Invalidated as u8 {
+            return Err(error!(ErrorCode::InvalidCertificate));
+        }
+    } else if ctx.accounts.token_manager.owner.key() == cardinal_token_manager::ID {
+        // token manager
+        let token_manager = Account::<TokenManager>::try_from(&ctx.accounts.token_manager).expect("Invalid token manager");
+        if token_manager.mint != mint || token_manager.issuer != ctx.accounts.namespace.key() || token_manager.state == TokenManagerState::Invalidated as u8 {
+            return Err(error!(ErrorCode::InvalidTokenManager));
+        }
+    } else {
+        return Err(error!(ErrorCode::InvalidTokenManagerOrCertificate));
+    }
+
     Ok(())
 }

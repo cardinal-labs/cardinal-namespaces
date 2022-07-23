@@ -1,8 +1,12 @@
 use anchor_spl::token::TokenAccount;
-use cardinal_certificate::{self};
 use {
     crate::{errors::ErrorCode, state::*},
     anchor_lang::prelude::*,
+    cardinal_certificate::state::{Certificate, CertificateState},
+    cardinal_token_manager::{
+        self,
+        state::{TokenManager, TokenManagerState},
+    },
 };
 
 #[derive(Accounts)]
@@ -31,13 +35,9 @@ pub struct SetReverseEntryCtx<'info> {
         @ ErrorCode::InvalidOwnerMint
     )]
     user_certificate_token_account: Box<Account<'info, TokenAccount>>,
-    #[account(constraint =
-        certificate.mint == entry.mint
-        && certificate.issuer == namespace.key()
-        && certificate.state != cardinal_certificate::state::CertificateState::Invalidated as u8
-        @ ErrorCode::InvalidCertificate
-    )]
-    certificate: Box<Account<'info, cardinal_certificate::state::Certificate>>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    certificate: AccountInfo<'info>,
 
     #[account(mut)]
     user: Signer<'info>,
@@ -54,5 +54,23 @@ pub fn handler(ctx: Context<SetReverseEntryCtx>, _reverse_entry_bump: u8) -> Res
     reverse_entry.bump = *ctx.bumps.get("reverse_entry").unwrap();
     reverse_entry.namespace_name = ctx.accounts.namespace.name.clone();
     reverse_entry.entry_name = entry.name.clone();
+
+    let mint = ctx.accounts.entry.mint.key();
+    if ctx.accounts.certificate.owner.key() == cardinal_certificate::ID {
+        // token manager
+        let token_manager = Account::<Certificate>::try_from(&ctx.accounts.certificate).expect("Invalid token manager");
+        if token_manager.mint != mint || token_manager.issuer != ctx.accounts.namespace.key() || token_manager.state == TokenManagerState::Invalidated as u8 {
+            return Err(error!(ErrorCode::InvalidCertificate));
+        }
+    } else if ctx.accounts.certificate.owner.key() == cardinal_token_manager::ID {
+        // certificate
+        let certificate = Account::<TokenManager>::try_from(&ctx.accounts.certificate).expect("Invalid certificate");
+        if certificate.mint != mint || certificate.issuer != ctx.accounts.namespace.key() || certificate.state == CertificateState::Invalidated as u8 {
+            return Err(error!(ErrorCode::InvalidTokenManager));
+        }
+    } else {
+        return Err(error!(ErrorCode::InvalidTokenManagerOrCertificate));
+    }
+
     Ok(())
 }

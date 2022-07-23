@@ -1,5 +1,9 @@
-import { withFindOrInitAssociatedTokenAccount } from "@cardinal/certificates";
-import { findAta } from "@cardinal/common";
+import {
+  certificateIdForMint,
+  getCertificate,
+  withFindOrInitAssociatedTokenAccount,
+} from "@cardinal/certificates";
+import { findAta, tryGetAccount } from "@cardinal/common";
 import {
   getRemainingAccountsForKind,
   InvalidationType,
@@ -622,7 +626,16 @@ export async function withSetNamespaceReverseEntry(
     mintId,
     provider.wallet.publicKey
   );
-  const [tokenManagerId] = await findTokenManagerAddress(mintId);
+
+  let [tokenManagerId] = await certificateIdForMint(mintId);
+  const checkCert = await tryGetAccount(() =>
+    getCertificate(connection, tokenManagerId)
+  );
+  if (!checkCert) {
+    // new version
+    console.log("Skipping to new version");
+    [tokenManagerId] = await findTokenManagerAddress(mintId);
+  }
   transaction.add(
     namespacesProgram.instruction.setNamespaceReverseEntry({
       accounts: {
@@ -799,7 +812,16 @@ export async function withInvalidateTransferableReverseEntry(
   );
   const [namespaceId] = await findNamespaceId(params.namespaceName);
   const [nameEntryId] = await findNameEntryId(namespaceId, params.entryName);
-  const [tokenManagerId] = await findTokenManagerAddress(params.mintId);
+  let [tokenManagerId] = await certificateIdForMint(params.mintId);
+  const checkCert = await tryGetAccount(() =>
+    getCertificate(connection, tokenManagerId)
+  );
+  if (!checkCert) {
+    // new version
+    console.log("Skipping to new version");
+    [tokenManagerId] = await findTokenManagerAddress(params.mintId);
+  }
+  console.log("invalidate", params.reverseEntryId.toString());
   transaction.add(
     namespacesProgram.instruction.invalidateTransferableReverseEntry({
       accounts: {
