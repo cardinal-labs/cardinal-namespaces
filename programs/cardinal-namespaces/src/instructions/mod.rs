@@ -33,6 +33,7 @@ pub use namespace::update_namespace::*;
 
 // requests
 pub mod requests;
+pub use requests::approve_claim_request::*;
 pub use requests::create_claim_request::*;
 pub use requests::update_claim_request::*;
 

@@ -662,6 +662,51 @@ export type Namespaces = {
       ];
     },
     {
+      name: "approveClaimRequest";
+      accounts: [
+        {
+          name: "namespace";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "payer";
+          isMut: true;
+          isSigner: true;
+        },
+        {
+          name: "claimRequest";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "nameEntry";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "approveAuthority";
+          isMut: false;
+          isSigner: true;
+        },
+        {
+          name: "systemProgram";
+          isMut: false;
+          isSigner: false;
+        }
+      ];
+      args: [
+        {
+          name: "entryName";
+          type: "string";
+        },
+        {
+          name: "user";
+          type: "publicKey";
+        }
+      ];
+    },
+    {
       name: "invalidateExpiredReverseEntry";
       accounts: [
         {
@@ -2440,6 +2485,51 @@ export const IDL: Namespaces = {
         {
           name: "isApproved",
           type: "bool",
+        },
+      ],
+    },
+    {
+      name: "approveClaimRequest",
+      accounts: [
+        {
+          name: "namespace",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "payer",
+          isMut: true,
+          isSigner: true,
+        },
+        {
+          name: "claimRequest",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "nameEntry",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "approveAuthority",
+          isMut: false,
+          isSigner: true,
+        },
+        {
+          name: "systemProgram",
+          isMut: false,
+          isSigner: false,
+        },
+      ],
+      args: [
+        {
+          name: "entryName",
+          type: "string",
+        },
+        {
+          name: "user",
+          type: "publicKey",
         },
       ],
     },
