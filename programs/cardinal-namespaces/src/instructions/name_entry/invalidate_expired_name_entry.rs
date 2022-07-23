@@ -9,7 +9,7 @@ pub struct InvalidateExpiredNameEntryCtx<'info> {
     #[account(mut)]
     pub namespace: Account<'info, Namespace>,
     // Must invalidate reverse entry first
-    #[account(mut, constraint = name_entry.namespace == namespace.key() && name_entry.reverse_entry == None @ ErrorCode::InvalidEntry)]
+    #[account(mut, constraint = name_entry.namespace == namespace.key() @ ErrorCode::InvalidEntry)]
     pub name_entry: Account<'info, Entry>,
     #[account(mut, constraint =
         namespace_token_account.mint == name_entry.mint
@@ -27,6 +27,17 @@ pub fn handler(ctx: Context<InvalidateExpiredNameEntryCtx>) -> Result<()> {
     let name_entry = &mut ctx.accounts.name_entry;
     name_entry.data = None;
     name_entry.is_claimed = false;
+
+    // check reverse entry
+    if name_entry.reverse_entry.is_some() {
+        let remaining_accs = &mut ctx.remaining_accounts.iter();
+        let reverse_entry_info = next_account_info(remaining_accs)?;
+        let reverse_entry = Account::<ReverseEntry>::try_from(reverse_entry_info)?;
+
+        if reverse_entry.entry_name == name_entry.name {
+            return Err(error!(ErrorCode::InvalidReverseEntryForNameEntry));
+        }
+    }
 
     let namespace = &mut ctx.accounts.namespace;
     namespace.count = namespace.count.checked_sub(1).expect("Sub error");
