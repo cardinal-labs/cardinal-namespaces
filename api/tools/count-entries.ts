@@ -1,5 +1,5 @@
+import type { AccountData } from "@cardinal/common";
 import type {
-  AccountData,
   ClaimRequestData,
   EntryData,
   ReverseEntryData,

@@ -14,7 +14,7 @@ import { SignerWallet } from "@saberhq/solana-contrib";
 import {
   Keypair,
   PublicKey,
-  sendAndConfirmRawTransaction,
+  // sendAndConfirmRawTransaction,
   Transaction,
 } from "@solana/web3.js";
 import fetch from "node-fetch";
@@ -138,7 +138,7 @@ export async function claimTransaction(
     entryName,
     new PublicKey(publicKey)
   );
-  const claimRequestTx = new Transaction();
+  // const claimRequestTx = new Transaction();
   let claimEntryTx = new Transaction();
   let mintKeypair: Keypair | undefined;
   if (!tryClaimRequest) {
@@ -149,7 +149,7 @@ export async function claimTransaction(
       namespace,
       entryName,
       new PublicKey(publicKey),
-      claimRequestTx
+      claimEntryTx
     );
   }
 
@@ -162,18 +162,18 @@ export async function claimTransaction(
       entryName,
       claimRequestId,
       true,
-      claimRequestTx
+      claimEntryTx
     );
   }
   // approve claim request
-  claimRequestTx.feePayer = wallet.publicKey;
-  claimRequestTx.recentBlockhash = (
-    await connection.getRecentBlockhash("max")
-  ).blockhash;
-  claimRequestTx.partialSign(wallet);
-  await sendAndConfirmRawTransaction(connection, claimRequestTx.serialize(), {
-    skipPreflight: true,
-  });
+  // claimRequestTx.feePayer = wallet.publicKey;
+  // claimRequestTx.recentBlockhash = (
+  //   await connection.getRecentBlockhash("max")
+  // ).blockhash;
+  // claimRequestTx.partialSign(wallet);
+  // await sendAndConfirmRawTransaction(connection, claimRequestTx.serialize(), {
+  //   skipPreflight: true,
+  // });
 
   const checkNameEntry = await tryGetNameEntry(
     connection,
