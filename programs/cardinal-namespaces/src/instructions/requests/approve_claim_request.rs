@@ -17,6 +17,8 @@ pub struct ApproveClaimRequestCtx<'info> {
         bump,
     )]
     claim_request: Account<'info, ClaimRequest>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
     name_entry: UncheckedAccount<'info>,
 
     #[account(constraint = approve_authority.key() == namespace.approve_authority.unwrap() @ ErrorCode::InvalidApproveAuthority)]
