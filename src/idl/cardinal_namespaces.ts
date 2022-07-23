@@ -1821,6 +1821,11 @@ export type Namespaces = {
       code: 6024;
       name: "InvalidInvalidationType";
       msg: "Namespace has invalid invalidation type";
+    },
+    {
+      code: 6025;
+      name: "InvalidReverseEntryForNameEntry";
+      msg: "Invalid reverse entry for name entry";
     }
   ];
 };
@@ -3648,6 +3653,11 @@ export const IDL: Namespaces = {
       code: 6024,
       name: "InvalidInvalidationType",
       msg: "Namespace has invalid invalidation type",
+    },
+    {
+      code: 6025,
+      name: "InvalidReverseEntryForNameEntry",
+      msg: "Invalid reverse entry for name entry",
     },
   ],
 };
