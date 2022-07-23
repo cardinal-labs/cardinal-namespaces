@@ -897,3 +897,37 @@ export function withCloseNameEntry(
   );
   return transaction;
 }
+
+export async function withApproveClaimRequest(
+  transaction: Transaction,
+  connection: Connection,
+  wallet: Wallet,
+  namespaceName: string,
+  entryName: string,
+  user: PublicKey
+): Promise<Transaction> {
+  const provider = new anchor.AnchorProvider(connection, wallet, {});
+  const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
+    NAMESPACES_IDL,
+    NAMESPACES_PROGRAM_ID,
+    provider
+  );
+  const [namespaceId] = await findNamespaceId(namespaceName);
+  const [claimRequestId] = await findClaimRequestId(
+    namespaceId,
+    entryName,
+    user
+  );
+
+  transaction.add(
+    namespacesProgram.instruction.approveClaimRequest(entryName, user, {
+      accounts: {
+        namespace: namespaceId,
+        payer: provider.wallet.publicKey,
+        claimRequest: claimRequestId,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      },
+    })
+  );
+  return transaction;
+}

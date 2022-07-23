@@ -83,6 +83,10 @@ pub mod namespaces {
         requests::update_claim_request::handler(ctx, is_approved)
     }
 
+    pub fn approve_claim_request(ctx: Context<ApproveClaimRequestCtx>, entry_name: String, user: Pubkey) -> Result<()> {
+        requests::approve_claim_request::handler(ctx, entry_name, user)
+    }
+
     // reverse name entry
     pub fn invalidate_expired_reverse_entry(ctx: Context<InvalidateExpiredReverseNameEntryCtx>) -> Result<()> {
         reverse_name_entry::invalidate_expired_reverse_name_entry::handler(ctx)
