@@ -28,7 +28,7 @@ module.exports.claim = async (event) => {
     }
 
     // custom params for each identity namespace
-    const namespace = event?.queryStringParameters?.namespace;
+    const namespace = event?.queryStringParameters?.namespace || "twitter";
     if (
       namespace === "twitter" &&
       (!event?.queryStringParameters?.tweetId ||

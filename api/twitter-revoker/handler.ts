@@ -8,19 +8,8 @@ module.exports.revoke = async (event) => {
     "Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS
   };
   try {
-    if (
-      !event?.queryStringParameters?.namespace ||
-      event?.queryStringParameters?.namespace === "undefined"
-    ) {
-      return {
-        headers: headers,
-        statusCode: 412,
-        body: JSON.stringify({ error: "Invalid API request" }),
-      };
-    }
-
     // custom params for each identity namespace
-    const namespace = event?.queryStringParameters?.namespace;
+    const namespace = event?.queryStringParameters?.namespace || "twitter";
     if (
       namespace === "twitter" &&
       (!event?.queryStringParameters?.tweetId ||

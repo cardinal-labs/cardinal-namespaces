@@ -20,9 +20,9 @@ module.exports.verify = async (event) => {
       };
     }
     // custom params for each identity namespace
-    const namespace = event?.queryStringParameters?.namespace;
+    const namespace = event?.queryStringParameters?.namespace || "twitter";
     if (
-      (!namespace || namespace === "twitter") &&
+      namespace === "twitter" &&
       (!event?.queryStringParameters?.tweetId ||
         event?.queryStringParameters?.tweetId === "undefined" ||
         !event?.queryStringParameters?.handle ||
