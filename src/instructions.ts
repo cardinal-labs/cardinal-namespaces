@@ -902,9 +902,12 @@ export async function withApproveClaimRequest(
   transaction: Transaction,
   connection: Connection,
   wallet: Wallet,
-  namespaceName: string,
-  entryName: string,
-  user: PublicKey
+  params: {
+    namespaceName: string;
+    entryName: string;
+    user: PublicKey;
+    approveAuthority?: PublicKey;
+  }
 ): Promise<Transaction> {
   const provider = new anchor.AnchorProvider(connection, wallet, {});
   const namespacesProgram = new anchor.Program<NAMESPACES_PROGRAM>(
@@ -912,22 +915,30 @@ export async function withApproveClaimRequest(
     NAMESPACES_PROGRAM_ID,
     provider
   );
-  const [namespaceId] = await findNamespaceId(namespaceName);
+  const [namespaceId] = await findNamespaceId(params.namespaceName);
   const [claimRequestId] = await findClaimRequestId(
     namespaceId,
-    entryName,
-    user
+    params.entryName,
+    params.user
   );
+  const [entryNameId] = await findNameEntryId(namespaceId, params.entryName);
 
   transaction.add(
-    namespacesProgram.instruction.approveClaimRequest(entryName, user, {
-      accounts: {
-        namespace: namespaceId,
-        payer: provider.wallet.publicKey,
-        claimRequest: claimRequestId,
-        systemProgram: anchor.web3.SystemProgram.programId,
-      },
-    })
+    namespacesProgram.instruction.approveClaimRequest(
+      params.entryName,
+      params.user,
+      {
+        accounts: {
+          namespace: namespaceId,
+          payer: provider.wallet.publicKey,
+          claimRequest: claimRequestId,
+          nameEntry: entryNameId,
+          approveAuthority:
+            params.approveAuthority ?? provider.wallet.publicKey,
+          systemProgram: anchor.web3.SystemProgram.programId,
+        },
+      }
+    )
   );
   return transaction;
 }

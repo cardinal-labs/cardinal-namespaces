@@ -4,7 +4,7 @@ use {
 };
 
 #[derive(Accounts)]
-#[instruction(entry_name: String, claim_request_bump: u8, user: Pubkey)]
+#[instruction(entry_name: String, user: Pubkey)]
 pub struct ApproveClaimRequestCtx<'info> {
     namespace: Account<'info, Namespace>,
     #[account(mut)]
