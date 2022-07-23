@@ -5,12 +5,10 @@ import {
   findClaimRequestId,
   findNamespaceId,
   shortenAddress,
-  withCreateClaimRequest,
+  withApproveClaimRequest,
   withRevokeReverseEntry,
-  withUpdateClaimRequest,
 } from "@cardinal/namespaces";
 import * as anchor from "@project-serum/anchor";
-import { SignerWallet } from "@saberhq/solana-contrib";
 import {
   Keypair,
   PublicKey,
@@ -20,12 +18,7 @@ import {
 import fetch from "node-fetch";
 
 import { connectionFor } from "../common/connection";
-import {
-  tryGetAta,
-  tryGetClaimRequest,
-  tryGetNameEntry,
-  tweetContainsPublicKey,
-} from "./utils";
+import { tryGetAta, tryGetNameEntry, tweetContainsPublicKey } from "./utils";
 
 type UserInfoParams = {
   id: string;
@@ -132,12 +125,6 @@ export async function claimTransaction(
     entryName,
     new PublicKey(publicKey)
   );
-  const tryClaimRequest = await tryGetClaimRequest(
-    connection,
-    namespace,
-    entryName,
-    new PublicKey(publicKey)
-  );
   const checkNameEntry = await tryGetNameEntry(
     connection,
     namespace,
@@ -146,46 +133,54 @@ export async function claimTransaction(
 
   let tx = new Transaction();
   let mintKeypair: Keypair | undefined;
-  if (!tryClaimRequest) {
-    console.log("Creating claim request");
-    await withCreateClaimRequest(
-      connection,
-      new SignerWallet(wallet),
-      namespace,
-      entryName,
-      new PublicKey(publicKey),
-      tx
-    );
-  }
+  // if (!tryClaimRequest) {
+  //   console.log("Creating claim request");
+  //   await withCreateClaimRequest(
+  //     connection,
+  //     new SignerWallet(wallet),
+  //     namespace,
+  //     entryName,
+  //     new PublicKey(publicKey),
+  //     tx
+  //   );
+  // }
 
-  if (
-    !tryClaimRequest ||
-    !tryClaimRequest?.parsed?.isApproved ||
-    (checkNameEntry &&
-      tryClaimRequest &&
-      tryClaimRequest.parsed.counter !==
-        checkNameEntry.parsed.claimRequestCounter)
-  ) {
-    console.log("Approving claim request");
-    await withUpdateClaimRequest(
-      connection,
-      new SignerWallet(wallet),
-      namespace,
-      entryName,
-      claimRequestId,
-      true,
-      tx
-    );
-  }
+  // if (
+  //   !tryClaimRequest ||
+  //   !tryClaimRequest?.parsed?.isApproved ||
+  //   (checkNameEntry &&
+  //     tryClaimRequest &&
+  //     tryClaimRequest.parsed.counter !==
+  //       checkNameEntry.parsed.claimRequestCounter)
+  // ) {
+  //   console.log("Approving claim request");
+  //   await withUpdateClaimRequest(
+  //     connection,
+  //     new SignerWallet(wallet),
+  //     namespace,
+  //     entryName,
+  //     claimRequestId,
+  //     true,
+  //     tx
+  //   );
+  // }
+
+  const userWallet = emptyWallet(new PublicKey(publicKey));
+  console.log("Approve claim request");
+  await withApproveClaimRequest(tx, connection, userWallet, {
+    namespaceName: namespace,
+    entryName: entryName,
+    user: new PublicKey(publicKey),
+    approveAuthority: wallet.publicKey,
+  });
 
   if (!checkNameEntry) {
     ////////////////////// Init and claim //////////////////////
     console.log("---> Initializing and claiming entry:", entryName);
     mintKeypair = Keypair.generate();
-    const wallet = emptyWallet(new PublicKey(publicKey));
     await deprecated.withInitEntry(
       connection,
-      wallet,
+      userWallet,
       mintKeypair.publicKey,
       namespace,
       entryName,
@@ -193,7 +188,7 @@ export async function claimTransaction(
     );
     await deprecated.withClaimEntry(
       connection,
-      wallet,
+      userWallet,
       namespace,
       entryName,
       mintKeypair.publicKey,
@@ -202,7 +197,7 @@ export async function claimTransaction(
     );
     await deprecated.withSetReverseEntry(
       connection,
-      wallet,
+      userWallet,
       namespace,
       entryName,
       mintKeypair.publicKey,
@@ -211,10 +206,9 @@ export async function claimTransaction(
   } else if (checkNameEntry && !checkNameEntry.parsed.isClaimed) {
     ////////////////////// Invalidated claim //////////////////////
     console.log("---> Claiming invalidated entry:", entryName);
-    const wallet = emptyWallet(new PublicKey(publicKey));
     await deprecated.withClaimEntry(
       connection,
-      wallet,
+      userWallet,
       namespace,
       entryName,
       checkNameEntry.parsed.mint,
@@ -223,7 +217,7 @@ export async function claimTransaction(
     );
     await deprecated.withSetReverseEntry(
       connection,
-      wallet,
+      userWallet,
       namespace,
       entryName,
       checkNameEntry.parsed.mint,
@@ -242,10 +236,9 @@ export async function claimTransaction(
     ) {
       ////////////////////// Expired claim //////////////////////
       console.log("---> Claiming expired entry:", entryName);
-      const wallet = emptyWallet(new PublicKey(publicKey));
       await deprecated.withClaimEntry(
         connection,
-        wallet,
+        userWallet,
         namespace,
         entryName,
         checkNameEntry.parsed.mint,
@@ -254,7 +247,7 @@ export async function claimTransaction(
       );
       await deprecated.withSetReverseEntry(
         connection,
-        wallet,
+        userWallet,
         namespace,
         entryName,
         checkNameEntry.parsed.mint,
@@ -263,12 +256,11 @@ export async function claimTransaction(
     } else {
       ////////////////////// Revoke and claim //////////////////////
       console.log("---> and claiming entry:", entryName);
-      const wallet = emptyWallet(new PublicKey(publicKey));
       if (checkNameEntry.parsed.reverseEntry) {
         await withRevokeReverseEntry(
           tx,
           connection,
-          wallet,
+          userWallet,
           namespace,
           entryName,
           checkNameEntry.parsed.reverseEntry,
@@ -277,7 +269,7 @@ export async function claimTransaction(
       }
       await deprecated.withRevokeEntry(
         connection,
-        wallet,
+        userWallet,
         namespace,
         entryName,
         checkNameEntry.parsed.mint,
@@ -287,7 +279,7 @@ export async function claimTransaction(
       );
       await deprecated.withClaimEntry(
         connection,
-        wallet,
+        userWallet,
         namespace,
         entryName,
         checkNameEntry.parsed.mint,
@@ -296,7 +288,7 @@ export async function claimTransaction(
       );
       await deprecated.withSetReverseEntry(
         connection,
-        wallet,
+        userWallet,
         namespace,
         entryName,
         checkNameEntry.parsed.mint,
@@ -305,7 +297,7 @@ export async function claimTransaction(
     }
   }
 
-  tx.feePayer = wallet.publicKey;
+  tx.feePayer = userWallet.publicKey;
   tx.recentBlockhash = (await connection.getRecentBlockhash("max")).blockhash;
   tx.partialSign(wallet);
   mintKeypair && tx.partialSign(mintKeypair);
