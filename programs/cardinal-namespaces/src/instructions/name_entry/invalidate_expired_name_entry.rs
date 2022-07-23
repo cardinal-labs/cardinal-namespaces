@@ -39,6 +39,7 @@ pub fn handler(ctx: Context<InvalidateExpiredNameEntryCtx>) -> Result<()> {
         }
     }
 
+    name_entry.reverse_entry = None;
     let namespace = &mut ctx.accounts.namespace;
     namespace.count = namespace.count.checked_sub(1).expect("Sub error");
     Ok(())

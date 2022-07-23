@@ -681,7 +681,7 @@ export type Namespaces = {
         },
         {
           name: "nameEntry";
-          isMut: false;
+          isMut: true;
           isSigner: false;
         },
         {
@@ -2513,7 +2513,7 @@ export const IDL: Namespaces = {
         },
         {
           name: "nameEntry",
-          isMut: false,
+          isMut: true,
           isSigner: false,
         },
         {
