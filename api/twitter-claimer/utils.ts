@@ -17,6 +17,7 @@ export const TWITTER_API_KEYS = [
   "AAAAAAAAAAAAAAAAAAAAAIeiYAEAAAAA0xfvS2Oonb3ijLTis8MmrSsRWm0%3DotAZj0h9Aq6qEa7VKLckzfeRH3eDxj2Gp69rxD4B7pJlf7kdQy",
   "AAAAAAAAAAAAAAAAAAAAAOz4ZgEAAAAAYQ%2F6yZsduzzRyIDsGuUlvbSM4nE%3DFzVAxwlczyaSn8tD2VqJN7AcgR97zcDXBLYZDrAwV8VLdrSKJM",
   "AAAAAAAAAAAAAAAAAAAAANcAbQEAAAAA6jd7gLquooPwcvc%2B%2F%2FNz62cp3Og%3DFNeW1ZQd6vunLwPZBS8mN65Sa7nn0mVc6sXTs7PhxXWt0VBOXA",
+  "AAAAAAAAAAAAAAAAAAAAAAuSfAEAAAAA%2B0N%2Bz14VMyAYgtn3a7jn%2F3yJDZw%3D9u5GCWG9s2G7iZmfBAbAWZlVObA3N9Tehlfx0B1tHN4aWbFOhr",
 ];
 
 export type TweetJson = {
@@ -32,7 +33,7 @@ export const tweetContainsPublicKey = async (
   let tweetJson: TweetJson | undefined;
   let userHandle: string | undefined;
   for (let i = 0; i < TWITTER_API_KEYS.length; i++) {
-    if (!tweetJson) {
+    if (!userHandle) {
       try {
         const tweetResponse = await fetch(
           `https://api.twitter.com/2/tweets/${tweetId}?tweet.fields=created_at&expansions=author_id`,
