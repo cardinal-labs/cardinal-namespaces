@@ -1,3 +1,4 @@
+use anchor_lang::AccountsClose;
 use anchor_spl::token::TokenAccount;
 use {
     crate::{errors::ErrorCode, state::*},
@@ -23,7 +24,7 @@ pub struct InvalidateExpiredNameEntryCtx<'info> {
     invalidator: UncheckedAccount<'info>,
 }
 
-pub fn handler(ctx: Context<InvalidateExpiredNameEntryCtx>) -> Result<()> {
+pub fn handler<'key, 'accounts, 'remaining, 'info>(ctx: Context<'key, 'accounts, 'remaining, 'info, InvalidateExpiredNameEntryCtx<'info>>) -> Result<()> {
     let name_entry = &mut ctx.accounts.name_entry;
     name_entry.data = None;
     name_entry.is_claimed = false;
@@ -35,7 +36,7 @@ pub fn handler(ctx: Context<InvalidateExpiredNameEntryCtx>) -> Result<()> {
         let reverse_entry = Account::<ReverseEntry>::try_from(reverse_entry_info)?;
 
         if reverse_entry.entry_name == name_entry.name {
-            return Err(error!(ErrorCode::InvalidReverseEntryForNameEntry));
+            reverse_entry.close(ctx.accounts.invalidator.to_account_info())?;
         }
     }
 
