@@ -81,10 +81,19 @@ functions:
     environment:
       TWITTER_SOLANA_KEY: ${ssm:/TWITTER_SOLANA_KEY~true}
       DISCORD_SOLANA_KEY_KEY: ${ssm:/DISCORD_SOLANA_KEY~true}
-
     events:
       - http:
           path: /twitter/claim
+          method: post
+          cors: true
+  twitter-claimer-v2:
+    handler: twitter-claimer-v2/handler.claim
+    environment:
+      TWITTER_SOLANA_KEY: ${ssm:/TWITTER_SOLANA_KEY~true}
+      DISCORD_SOLANA_KEY_KEY: ${ssm:/DISCORD_SOLANA_KEY~true}
+    events:
+      - http:
+          path: /twitter/claim-v2
           method: post
           cors: true
   twitter-revoker:
