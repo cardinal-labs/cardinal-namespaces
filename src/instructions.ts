@@ -1,5 +1,5 @@
 import { withFindOrInitAssociatedTokenAccount } from "@cardinal/certificates";
-import { findAta } from "@cardinal/common";
+import { findAta, tryGetAccount } from "@cardinal/common";
 import {
   getRemainingAccountsForKind,
   InvalidationType,
@@ -475,6 +475,13 @@ export async function withInvalidateExpiredNameEntry(
     namespaceId,
     true
   );
+  const checkNameEntry = await tryGetAccount(() =>
+    getNameEntry(connection, params.namespaceName, params.entryName)
+  );
+  if (!checkNameEntry) {
+    throw new Error("No name entry to invalidate found");
+  }
+
   transaction.add(
     namespacesProgram.instruction.invalidateExpiredNameEntry({
       accounts: {
@@ -483,6 +490,15 @@ export async function withInvalidateExpiredNameEntry(
         namespaceTokenAccount: namespaceTokenAccountId,
         invalidator: params.invalidator || namespaceId,
       },
+      remainingAccounts: checkNameEntry.parsed.reverseEntry
+        ? [
+            {
+              pubkey: checkNameEntry.parsed.reverseEntry,
+              isSigner: false,
+              isWritable: false,
+            },
+          ]
+        : [],
     })
   );
   return transaction;

@@ -37,7 +37,7 @@ pub mod namespaces {
         name_entry::init_name_entry::handler(ctx, ix)
     }
 
-    pub fn invalidate_expired_name_entry(ctx: Context<InvalidateExpiredNameEntryCtx>) -> Result<()> {
+    pub fn invalidate_expired_name_entry<'key, 'accounts, 'remaining, 'info>(ctx: Context<'key, 'accounts, 'remaining, 'info, InvalidateExpiredNameEntryCtx<'info>>) -> Result<()> {
         name_entry::invalidate_expired_name_entry::handler(ctx)
     }
 

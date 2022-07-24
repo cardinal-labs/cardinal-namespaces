@@ -52,4 +52,6 @@ pub enum ErrorCode {
     NamespaceReachedLimit,
     #[msg("Namespace has invalid invalidation type")]
     InvalidInvalidationType,
+    #[msg("Invalid reverse entry for name entry")]
+    InvalidReverseEntryForNameEntry,
 }
